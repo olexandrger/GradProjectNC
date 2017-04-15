@@ -5,5 +5,5 @@ jdk:
 deploy:
  provider: heroku
  api-key: 
-  secure: 96bbd00f-54a6-4d31-92e7-c1d9757d4537
+  secure: $HEROKU_API_KEY
  app: ncgrad
