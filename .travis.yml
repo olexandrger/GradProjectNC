@@ -7,4 +7,3 @@ deploy:
  api-key: 
   secure: $HEROKU_API_KEY
  app: ncgrad
- all_branches: true
