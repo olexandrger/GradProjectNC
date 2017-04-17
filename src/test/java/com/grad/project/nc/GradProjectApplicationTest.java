@@ -9,6 +9,7 @@ import org.junit.Test;
 public class GradProjectApplicationTest {
     @Test
     public void test() {
+
         Assert.assertTrue(true);
     }
 
