@@ -2,8 +2,11 @@ package com.grad.project.nc.model;
 
 public class User {
 
+    private int ID;
     private String name;
     private String surname;
+
+
 
     public User() {
     }
@@ -27,6 +30,14 @@ public class User {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
     @Override
