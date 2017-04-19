@@ -1,7 +1,7 @@
 package com.grad.project.nc.controller;
 
 import com.grad.project.nc.model.User;
-import com.grad.project.nc.persistence.DatabaseStub;
+import com.grad.project.nc.persistence.UserDao;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +18,7 @@ public class DemoController {
 
     @RequestMapping(value = "/users")
     public String findUsers(Model model) {
-        List<User> users = DatabaseStub.getUsers();
+        List<User> users = UserDao.getUsers();
         model.addAttribute("users", users);
         return "users";
     }
