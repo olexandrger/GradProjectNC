@@ -20,20 +20,20 @@ public class RegistrationController {
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
     public String registration(Model model) {
-        model.addAttribute("userForm", new User());
+        model.addAttribute("user", new User());
 
         return "registration";
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
-    public String registration(@ModelAttribute("userForm") User userForm) {
+    public String registration(@ModelAttribute("user") User user) {
 
         ArrayList<Role> roles = new ArrayList<>();
         roles.add(Role.USER);
-        userForm.setAuthorities(roles);
+        user.setAuthorities(roles);
 
-        userService.createUser(userForm);
+        userService.createUser(user);
 
-        return "redirect:/welcome";
+        return "redirect:/index";
     }
 }
