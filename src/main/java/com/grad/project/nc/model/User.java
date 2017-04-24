@@ -1,25 +1,52 @@
 package com.grad.project.nc.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
+/**
+ * Created by Alex on 4/24/2017.
+ */
+public class User {
+    private int user_id;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private int accountId;
 
-import java.util.List;
+    public int getUser_id() {
+        return user_id;
+    }
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class User implements UserDetails {
-    private Long id;
-    private List<Role> authorities;
-    private String password;
-    private String username;
-    private boolean accountNonExpired;
-    private boolean accountNonLocked;
-    private boolean credentialsNonExpired;
-    private boolean enabled;
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public int getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
+    }
 }
-

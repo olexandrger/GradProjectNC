@@ -1,6 +1,6 @@
 package com.grad.project.nc.service.security;
 
-import com.grad.project.nc.model.User;
+import com.grad.project.nc.model.UserOLD;
 import com.grad.project.nc.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,8 +23,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void createUser(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        userDao.createUser(user);
+    public void createUser(UserOLD userOLD) {
+        userOLD.setPassword(bCryptPasswordEncoder.encode(userOLD.getPassword()));
+        userDao.createUser(userOLD);
     }
 }
