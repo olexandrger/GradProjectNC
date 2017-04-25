@@ -45,14 +45,9 @@ public class ProductTypeDao implements CrudDao<ProductType> {
 
     }
 
-    @Transactional
     @Override
     public ProductType find(long id) {
-        final String SELECT_QUERY = "SELECT product_type_id" +
-                ",product_type_name" +
-                ",product_type_description " +
-                "FROM product_type " +
-                "WHERE product_type_id = ?";
+        final String SELECT_QUERY = "SELECT product_type_id,product_type_name,product_type_description FROM product_type WHERE product_type_id = ?";
 
         ProductType productType = jdbcTemplate.queryForObject(SELECT_QUERY,
                 new Object[]{id}, new ProductTypeRowMapper());
@@ -76,7 +71,7 @@ public class ProductTypeDao implements CrudDao<ProductType> {
 
     }
 
-    @Transactional
+
     @Override
     public void delete(ProductType entity)  {
 

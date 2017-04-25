@@ -1,6 +1,5 @@
 package com.grad.project.nc.persistence;
 
-import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductCharacteristicValue;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
