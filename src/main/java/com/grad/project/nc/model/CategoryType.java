@@ -4,14 +4,14 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class CategoryType {
-    private int categoryTypeId;
+    private Long categoryTypeId;
     private String categoryTypeName;
 
-    public int getCategoryTypeId() {
+    public Long getCategoryTypeId() {
         return categoryTypeId;
     }
 
-    public void setCategoryTypeId(int categoryTypeId) {
+    public void setCategoryTypeId(Long categoryTypeId) {
         this.categoryTypeId = categoryTypeId;
     }
 

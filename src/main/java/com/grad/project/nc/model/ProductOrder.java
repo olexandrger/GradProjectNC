@@ -7,60 +7,60 @@ import java.time.LocalDateTime;
  * Created by Alex on 4/24/2017.
  */
 public class ProductOrder {
-    private int productOrderId;
-    private int productInstanceId;
-    private int userId;
-    private int categoryId;
-    private int statusID;
-    private int responsibleId;
+    private Long productOrderId;
+    private Long productInstanceId;
+    private Long userId;
+    private Long categoryId;
+    private Long statusID;
+    private Long responsibleId;
     private LocalDateTime openDate;
     private LocalDateTime closeDate;
 
-    public int getProductOrderId() {
+    public Long getProductOrderId() {
         return productOrderId;
     }
 
-    public void setProductOrderId(int productOrderId) {
+    public void setProductOrderId(Long productOrderId) {
         this.productOrderId = productOrderId;
     }
 
-    public int getProductInstanceId() {
+    public Long getProductInstanceId() {
         return productInstanceId;
     }
 
-    public void setProductInstanceId(int productInstanceId) {
+    public void setProductInstanceId(Long productInstanceId) {
         this.productInstanceId = productInstanceId;
     }
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public int getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 
-    public int getStatusID() {
+    public Long getStatusID() {
         return statusID;
     }
 
-    public void setStatusID(int statusID) {
+    public void setStatusID(Long statusID) {
         this.statusID = statusID;
     }
 
-    public int getResponsibleId() {
+    public Long getResponsibleId() {
         return responsibleId;
     }
 
-    public void setResponsibleId(int responsibleId) {
+    public void setResponsibleId(Long responsibleId) {
         this.responsibleId = responsibleId;
     }
 

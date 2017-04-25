@@ -4,15 +4,15 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class Category {
-    private int categoryId;
+    private Long categoryId;
     private String categoryName;
-    private int categoryTypeId;
+    private Long categoryTypeId;
 
-    public int getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -24,11 +24,11 @@ public class Category {
         this.categoryName = categoryName;
     }
 
-    public int getCategoryTypeId() {
+    public Long getCategoryTypeId() {
         return categoryTypeId;
     }
 
-    public void setCategoryTypeId(int categoryTypeId) {
+    public void setCategoryTypeId(Long categoryTypeId) {
         this.categoryTypeId = categoryTypeId;
     }
 }

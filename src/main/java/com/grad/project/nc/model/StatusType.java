@@ -4,14 +4,14 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class StatusType {
-    private int statusTypeId;
+    private Long statusTypeId;
     private String statusTypeName;
 
-    public int getStatusTypeId() {
+    public Long getStatusTypeId() {
         return statusTypeId;
     }
 
-    public void setStatusTypeId(int statusTypeId) {
+    public void setStatusTypeId(Long statusTypeId) {
         this.statusTypeId = statusTypeId;
     }
 

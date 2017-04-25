@@ -4,31 +4,31 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class Building {
-    private int buildingId;
-    private int buildingNumber;
-    private int streetId;
+    private Long buildingId;
+    private Long buildingNumber;
+    private Long streetId;
 
-    public int getBuildingId() {
+    public Long getBuildingId() {
         return buildingId;
     }
 
-    public void setBuildingId(int buildingId) {
+    public void setBuildingId(Long buildingId) {
         this.buildingId = buildingId;
     }
 
-    public int getBuildingNumber() {
+    public Long getBuildingNumber() {
         return buildingNumber;
     }
 
-    public void setBuildingNumber(int buildingNumber) {
+    public void setBuildingNumber(Long buildingNumber) {
         this.buildingNumber = buildingNumber;
     }
 
-    public int getStreetId() {
+    public Long getStreetId() {
         return streetId;
     }
 
-    public void setStreetId(int streetId) {
+    public void setStreetId(Long streetId) {
         this.streetId = streetId;
     }
 }

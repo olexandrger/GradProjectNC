@@ -14,9 +14,9 @@ public class ValueRowMapper implements RowMapper<Value> {
     public Value mapRow(ResultSet rs, int rowNum) throws SQLException {
         Value value = new Value();
 
-        value.setValueId(rs.getInt("value_id"));
-        value.setProductCharacteristicId(rs.getInt("product_characteristic_id"));
-        value.setNumberValue(rs.getInt("number_value"));
+        value.setValueId(rs.getLong("value_id"));
+        value.setProductCharacteristicId(rs.getLong("product_characteristic_id"));
+        value.setNumberValue(rs.getLong("number_value"));
         value.setDateValue(rs.getTimestamp("date_value").toLocalDateTime());
         value.setStringValue(rs.getString("string_value"));
 

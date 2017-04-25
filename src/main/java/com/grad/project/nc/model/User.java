@@ -4,17 +4,17 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class User {
-    private int user_id;
+    private Long user_id;
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private int accountId;
+    private Long accountId;
 
-    public int getUser_id() {
+    public Long getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(int user_id) {
+    public void setUser_id(Long user_id) {
         this.user_id = user_id;
     }
 
@@ -42,11 +42,11 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public int getAccountId() {
+    public Long getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(int accountId) {
+    public void setAccountId(Long accountId) {
         this.accountId = accountId;
     }
 }

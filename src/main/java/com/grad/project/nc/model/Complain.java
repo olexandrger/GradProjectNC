@@ -7,39 +7,39 @@ import java.time.LocalDateTime;
  * Created by Alex on 4/24/2017.
  */
 public class Complain {
-    private int complainId;
-    private int userId;
-    private int productInstanceId;
+    private Long complainId;
+    private Long userId;
+    private Long productInstanceId;
     private String complainTitle;
     private String content;
-    private int statusId;
-    private int responsibleId;
+    private Long statusId;
+    private Long responsibleId;
     private String response;
     private LocalDateTime openDate;
     private LocalDateTime closeDate;
-    private int categoryId;
+    private Long categoryId;
 
-    public int getComplainId() {
+    public Long getComplainId() {
         return complainId;
     }
 
-    public void setComplainId(int complainId) {
+    public void setComplainId(Long complainId) {
         this.complainId = complainId;
     }
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public int getProductInstanceId() {
+    public Long getProductInstanceId() {
         return productInstanceId;
     }
 
-    public void setProductInstanceId(int productInstanceId) {
+    public void setProductInstanceId(Long productInstanceId) {
         this.productInstanceId = productInstanceId;
     }
 
@@ -59,19 +59,19 @@ public class Complain {
         this.content = content;
     }
 
-    public int getStatusId() {
+    public Long getStatusId() {
         return statusId;
     }
 
-    public void setStatusId(int statusId) {
+    public void setStatusId(Long statusId) {
         this.statusId = statusId;
     }
 
-    public int getResponsibleId() {
+    public Long getResponsibleId() {
         return responsibleId;
     }
 
-    public void setResponsibleId(int responsibleId) {
+    public void setResponsibleId(Long responsibleId) {
         this.responsibleId = responsibleId;
     }
 
@@ -99,11 +99,11 @@ public class Complain {
         this.closeDate = closeDate;
     }
 
-    public int getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 }

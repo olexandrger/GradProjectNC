@@ -4,14 +4,14 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class Region {
-    private int regionId;
+    private Long regionId;
     private String regionName;
 
-    public int getRegionId() {
+    public Long getRegionId() {
         return regionId;
     }
 
-    public void setRegionId(int regionId) {
+    public void setRegionId(Long regionId) {
         this.regionId = regionId;
     }
 

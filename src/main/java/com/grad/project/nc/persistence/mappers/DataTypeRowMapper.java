@@ -14,7 +14,7 @@ public class DataTypeRowMapper implements RowMapper<DataType> {
     public DataType mapRow(ResultSet rs, int rowNum) throws SQLException {
         DataType dataType = new DataType();
 
-        dataType.setDataTypeId(rs.getInt("data_type_id"));
+        dataType.setDataTypeId(rs.getLong("data_type_id"));
         dataType.setDataType(rs.getString("data_type"));
 
         return dataType;

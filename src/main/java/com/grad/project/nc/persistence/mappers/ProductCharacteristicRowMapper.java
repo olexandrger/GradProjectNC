@@ -14,11 +14,11 @@ public class ProductCharacteristicRowMapper implements RowMapper<ProductCharacte
     public ProductCharacteristic mapRow(ResultSet rs, int rowNum) throws SQLException {
         ProductCharacteristic productCharacteristic = new ProductCharacteristic();
 
-        productCharacteristic.setProductCharacteristicId(rs.getInt("product_characteristic_id"));
-        productCharacteristic.setProductTypeId(rs.getInt("product_type_id"));
+        productCharacteristic.setProductCharacteristicId(rs.getLong("product_characteristic_id"));
+        productCharacteristic.setProductTypeId(rs.getLong("product_type_id"));
         productCharacteristic.setCharacteristicName(rs.getString("characteristic_name"));
         productCharacteristic.setMeasure(rs.getString("measure"));
-        productCharacteristic.setDataTypeId(rs.getInt("data_type_id"));
+        productCharacteristic.setDataTypeId(rs.getLong("data_type_id"));
 
 
         return productCharacteristic;

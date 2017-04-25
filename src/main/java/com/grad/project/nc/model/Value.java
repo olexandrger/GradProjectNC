@@ -7,33 +7,33 @@ import java.time.LocalDateTime;
  * Created by Alex on 4/24/2017.
  */
 public class Value {
-    private int valueId;
-    private int productCharacteristicId;
-    private int numberValue;
+    private Long valueId;
+    private Long productCharacteristicId;
+    private Long numberValue;
     private LocalDateTime dateValue;
     private String stringValue;
 
-    public int getValueId() {
+    public Long getValueId() {
         return valueId;
     }
 
-    public void setValueId(int valueId) {
+    public void setValueId(Long valueId) {
         this.valueId = valueId;
     }
 
-    public int getProductCharacteristicId() {
+    public Long getProductCharacteristicId() {
         return productCharacteristicId;
     }
 
-    public void setProductCharacteristicId(int productCharacteristicId) {
+    public void setProductCharacteristicId(Long productCharacteristicId) {
         this.productCharacteristicId = productCharacteristicId;
     }
 
-    public int getNumberValue() {
+    public Long getNumberValue() {
         return numberValue;
     }
 
-    public void setNumberValue(int numberValue) {
+    public void setNumberValue(Long numberValue) {
         this.numberValue = numberValue;
     }
 

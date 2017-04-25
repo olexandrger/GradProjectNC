@@ -7,17 +7,17 @@ import java.time.LocalDateTime;
  * Created by Alex on 4/24/2017.
  */
 public class Discount {
-    private int discountId;
+    private Long discountId;
     private String discountTitle;
-    private double discount;
+    private Double discount;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
-    public int getDiscountId() {
+    public Long getDiscountId() {
         return discountId;
     }
 
-    public void setDiscountId(int discountId) {
+    public void setDiscountId(Long discountId) {
         this.discountId = discountId;
     }
 

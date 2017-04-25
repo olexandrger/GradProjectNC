@@ -1,7 +1,9 @@
 package com.grad.project.nc.controller;
 
+import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.UserOLD;
+import com.grad.project.nc.persistence.ProductDao;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ public class RegistrationController {
 
     @Autowired
     private EmailService emailService;
+
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
     public String registration(Model model) {
