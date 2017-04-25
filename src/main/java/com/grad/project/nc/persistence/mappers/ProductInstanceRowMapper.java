@@ -11,10 +11,10 @@ public class ProductInstanceRowMapper implements RowMapper<ProductInstance>{
     public ProductInstance mapRow(ResultSet resultSet, int i) throws SQLException {
         ProductInstance productInstance = new ProductInstance();
 
-        productInstance.setInstanceId(resultSet.getInt("instance_id"));
-        productInstance.setProductId(resultSet.getInt("product_id"));
-        productInstance.setDomainId(resultSet.getInt("domain_id"));
-        productInstance.setStatusId(resultSet.getInt("status_id"));
+        productInstance.setInstanceId(resultSet.getLong("instance_id"));
+        productInstance.setProductId(resultSet.getLong("product_id"));
+        productInstance.setDomainId(resultSet.getLong("domain_id"));
+        productInstance.setStatusId(resultSet.getLong("status_id"));
 
         return productInstance;
     }

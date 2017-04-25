@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  * Created by Alex on 4/25/2017.
  */
-@Component
+@Repository
 public class DataTypeDao {
 
     @Autowired
@@ -34,13 +35,13 @@ public class DataTypeDao {
         parameters.put("data_type", dataType.getDataType());
 
         Number newId = insertProductQuery.executeAndReturnKey(parameters);
-        dataType.setDataTypeId(newId.intValue());
+        dataType.setDataTypeId(newId.longValue());
 
     }
 
     @Transactional
     public DataType readDataTypeById(int id) {
-        final String SELECT_QUERY = "SELECT * FROM data_type where data_type_id = ?";
+        final String SELECT_QUERY = "SELECT data_type,data_type_id FROM data_type where data_type_id = ?";
 
         DataType dataType = jdbcTemplate.queryForObject(SELECT_QUERY,
                 new Object[]{id}, new DataTypeRowMapper());
@@ -53,7 +54,7 @@ public class DataTypeDao {
         final String UPDATE_QUERY = "UPDATE data_type SET data_type = ?" +
                 "WHERE data_type_id = ? ";
 
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{dataType.getDataType()});
+        jdbcTemplate.update(UPDATE_QUERY, new Object[]{dataType.getDataType(),dataType.getDataTypeId()});
 
 
     }

@@ -5,15 +5,15 @@ package com.grad.project.nc.model;
  */
 public class ProductType {
 
-    private int productTypeId;
+    private Long productTypeId;
     private String productTypeName;
     private String productTypeDescription;
 
-    public int getProductTypeId() {
+    public Long getProductTypeId() {
         return productTypeId;
     }
 
-    public void setProductTypeId(int productTypeId) {
+    public void setProductTypeId(Long productTypeId) {
         this.productTypeId = productTypeId;
     }
 

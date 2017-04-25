@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  * Created by Alex on 4/25/2017.
  */
-@Component
+@Repository
 public class ProductTypeDao {
 
     @Autowired
@@ -35,13 +36,17 @@ public class ProductTypeDao {
         parameters.put("product_type_description", productType.getProductTypeDescription());
 
         Number newId = insertProductQuery.executeAndReturnKey(parameters);
-        productType.setProductTypeId(newId.intValue());
+        productType.setProductTypeId(newId.longValue());
 
     }
 
     @Transactional
     public ProductType readProductTypeById(int id) {
-        final String SELECT_QUERY = "SELECT * FROM product_type where product_type_id = ?";
+        final String SELECT_QUERY = "SELECT product_type_id" +
+                ",product_type_name" +
+                ",product_type_description " +
+                "FROM product_type " +
+                "WHERE product_type_id = ?";
 
         ProductType productType = jdbcTemplate.queryForObject(SELECT_QUERY,
                 new Object[]{id}, new ProductTypeRowMapper());

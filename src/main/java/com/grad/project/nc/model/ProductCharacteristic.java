@@ -4,25 +4,25 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class ProductCharacteristic {
-    private int productCharacteristicId;
-    private int productTypeId;
+    private Long productCharacteristicId;
+    private Long productTypeId;
     private String characteristicName;
     private String measure;
-    private int dataTypeId;
+    private Long dataTypeId;
 
-    public int getProductCharacteristicId() {
+    public Long getProductCharacteristicId() {
         return productCharacteristicId;
     }
 
-    public void setProductCharacteristicId(int productCharacteristicId) {
+    public void setProductCharacteristicId(Long productCharacteristicId) {
         this.productCharacteristicId = productCharacteristicId;
     }
 
-    public int getProductTypeId() {
+    public Long getProductTypeId() {
         return productTypeId;
     }
 
-    public void setProductTypeId(int productTypeId) {
+    public void setProductTypeId(Long productTypeId) {
         this.productTypeId = productTypeId;
     }
 
@@ -42,11 +42,11 @@ public class ProductCharacteristic {
         this.measure = measure;
     }
 
-    public int getDataTypeId() {
+    public Long getDataTypeId() {
         return dataTypeId;
     }
 
-    public void setDataTypeId(int dataTypeId) {
+    public void setDataTypeId(Long dataTypeId) {
         this.dataTypeId = dataTypeId;
     }
 }

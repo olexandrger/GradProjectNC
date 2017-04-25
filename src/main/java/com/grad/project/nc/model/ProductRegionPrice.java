@@ -4,32 +4,32 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class ProductRegionPrice {
-    private int priceId;
-    private int productId;
-    private int regionID;
+    private Long priceId;
+    private Long productId;
+    private Long regionID;
     private double price;
 
-    public int getPriceId() {
+    public Long getPriceId() {
         return priceId;
     }
 
-    public void setPriceId(int priceId) {
+    public void setPriceId(Long priceId) {
         this.priceId = priceId;
     }
 
-    public int getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 
-    public int getRegionID() {
+    public Long getRegionID() {
         return regionID;
     }
 
-    public void setRegionID(int regionID) {
+    public void setRegionID(Long regionID) {
         this.regionID = regionID;
     }
 

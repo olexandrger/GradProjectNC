@@ -11,7 +11,7 @@ public class StatusTypeRowMapper implements RowMapper<StatusType> {
     public StatusType mapRow(ResultSet resultSet, int i) throws SQLException {
         StatusType statusType = new StatusType();
 
-        statusType.setStatusTypeId(resultSet.getInt("status_type_id"));
+        statusType.setStatusTypeId(resultSet.getLong("status_type_id"));
         statusType.setStatusTypeName(resultSet.getString("status_type_name"));
 
         return statusType;

@@ -4,15 +4,15 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class Street {
-    private int streetId;
+    private Long streetId;
     private String streetName;
-    private int cityId;
+    private Long cityId;
 
-    public int getStreetId() {
+    public Long getStreetId() {
         return streetId;
     }
 
-    public void setStreetId(int streetId) {
+    public void setStreetId(Long streetId) {
         this.streetId = streetId;
     }
 
@@ -24,11 +24,11 @@ public class Street {
         this.streetName = streetName;
     }
 
-    public int getCityId() {
+    public Long getCityId() {
         return cityId;
     }
 
-    public void setCityId(int cityId) {
+    public void setCityId(Long cityId) {
         this.cityId = cityId;
     }
 }

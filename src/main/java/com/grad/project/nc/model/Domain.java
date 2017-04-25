@@ -4,15 +4,15 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class Domain {
-    private int domaiId;
+    private Long domaiId;
     private String domainName;
-    private int addressId;
+    private Long addressId;
 
-    public int getDomaiId() {
+    public Long getDomaiId() {
         return domaiId;
     }
 
-    public void setDomaiId(int domaiId) {
+    public void setDomaiId(Long domaiId) {
         this.domaiId = domaiId;
     }
 
@@ -24,11 +24,11 @@ public class Domain {
         this.domainName = domainName;
     }
 
-    public int getAddressId() {
+    public Long getAddressId() {
         return addressId;
     }
 
-    public void setAddressId(int addressId) {
+    public void setAddressId(Long addressId) {
         this.addressId = addressId;
     }
 }

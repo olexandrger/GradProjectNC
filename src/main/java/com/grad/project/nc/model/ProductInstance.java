@@ -4,41 +4,41 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class ProductInstance {
-    private int instanceId;
-    private int productId;
-    private int domainId;
-    private int statusId;
+    private Long instanceId;
+    private Long productId;
+    private Long domainId;
+    private Long statusId;
 
 
-    public int getInstanceId() {
+    public Long getInstanceId() {
         return instanceId;
     }
 
-    public void setInstanceId(int instanceId) {
+    public void setInstanceId(Long instanceId) {
         this.instanceId = instanceId;
     }
 
-    public int getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 
-    public int getDomainId() {
+    public Long getDomainId() {
         return domainId;
     }
 
-    public void setDomainId(int domainId) {
+    public void setDomainId(Long domainId) {
         this.domainId = domainId;
     }
 
-    public int getStatusId() {
+    public Long getStatusId() {
         return statusId;
     }
 
-    public void setStatusId(int statusId) {
+    public void setStatusId(Long statusId) {
         this.statusId = statusId;
     }
 }

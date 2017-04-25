@@ -4,16 +4,16 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class Product {
-    private int productId;
+    private Long productId;
     private String name;
     private String description;
-    private int productTypeId;
+    private Long productTypeId;
 
-    public int getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 
@@ -33,11 +33,11 @@ public class Product {
         this.description = description;
     }
 
-    public int getProductTypeId() {
+    public Long getProductTypeId() {
         return productTypeId;
     }
 
-    public void setProductTypeId(int productTypeId) {
+    public void setProductTypeId(Long productTypeId) {
         this.productTypeId = productTypeId;
     }
 }

@@ -4,14 +4,14 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class DataType {
-    private int dataTypeId;
+    private Long dataTypeId;
     private String dataType;
 
-    public int getDataTypeId() {
+    public Long getDataTypeId() {
         return dataTypeId;
     }
 
-    public void setDataTypeId(int dataTypeId) {
+    public void setDataTypeId(Long dataTypeId) {
         this.dataTypeId = dataTypeId;
     }
 

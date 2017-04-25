@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
@@ -16,7 +17,7 @@ import java.util.Map;
  * Created by Alex on 4/25/2017.
  * !!!!
  */
-@Component
+@Repository
 public class ValueDao {
 
     @Autowired
@@ -39,13 +40,19 @@ public class ValueDao {
         parameters.put("string_value", value.getStringValue());
 
         Number newId = insertProductQuery.executeAndReturnKey(parameters);
-        value.setValueId(newId.intValue());
+        value.setValueId(newId.longValue());
 
     }
 
     @Transactional
     public Value readValueById(int id) {
-        final String SELECT_QUERY = "SELECT * FROM value where value_id = ?";
+        final String SELECT_QUERY = "SELECT value_id" +
+                ",product_characteristic_id" +
+                ",number_value" +
+                ",date_value" +
+                ",string_value " +
+                "FROM value " +
+                "WHERE value_id = ?";
 
         Value value = jdbcTemplate.queryForObject(SELECT_QUERY,
                 new Object[]{id}, new ValueRowMapper());
