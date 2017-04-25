@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
@@ -17,14 +17,14 @@ import java.util.Map;
 /**
  * Created by Roman Savuliak on 25.04.2017.
  */
-@Component
+@Repository
 public class RegionDao implements CrudDao<Region>{
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Transactional
     @Override
+    @Transactional
     public Region add(Region region) {
 
         SimpleJdbcInsert insertRegionQuery = new SimpleJdbcInsert(jdbcTemplate)
@@ -40,35 +40,35 @@ public class RegionDao implements CrudDao<Region>{
         return region;
     }
 
-    @Transactional
     @Override
-    public Region find(long id) {
-        final String SELECT_QUERY = "SELECT region_id, region_name FROM region WHERE region_id = ?";
-        Region region = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RegionRowMapper());
-        return region;
-    }
-
     @Transactional
-    @Override
     public Region update(Region region) {
         final String UPDATE_QUERY = "UPDATE region SET region_name = ?" + "WHERE region_id = ?";
         jdbcTemplate.update(UPDATE_QUERY, new Object[]{region.getRegionName(), region.getRegionId()});
         return region;
     }
 
-    @Transactional
     @Override
-    public void delete(Region region) {
-        final String DELETE_QUERY = "DELETE FROM region WHERE region_id = ?";
-        jdbcTemplate.update(DELETE_QUERY, region.getRegionId());
+    @Transactional
+    public Region find(long id) {
+        final String SELECT_QUERY = "SELECT region_id, region_name FROM region WHERE region_id = ?";
+        Region region = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RegionRowMapper());
+        return region;
     }
 
     @Override
+    @Transactional
     public Collection<Region> findAll() {
         final String SELECT_QUERY = "SELECT region_id, region_name FROM region";
         return jdbcTemplate.query(SELECT_QUERY, new RegionRowMapper());
     }
 
+    @Override
+    @Transactional
+    public void delete(Region region) {
+        final String DELETE_QUERY = "DELETE FROM region WHERE region_id = ?";
+        jdbcTemplate.update(DELETE_QUERY, region.getRegionId());
+    }
 
     private static final class RegionRowMapper implements RowMapper<Region> {
         @Override
