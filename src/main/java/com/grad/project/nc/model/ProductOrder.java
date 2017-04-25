@@ -48,7 +48,7 @@ public class ProductOrder {
         this.categoryId = categoryId;
     }
 
-    public Long getStatusID() {
+    public Long getStatusId() {
         return statusID;
     }
 
