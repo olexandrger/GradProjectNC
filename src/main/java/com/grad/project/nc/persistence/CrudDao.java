@@ -5,7 +5,8 @@ import java.util.Collection;
 public interface CrudDao<T> {
     T add(T entity);
     T update(T entity);
-    T find(int id);
+    //add optional here?
+    T find(long id);
     Collection<T> findAll();
     void delete(T entity);
 }
