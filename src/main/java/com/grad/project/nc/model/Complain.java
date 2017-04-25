@@ -1,6 +1,7 @@
 package com.grad.project.nc.model;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
+
 
 /**
  * Created by Alex on 4/24/2017.
@@ -14,8 +15,8 @@ public class Complain {
     private int statusId;
     private int responsibleId;
     private String response;
-    private Calendar openDate;
-    private Calendar closeDate;
+    private LocalDateTime openDate;
+    private LocalDateTime closeDate;
     private int categoryId;
 
     public int getComplainId() {
@@ -82,19 +83,19 @@ public class Complain {
         this.response = response;
     }
 
-    public Calendar getOpenDate() {
+    public LocalDateTime getOpenDate() {
         return openDate;
     }
 
-    public void setOpenDate(Calendar openDate) {
+    public void setOpenDate(LocalDateTime openDate) {
         this.openDate = openDate;
     }
 
-    public Calendar getCloseDate() {
+    public LocalDateTime getCloseDate() {
         return closeDate;
     }
 
-    public void setCloseDate(Calendar closeDate) {
+    public void setCloseDate(LocalDateTime closeDate) {
         this.closeDate = closeDate;
     }
 

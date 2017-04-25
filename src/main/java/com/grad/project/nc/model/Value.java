@@ -1,6 +1,7 @@
 package com.grad.project.nc.model;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
+
 
 /**
  * Created by Alex on 4/24/2017.
@@ -9,7 +10,7 @@ public class Value {
     private int valueId;
     private int productCharacteristicId;
     private int numberValue;
-    private Calendar dateValue;
+    private LocalDateTime dateValue;
     private String stringValue;
 
     public int getValueId() {
@@ -36,11 +37,11 @@ public class Value {
         this.numberValue = numberValue;
     }
 
-    public Calendar getDateValue() {
+    public LocalDateTime getDateValue() {
         return dateValue;
     }
 
-    public void setDateValue(Calendar dateValue) {
+    public void setDateValue(LocalDateTime dateValue) {
         this.dateValue = dateValue;
     }
 

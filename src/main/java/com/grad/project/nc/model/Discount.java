@@ -1,6 +1,7 @@
 package com.grad.project.nc.model;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
+
 
 /**
  * Created by Alex on 4/24/2017.
@@ -9,8 +10,8 @@ public class Discount {
     private int discountId;
     private String discountTitle;
     private double discount;
-    private Calendar startDate;
-    private Calendar endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     public int getDiscountId() {
         return discountId;
@@ -36,19 +37,19 @@ public class Discount {
         this.discount = discount;
     }
 
-    public Calendar getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Calendar startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public Calendar getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Calendar endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 }
