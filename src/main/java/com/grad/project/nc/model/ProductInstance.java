@@ -3,7 +3,7 @@ package com.grad.project.nc.model;
 /**
  * Created by Alex on 4/24/2017.
  */
-public class ProducInstance {
+public class ProductInstance {
     private int instanceId;
     private int productId;
     private int domainId;

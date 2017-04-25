@@ -24,7 +24,7 @@ public class ProductCharacteristicDao {
 
 
     @Transactional
-    public void insertProductCharecteristic(ProductCharacteristic productCharacteristic) {
+    public void insertProductCharacteristic(ProductCharacteristic productCharacteristic) {
 
         SimpleJdbcInsert insertProductQuery = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("product_characteristic")

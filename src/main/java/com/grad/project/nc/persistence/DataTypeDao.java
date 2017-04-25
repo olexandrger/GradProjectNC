@@ -49,7 +49,7 @@ public class DataTypeDao {
     }
 
     @Transactional
-    public void updateDataype(DataType dataType) {
+    public void updateDataType(DataType dataType) {
         final String UPDATE_QUERY = "UPDATE data_type SET data_type = ?" +
                 "WHERE data_type_id = ? ";
 
