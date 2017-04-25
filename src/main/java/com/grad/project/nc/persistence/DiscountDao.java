@@ -1,27 +1,31 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Discount;
-import com.grad.project.nc.persistence.mappers.DiscountRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Roman Savuliak on 25.04.2017.
  */
-@Component
-public class DiscountDao {
+@Repository
+public class DiscountDao implements CrudDao<Discount>{
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Override
     @Transactional
-    public void insertDiscount(Discount discount){
+    public Discount add(Discount discount) {
 
         SimpleJdbcInsert insertDiscountQuery = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("discount")
@@ -34,20 +38,22 @@ public class DiscountDao {
         parameters.put("end_date", discount.getEndDate());
 
         Number newId = insertDiscountQuery.executeAndReturnKey(parameters);
-        discount.setDiscountId(newId.intValue());
-
+        discount.setDiscountId(newId.longValue());
+        return discount;
     }
 
+    @Override
     @Transactional
-    public Discount readDiscountById(int id){
-        final String SELECT_QUERY = "SELECT discount_id, discount_title, discount, start_date, end_date FROM end_date WHERE discount_id = ?";
+    public Discount find(long id) {
+        final String SELECT_QUERY = "SELECT discount_id, discount_title, discount, start_date, end_date FROM discount WHERE discount_id = ?";
 
         Discount discount = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new DiscountRowMapper());
         return discount;
     }
 
+    @Override
     @Transactional
-    public void updateDiscount(Discount discount) {
+    public Discount update(Discount discount) {
         final String UPDATE_QUERY = "UPDATE discount SET" +
                 " discount_title = ?" +
                 ", discount = ?" +
@@ -61,15 +67,42 @@ public class DiscountDao {
                 ,discount.getStartDate()
                 ,discount.getEndDate()
                 ,discount.getEndDate()});
+
+        return discount;
     }
 
+    @Override
     @Transactional
-    public void deleteDiscountById(int id) {
+    public void delete(Discount discount) {
 
         final String DELETE_QUERY = "DELETE FROM discount WHERE discount_id = ?";
 
-        jdbcTemplate.update(DELETE_QUERY,id);
+        jdbcTemplate.update(DELETE_QUERY,discount.getDiscountId());
 
+    }
+
+
+    @Override
+    @Transactional
+    public Collection<Discount> findAll() {
+        final String SELECT_QUERY = "SELECT discount_id, discount_title, discount, start_date, end_date FROM discount";
+
+        return jdbcTemplate.query(SELECT_QUERY, new DiscountRowMapper());
+    }
+
+    private static final class DiscountRowMapper implements RowMapper<Discount> {
+        @Override
+        public Discount mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Discount discount = new Discount();
+
+            discount.setDiscountId(rs.getLong("discount_id"));
+            discount.setDiscountTitle(rs.getString("discount_title"));
+            discount.setDiscount(rs.getDouble("discount"));
+            discount.setStartDate(rs.getTimestamp("start_date").toLocalDateTime());
+            discount.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
+
+            return discount;
+        }
     }
 
 }
