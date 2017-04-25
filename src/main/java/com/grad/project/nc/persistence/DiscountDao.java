@@ -44,15 +44,6 @@ public class DiscountDao implements CrudDao<Discount>{
 
     @Override
     @Transactional
-    public Discount find(long id) {
-        final String SELECT_QUERY = "SELECT discount_id, discount_title, discount, start_date, end_date FROM discount WHERE discount_id = ?";
-
-        Discount discount = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new DiscountRowMapper());
-        return discount;
-    }
-
-    @Override
-    @Transactional
     public Discount update(Discount discount) {
         final String UPDATE_QUERY = "UPDATE discount SET" +
                 " discount_title = ?" +
@@ -73,14 +64,11 @@ public class DiscountDao implements CrudDao<Discount>{
 
     @Override
     @Transactional
-    public void delete(Discount discount) {
-
-        final String DELETE_QUERY = "DELETE FROM discount WHERE discount_id = ?";
-
-        jdbcTemplate.update(DELETE_QUERY,discount.getDiscountId());
-
+    public Discount find(long id) {
+        final String SELECT_QUERY = "SELECT discount_id, discount_title, discount, start_date, end_date FROM discount WHERE discount_id = ?";
+        Discount discount = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new DiscountRowMapper());
+        return discount;
     }
-
 
     @Override
     @Transactional
@@ -88,6 +76,16 @@ public class DiscountDao implements CrudDao<Discount>{
         final String SELECT_QUERY = "SELECT discount_id, discount_title, discount, start_date, end_date FROM discount";
 
         return jdbcTemplate.query(SELECT_QUERY, new DiscountRowMapper());
+    }
+
+    @Override
+    @Transactional
+    public void delete(Discount discount) {
+
+        final String DELETE_QUERY = "DELETE FROM discount WHERE discount_id = ?";
+
+        jdbcTemplate.update(DELETE_QUERY, discount.getDiscountId());
+
     }
 
     private static final class DiscountRowMapper implements RowMapper<Discount> {
