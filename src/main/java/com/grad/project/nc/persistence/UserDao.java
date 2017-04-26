@@ -3,6 +3,7 @@ package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -69,7 +70,12 @@ public class UserDao implements CrudDao<User> {
     @Transactional
     public User find(long id) {
         final String SELECT_QUERY = "SELECT user_id, email, password, first_name, last_name, phone_number FROM user WHERE user_id = ?";
-        User user = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new UserRowMapper());
+        User user = null;
+        try {
+            user =jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new UserRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
         return user;
     }
 

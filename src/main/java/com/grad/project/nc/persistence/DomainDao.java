@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Domain;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -69,8 +70,14 @@ public class DomainDao implements CrudDao<Domain> {
                 "FROM domain " +
                 "WHERE domain_id = ?";
 
-        Domain domain = jdbcTemplate.queryForObject(SELECT_QUERY,
-                new Object[]{id}, new DomainRowMapper());
+        Domain domain = null;
+        try {
+            domain = jdbcTemplate.queryForObject(SELECT_QUERY,
+                    new Object[]{id}, new DomainRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
+
 
         return domain;
     }

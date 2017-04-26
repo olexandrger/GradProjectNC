@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.DataType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -61,9 +62,13 @@ public class DataTypeDao implements CrudDao<DataType> {
     public DataType find(long id) {
         final String SELECT_QUERY = "SELECT data_type,data_type_id FROM data_type where data_type_id = ?";
 
-        DataType dataType = jdbcTemplate.queryForObject(SELECT_QUERY,
-                new Object[]{id}, new DataTypeRowMapper());
+        DataType dataType = null;
+        try {
+            dataType = jdbcTemplate.queryForObject(SELECT_QUERY,
+                    new Object[]{id}, new DataTypeRowMapper());
+        } catch (EmptyResultDataAccessException ex){
 
+        }
         return dataType;
     }
 

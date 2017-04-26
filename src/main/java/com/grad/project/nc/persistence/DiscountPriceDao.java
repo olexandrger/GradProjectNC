@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.DiscountPrice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -50,7 +51,12 @@ public class DiscountPriceDao implements CrudDao<DiscountPrice>{
     @Transactional
     public DiscountPrice find(long id) {
         final String SELECT_QUERY = "SELECT discount_id, price_id FROM discount_price WHERE discount_id = ?";
-        DiscountPrice discountPrice = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new DiscountPriceRowMapper());
+        DiscountPrice discountPrice = null;
+        try {
+            discountPrice = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new DiscountPriceRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
         return discountPrice;
     }
 

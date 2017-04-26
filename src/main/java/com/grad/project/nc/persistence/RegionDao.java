@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Region;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -52,7 +53,12 @@ public class RegionDao implements CrudDao<Region>{
     @Transactional
     public Region find(long id) {
         final String SELECT_QUERY = "SELECT region_id, region_name FROM region WHERE region_id = ?";
-        Region region = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RegionRowMapper());
+        Region region = null;
+        try{
+            region = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RegionRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
         return region;
     }
 

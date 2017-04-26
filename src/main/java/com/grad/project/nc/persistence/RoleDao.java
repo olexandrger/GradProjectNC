@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -51,7 +52,12 @@ public class RoleDao implements CrudDao<Role>{
     @Transactional
     public Role find(long id) {
         final String SELECT_QUERY = "SELECT role_id, role_name FROM role WHERE role_id = ?";
-        Role role = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RoleRowMapper());
+        Role role = null;
+        try{
+            role =jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RoleRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
         return role;
     }
 

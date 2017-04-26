@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.ProductCharacteristic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -56,8 +57,14 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
                 " FROM product_characteristic " +
                 "WHERE product_characteristic_id = ?";
 
-        ProductCharacteristic productCharacteristic = jdbcTemplate.queryForObject(SELECT_QUERY,
-                new Object[]{id}, new ProductCharacteristicRowMapper());
+        ProductCharacteristic productCharacteristic = null;
+        try {
+            productCharacteristic = jdbcTemplate.queryForObject(SELECT_QUERY,
+                    new Object[]{id}, new ProductCharacteristicRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
+
 
         return productCharacteristic;
     }
