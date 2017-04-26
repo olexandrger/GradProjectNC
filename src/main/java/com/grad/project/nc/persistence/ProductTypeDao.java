@@ -16,14 +16,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Alex on 4/25/2017.
- */
+
 @Repository
 public class ProductTypeDao implements CrudDao<ProductType> {
 
-    @Autowired
+
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public ProductTypeDao(JdbcTemplate jdbcTemplate){
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
 
     @Transactional

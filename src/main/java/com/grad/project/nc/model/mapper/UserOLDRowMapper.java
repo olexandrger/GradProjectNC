@@ -1,7 +1,7 @@
 package com.grad.project.nc.model.mapper;
 
 import com.google.common.collect.ImmutableList;
-import com.grad.project.nc.model.Role;
+import com.grad.project.nc.model.RoleOld;
 import com.grad.project.nc.model.UserOLD;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -15,7 +15,7 @@ public class UserOLDRowMapper implements RowMapper<UserOLD> {
         userOLD.setId(resultSet.getLong("id"));
         userOLD.setUsername(resultSet.getString("username"));
         userOLD.setPassword(resultSet.getString("password"));
-        userOLD.setAuthorities(ImmutableList.of(Role.USER));
+        userOLD.setAuthorities(ImmutableList.of(RoleOld.USER));
         userOLD.setAccountNonExpired(true);
         userOLD.setAccountNonLocked(true);
         userOLD.setCredentialsNonExpired(true);

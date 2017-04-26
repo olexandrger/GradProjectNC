@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserOLD implements UserDetails {
     private Long id;
-    private List<Role> authorities;
+    private List<RoleOld> authorities;
     private String password;
     private String username;
     private boolean accountNonExpired;
@@ -31,11 +31,11 @@ public class UserOLD implements UserDetails {
     }
 
     @Override
-    public List<Role> getAuthorities() {
+    public List<RoleOld> getAuthorities() {
         return authorities;
     }
 
-    public void setAuthorities(List<Role> authorities) {
+    public void setAuthorities(List<RoleOld> authorities) {
         this.authorities = authorities;
     }
 

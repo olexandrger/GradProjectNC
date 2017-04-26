@@ -12,7 +12,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private ArrayList<Role> authorities;
+    private ArrayList<RoleOld> authorities;
 
     public Long getUser_id() {
         return user_id;
@@ -62,11 +62,11 @@ public class User {
         this.password = password;
     }
 
-    public ArrayList<Role> getAuthorities() {
+    public ArrayList<RoleOld> getAuthorities() {
         return authorities;
     }
 
-    public void setAuthorities(ArrayList<Role> authorities) {
+    public void setAuthorities(ArrayList<RoleOld> authorities) {
         this.authorities = authorities;
     }
 }

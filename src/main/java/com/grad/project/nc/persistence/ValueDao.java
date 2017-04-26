@@ -14,15 +14,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Alex on 4/25/2017.
- * !!!!
- */
+
 @Repository
 public class ValueDao implements CrudDao<Value> {
 
-    @Autowired
+
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    public ValueDao(JdbcTemplate jdbcTemplate){
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
 
     @Transactional
@@ -74,11 +75,11 @@ public class ValueDao implements CrudDao<Value> {
                 ", string_value = ? " +
                 "WHERE value_id = ? ";
 
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{value.getProductCharacteristicId()
+        jdbcTemplate.update(UPDATE_QUERY, value.getProductCharacteristicId()
                 ,value.getNumberValue()
                 ,Timestamp.valueOf(value.getDateValue())
                 ,value.getStringValue()
-                ,value.getValueId()});
+                ,value.getValueId());
 
         return value;
 
