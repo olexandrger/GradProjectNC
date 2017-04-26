@@ -1,13 +1,11 @@
 package com.grad.project.nc.model;
 
-import java.util.ArrayList;
-
 /**
  * Created by Alex on 4/24/2017.
  */
 public class User {
     private Long user_id;
-    private String username;
+    private String email;
     private String password;
     private String firstName;
     private String lastName;
@@ -45,12 +43,12 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
