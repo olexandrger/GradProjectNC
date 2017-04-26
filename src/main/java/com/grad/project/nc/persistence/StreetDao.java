@@ -3,6 +3,7 @@ package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.Street;
 import com.sun.javafx.collections.MappingChange;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -55,8 +56,15 @@ public class StreetDao implements CrudDao<Street> {
     @Transactional
     public Street find(long id) {
         final String SELECT_QUERY = "SELECT street_id, street_name, city_id FROM street WHERE street_id = ?";
+        Street street = null;
 
-        return jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, mapper);
+        try{
+            street = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, mapper);
+        } catch (EmptyResultDataAccessException ex){
+
+        }
+
+        return street;
     }
 
 

@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Address;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -45,9 +46,13 @@ public class AddressDao implements CrudDao<Address> {
         final String SELECT_QUERY = "SELECT address_id, apartment_number, building_id" +
                 " FROM address WHERE address_id = ?";
 
-        Address address = jdbcTemplate.queryForObject(SELECT_QUERY,
-                new Object[]{id}, mapper);
+        Address address = null;
+        try {
+            address = jdbcTemplate.queryForObject(SELECT_QUERY,
+                    new Object[]{id}, mapper);
+        } catch (EmptyResultDataAccessException ex){
 
+        }
         return address;
 
     }

@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.City;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -55,7 +56,15 @@ public class CityDao implements CrudDao<City> {
     @Transactional
     public City find(long id) {
         final String SELECT_QURY = "SELECT city_id, city_name, region_id FROM city WHERE ciy_id = ?";
-        return jdbcTemplate.queryForObject(SELECT_QURY, new Object[]{id}, mapper);
+        City city = null;
+
+        try{
+            city = jdbcTemplate.queryForObject(SELECT_QURY, new Object[]{id}, mapper);
+        } catch (EmptyResultDataAccessException ex){
+
+        }
+
+        return null;
     }
 
     @Override
