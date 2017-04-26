@@ -52,7 +52,8 @@ public class RoleDao implements CrudDao<Role>{
     public Role find(long id) {
         final String SELECT_QUERY = "SELECT role_id, role_name FROM role WHERE role_id = ?";
         Role role = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RoleRowMapper());
-        return role;    }
+        return role;
+    }
 
     @Override
     @Transactional
@@ -61,12 +62,14 @@ public class RoleDao implements CrudDao<Role>{
         return jdbcTemplate.query(SELECT_QUERY, new RoleRowMapper());
     }
 
+
     @Override
     @Transactional
     public void delete(Role role) {
         final String DELETE_QUERY = "DELETE FROM role WHERE role_id = ?";
         jdbcTemplate.update(DELETE_QUERY, role.getRoleId());
     }
+
 
     private static final class RoleRowMapper implements RowMapper<Role> {
         @Override

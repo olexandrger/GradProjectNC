@@ -1,3 +1,3 @@
-Hello ${userOLD.email}!
+Hello ${userOLD.username}!
 
 Welcome to our service.

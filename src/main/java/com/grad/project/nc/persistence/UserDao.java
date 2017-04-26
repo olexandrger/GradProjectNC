@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,14 +18,14 @@ import java.util.Optional;
 /**
  * Created by Roman Savuliak on 26.04.2017.
  */
-public class UserDao implements CrudDao<User>{
+public class UserDao implements CrudDao<User> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Override
     @Transactional
-    public User add(User user) {
+    public User add(User user){
 
         SimpleJdbcInsert insertUserQuery = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("user")
@@ -93,6 +94,19 @@ public class UserDao implements CrudDao<User>{
                 sql,
                 new Object[]{email},
                 new UserRowMapper()));
+    }
+
+    @Transactional
+    public void addUserRole(User user, Role role){
+
+        SimpleJdbcInsert insertUserQuery = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("user_role");
+
+        Map<String, Object> parameters = new HashMap<>(2);
+        parameters.put("user_id", user.getUser_id());
+        parameters.put("role_id", role.getRoleId());
+
+        insertUserQuery.execute(parameters);
     }
 
     private static final class UserRowMapper implements RowMapper<User> {
