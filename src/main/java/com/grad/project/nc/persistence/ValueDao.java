@@ -1,15 +1,16 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Value;
-import com.grad.project.nc.persistence.mappers.ValueRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,14 +19,15 @@ import java.util.Map;
  * !!!!
  */
 @Repository
-public class ValueDao {
+public class ValueDao implements CrudDao<Value> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
 
     @Transactional
-    public void insertValue(Value value) {
+    @Override
+    public Value add(Value value) {
 
         SimpleJdbcInsert insertProductQuery = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("value")
@@ -42,10 +44,13 @@ public class ValueDao {
         Number newId = insertProductQuery.executeAndReturnKey(parameters);
         value.setValueId(newId.longValue());
 
+        return value;
+
     }
 
     @Transactional
-    public Value readValueById(int id) {
+    @Override
+    public Value find(long id)  {
         final String SELECT_QUERY = "SELECT value_id" +
                 ",product_characteristic_id" +
                 ",number_value" +
@@ -61,7 +66,8 @@ public class ValueDao {
     }
 
     @Transactional
-    public void updateValue(Value value) {
+    @Override
+    public Value update(Value value){
         final String UPDATE_QUERY = "UPDATE value SET product_characteristic_id = ?" +
                 ", number_value = ?" +
                 ", date_value = ?" +
@@ -74,15 +80,46 @@ public class ValueDao {
                 ,value.getStringValue()
                 ,value.getValueId()});
 
+        return value;
+
 
     }
 
     @Transactional
-    public void deleteValueById(int id) {
+    @Override
+    public void delete(Value entity)  {
 
         final String DELETE_QUERY = "DELETE FROM value WHERE value_id = ?";
-
-        jdbcTemplate.update(DELETE_QUERY,id);
+        jdbcTemplate.update(DELETE_QUERY,entity.getValueId());
 
     }
+
+
+    @Override
+    public Collection<Value> findAll() {
+        final String SELECT_QUERY = "SELECT value_id" +
+                ",product_characteristic_id" +
+                ",number_value" +
+                ",date_value" +
+                ",string_value " +
+                "FROM value ";
+
+        return jdbcTemplate.query(SELECT_QUERY,new ValueRowMapper()) ;
+    }
+
+    public static final class ValueRowMapper implements RowMapper<Value> {
+        @Override
+        public Value mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Value value = new Value();
+
+            value.setValueId(rs.getLong("value_id"));
+            value.setProductCharacteristicId(rs.getLong("product_characteristic_id"));
+            value.setNumberValue(rs.getLong("number_value"));
+            value.setDateValue(rs.getTimestamp("date_value").toLocalDateTime());
+            value.setStringValue(rs.getString("string_value"));
+
+            return value;
+        }
+    }
+
 }

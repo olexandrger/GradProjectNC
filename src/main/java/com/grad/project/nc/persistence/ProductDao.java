@@ -1,14 +1,16 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Product;
-import com.grad.project.nc.persistence.mappers.ProductRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,14 +18,14 @@ import java.util.Map;
  * Created by Alex on 4/25/2017.
  */
 @Repository
-public class ProductDao  {
+public class ProductDao implements CrudDao<Product> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-
     @Transactional
-    public void insertProduct(Product product) {
+    @Override
+    public Product add(Product product) {
 
         SimpleJdbcInsert insertProductQuery = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("product")
@@ -36,11 +38,13 @@ public class ProductDao  {
 
         Number newId = insertProductQuery.executeAndReturnKey(parameters);
         product.setProductId(newId.longValue());
+        return product;
 
     }
 
     @Transactional
-    public Product readProductById(int id) {
+    @Override
+    public Product find(long id)  {
         final String SELECT_QUERY = "SELECT product_id" +
                 ",product_name" +
                 ",product_description" +
@@ -55,7 +59,8 @@ public class ProductDao  {
     }
 
     @Transactional
-    public void updateProduct(Product product) {
+    @Override
+    public Product update(Product product) {
         final String UPDATE_QUERY = "UPDATE product SET product_name = ?" +
                 ", product_description = ?" +
                 ", product_type_id = ? " +
@@ -67,14 +72,45 @@ public class ProductDao  {
                 ,product.getProductId()});
 
 
+        return product;
     }
 
     @Transactional
-    public void deleteProductById(int id) {
+    @Override
+    public void delete(Product entity){
 
         final String DELETE_QUERY = "DELETE FROM product WHERE product_id = ?";
 
-        jdbcTemplate.update(DELETE_QUERY,id);
+        jdbcTemplate.update(DELETE_QUERY,entity.getProductId());
 
     }
+
+
+    @Override
+    public Collection<Product> findAll() {
+        final String SELECT_QUERY = "SELECT product_id" +
+                ",product_name" +
+                ",product_description" +
+                ",product_type_id " +
+                "FROM product ";
+
+        return jdbcTemplate.query(SELECT_QUERY, new ProductRowMapper());
+    }
+
+    public static final class ProductRowMapper implements RowMapper<Product> {
+
+        @Override
+        public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Product product = new Product();
+
+            product.setProductId(rs.getLong("product_id"));
+            product.setName(rs.getString("product_name"));
+            product.setDescription(rs.getString("product_description"));
+            product.setProductTypeId(rs.getLong("product_type_id"));
+
+            return product;
+        }
+    }
+
+
 }

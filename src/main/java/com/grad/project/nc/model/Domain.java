@@ -7,6 +7,7 @@ public class Domain {
     private Long domaiId;
     private String domainName;
     private Long addressId;
+    private Long domainTypeId;
 
     public Long getDomaiId() {
         return domaiId;
@@ -30,5 +31,13 @@ public class Domain {
 
     public void setAddressId(Long addressId) {
         this.addressId = addressId;
+    }
+
+    public Long getDomainTypeId() {
+        return domainTypeId;
+    }
+
+    public void setDomainTypeId(Long domainTypeId) {
+        this.domainTypeId = domainTypeId;
     }
 }

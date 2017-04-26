@@ -41,6 +41,7 @@ public class RegistrationController {
         emailService.sendRegistrationEmail(userOLD);
         userService.createUser(userOLD);
 
+
         return "redirect:/index";
     }
 }

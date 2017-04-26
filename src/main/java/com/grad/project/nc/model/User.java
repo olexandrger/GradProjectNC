@@ -1,14 +1,18 @@
 package com.grad.project.nc.model;
 
+import java.util.ArrayList;
+
 /**
  * Created by Alex on 4/24/2017.
  */
 public class User {
     private Long user_id;
+    private String username;
+    private String password;
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private Long accountId;
+    private ArrayList<Role> authorities;
 
     public Long getUser_id() {
         return user_id;
@@ -42,11 +46,27 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public ArrayList<Role> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(ArrayList<Role> authorities) {
+        this.authorities = authorities;
     }
 }
