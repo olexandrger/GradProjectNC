@@ -1,7 +1,6 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Street;
-import com.sun.javafx.collections.MappingChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Created by DeniG on 26.04.2017.
