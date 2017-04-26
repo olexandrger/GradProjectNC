@@ -1,25 +1,12 @@
 package com.grad.project.nc.model;
 
-/**
- * Created by Alex on 4/26/2017.
- */
-public class Role {
-    Long roleId;
-    String roleName;
+import org.springframework.security.core.GrantedAuthority;
 
-    public Long getRoleId() {
-        return roleId;
-    }
+public enum Role implements GrantedAuthority {
+    USER;
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    @Override
+    public String getAuthority() {
+        return name();
     }
 }

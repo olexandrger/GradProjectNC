@@ -9,10 +9,6 @@ target/
 .settings
 .springBeans
 
-### spring boot profiles ###
-application-dev.properties
-application-test.properties
-
 ### IntelliJ IDEA ###
 .idea
 *.iws

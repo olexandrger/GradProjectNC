@@ -1,6 +1,6 @@
 package com.grad.project.nc.service.notifications;
 
-import com.grad.project.nc.model.UserOLD;
+import com.grad.project.nc.model.User;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
@@ -88,13 +88,13 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private void sendTemplateEmail(UserOLD userOLD, Template template, String sender, String subject) {
-        //TODO after ERD completion change it to userOLD's email
-        String userAddress = userOLD.getUsername();
+    private void sendTemplateEmail(User user, Template template, String sender, String subject) {
+        //TODO after ERD completion change it to user's email
+        String userAddress = user.getUsername();
 
         try {
             Map<String, Object> context = new HashMap<>();
-            context.put("userOLD", userOLD);
+            context.put("user", user);
 
             String message = FreeMarkerTemplateUtils.processTemplateIntoString(template, context);
 
@@ -116,16 +116,16 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void sendRegistrationEmail(UserOLD userOLD) {
-        logger.info("Sending registration email to " + userOLD.getUsername());
+    public void sendRegistrationEmail(User user) {
+        logger.info("Sending registration email to " + user.getUsername());
 
         try {
             Template mailTemplate = getTemplateFromResources("registration");
-            sendTemplateEmail(userOLD, mailTemplate, senderAddress, "Welcome");
+            sendTemplateEmail(user, mailTemplate, senderAddress, "Welcome");
         } catch (IOException e) {
             logger.error("Can not load email template", e);
         }
 
-        logger.info("Registration email sent to " + userOLD.getUsername());
+        logger.info("Registration email sent to " + user.getUsername());
     }
 }

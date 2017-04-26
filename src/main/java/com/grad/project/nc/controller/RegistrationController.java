@@ -1,9 +1,7 @@
 package com.grad.project.nc.controller;
 
-import com.grad.project.nc.model.Product;
-import com.grad.project.nc.model.RoleOld;
-import com.grad.project.nc.model.UserOLD;
-import com.grad.project.nc.persistence.ProductDao;
+import com.grad.project.nc.model.Role;
+import com.grad.project.nc.model.User;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,25 +22,21 @@ public class RegistrationController {
     @Autowired
     private EmailService emailService;
 
-
-
-
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
     public String registration(Model model) {
-        model.addAttribute("user", new UserOLD());
+        model.addAttribute("user", new User());
 
         return "registration";
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
-    public String registration(@ModelAttribute("user") UserOLD userOLD) {
+    public String registration(@ModelAttribute("user") User user) {
 
-        ArrayList<RoleOld> roleOlds = new ArrayList<>();
-        roleOlds.add(RoleOld.USER);
-        userOLD.setAuthorities(roleOlds);
-        emailService.sendRegistrationEmail(userOLD);
-        userService.createUser(userOLD);
-
+        ArrayList<Role> roles = new ArrayList<>();
+        roles.add(Role.USER);
+        user.setAuthorities(roles);
+        emailService.sendRegistrationEmail(user);
+        userService.createUser(user);
 
         return "redirect:/index";
     }

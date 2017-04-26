@@ -1,7 +1,7 @@
 package com.grad.project.nc.service.notifications;
 
-import com.grad.project.nc.model.UserOLD;
+import com.grad.project.nc.model.User;
 
 public interface EmailService {
-    void sendRegistrationEmail(UserOLD userOLD);
+    void sendRegistrationEmail(User user);
 }
