@@ -4,17 +4,17 @@ package com.grad.project.nc.model;
  * Created by Alex on 4/24/2017.
  */
 public class Domain {
-    private Long domaiId;
+    private Long domainId;
     private String domainName;
     private Long addressId;
     private Long domainTypeId;
 
-    public Long getDomaiId() {
-        return domaiId;
+    public Long getDomainId() {
+        return domainId;
     }
 
-    public void setDomaiId(Long domaiId) {
-        this.domaiId = domaiId;
+    public void setDomainId(Long domainId) {
+        this.domainId = domainId;
     }
 
     public String getDomainName() {

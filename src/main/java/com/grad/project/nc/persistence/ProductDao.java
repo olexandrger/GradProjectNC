@@ -14,14 +14,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Alex on 4/25/2017.
- */
+
 @Repository
 public class ProductDao implements CrudDao<Product> {
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public ProductDao(JdbcTemplate jdbcTemplate){
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Transactional
     @Override
@@ -66,10 +68,10 @@ public class ProductDao implements CrudDao<Product> {
                 ", product_type_id = ? " +
                 "WHERE product_id = ? ";
 
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{product.getName()
+        jdbcTemplate.update(UPDATE_QUERY, product.getName()
                 ,product.getDescription()
                 ,product.getProductTypeId()
-                ,product.getProductId()});
+                ,product.getProductId());
 
 
         return product;

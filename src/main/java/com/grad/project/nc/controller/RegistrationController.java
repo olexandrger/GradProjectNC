@@ -1,7 +1,7 @@
 package com.grad.project.nc.controller;
 
 import com.grad.project.nc.model.Product;
-import com.grad.project.nc.model.Role;
+import com.grad.project.nc.model.RoleOld;
 import com.grad.project.nc.model.UserOLD;
 import com.grad.project.nc.persistence.ProductDao;
 import com.grad.project.nc.service.notifications.EmailService;
@@ -24,6 +24,9 @@ public class RegistrationController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private ProductDao productDao;
+
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
     public String registration(Model model) {
@@ -35,11 +38,19 @@ public class RegistrationController {
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     public String registration(@ModelAttribute("user") UserOLD userOLD) {
 
-        ArrayList<Role> roles = new ArrayList<>();
-        roles.add(Role.USER);
-        userOLD.setAuthorities(roles);
+        ArrayList<RoleOld> roleOlds = new ArrayList<>();
+        roleOlds.add(RoleOld.USER);
+        userOLD.setAuthorities(roleOlds);
         emailService.sendRegistrationEmail(userOLD);
         userService.createUser(userOLD);
+
+        Product p = new Product();
+        p.setProductId((long) 3);
+        p.setProductTypeId((long) 12);
+        p.setDescription("new Descr");
+        p.setName("NoARR");
+
+        productDao.update(p);
 
 
         return "redirect:/index";

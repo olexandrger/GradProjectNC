@@ -12,14 +12,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Alex on 4/25/2017.
- */
+
 @Repository
 public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> {
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public ProductCharacteristicDao(JdbcTemplate jdbcTemplate){
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
 
     @Transactional
@@ -69,11 +71,11 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
                 ", data_type_id = ? " +
                 "WHERE product_characteristic_id = ? ";
 
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{productCharacteristic.getProductTypeId()
+        jdbcTemplate.update(UPDATE_QUERY, productCharacteristic.getProductTypeId()
                 ,productCharacteristic.getCharacteristicName()
                 ,productCharacteristic.getMeasure()
                 ,productCharacteristic.getDataTypeId()
-                ,productCharacteristic.getProductCharacteristicId()});
+                ,productCharacteristic.getProductCharacteristicId());
         return productCharacteristic;
 
     }
@@ -102,7 +104,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
         return jdbcTemplate.query(SELECT_QUERY,new ProductCharacteristicRowMapper());
     }
 
-    public static final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
+    private static final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
         @Override
         public ProductCharacteristic mapRow(ResultSet rs, int rowNum) throws SQLException {
             ProductCharacteristic productCharacteristic = new ProductCharacteristic();
