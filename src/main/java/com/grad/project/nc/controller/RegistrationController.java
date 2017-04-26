@@ -24,8 +24,7 @@ public class RegistrationController {
     @Autowired
     private EmailService emailService;
 
-    @Autowired
-    private ProductDao productDao;
+
 
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
@@ -43,14 +42,6 @@ public class RegistrationController {
         userOLD.setAuthorities(roleOlds);
         emailService.sendRegistrationEmail(userOLD);
         userService.createUser(userOLD);
-
-        Product p = new Product();
-        p.setProductId((long) 3);
-        p.setProductTypeId((long) 12);
-        p.setDescription("new Descr");
-        p.setName("NoARR");
-
-        productDao.update(p);
 
 
         return "redirect:/index";
