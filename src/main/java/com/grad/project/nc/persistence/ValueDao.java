@@ -108,7 +108,7 @@ public class ValueDao implements CrudDao<Value> {
         return jdbcTemplate.query(SELECT_QUERY,new ValueRowMapper()) ;
     }
 
-    public static final class ValueRowMapper implements RowMapper<Value> {
+    private static final class ValueRowMapper implements RowMapper<Value> {
         @Override
         public Value mapRow(ResultSet rs, int rowNum) throws SQLException {
             Value value = new Value();

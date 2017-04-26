@@ -95,7 +95,7 @@ public class ProductTypeDao implements CrudDao<ProductType> {
         return jdbcTemplate.query(SELECT_QUERY,new ProductTypeRowMapper());
     }
 
-    public static final class ProductTypeRowMapper implements RowMapper<ProductType> {
+    private static final class ProductTypeRowMapper implements RowMapper<ProductType> {
         @Override
         public ProductType mapRow(ResultSet rs, int rowNum) throws SQLException {
             ProductType productType = new ProductType();
