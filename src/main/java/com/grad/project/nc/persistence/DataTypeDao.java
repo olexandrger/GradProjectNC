@@ -13,14 +13,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Alex on 4/25/2017.
- */
+
 @Repository
 public class DataTypeDao implements CrudDao<DataType> {
 
-    @Autowired
+
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public DataTypeDao(JdbcTemplate jdbcTemplate){
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
 
     @Transactional
@@ -48,7 +51,7 @@ public class DataTypeDao implements CrudDao<DataType> {
         final String UPDATE_QUERY = "UPDATE data_type SET data_type = ?" +
                 "WHERE data_type_id = ? ";
 
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{dataType.getDataType(),dataType.getDataTypeId()});
+        jdbcTemplate.update(UPDATE_QUERY, dataType.getDataType(),dataType.getDataTypeId());
 
         return dataType;
     }
