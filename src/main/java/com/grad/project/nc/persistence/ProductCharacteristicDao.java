@@ -104,7 +104,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
         return jdbcTemplate.query(SELECT_QUERY,new ProductCharacteristicRowMapper());
     }
 
-    public static final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
+    private static final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
         @Override
         public ProductCharacteristic mapRow(ResultSet rs, int rowNum) throws SQLException {
             ProductCharacteristic productCharacteristic = new ProductCharacteristic();

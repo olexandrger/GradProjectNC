@@ -81,7 +81,7 @@ public class ProductCharacteristicValueDao  {
 
     }
 
-    public static final class ProductCharacteristicValueRowMapper implements RowMapper<ProductCharacteristicValue> {
+    private static final class ProductCharacteristicValueRowMapper implements RowMapper<ProductCharacteristicValue> {
         @Override
         public ProductCharacteristicValue mapRow(ResultSet rs, int rowNum) throws SQLException {
             ProductCharacteristicValue productCharacteristicValue = new ProductCharacteristicValue();
