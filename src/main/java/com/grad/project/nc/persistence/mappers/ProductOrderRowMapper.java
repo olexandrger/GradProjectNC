@@ -15,10 +15,12 @@ public class ProductOrderRowMapper implements RowMapper<ProductOrder> {
         productOrder.setProductInstanceId(resultSet.getLong("product_instance_id"));
         productOrder.setUserId(resultSet.getLong("user_id"));
         productOrder.setCategoryId(resultSet.getLong("category_id"));
-        productOrder.setStatusID(resultSet.getLong("status_id"));
+        productOrder.setStatusId(resultSet.getLong("status_id"));
         productOrder.setResponsibleId(resultSet.getLong("responsible_id"));
         productOrder.setOpenDate(resultSet.getTimestamp("open_date").toLocalDateTime());
-        productOrder.setCloseDate(resultSet.getTimestamp("close_date").toLocalDateTime());
+
+        if (resultSet.getTimestamp("close_date") != null)
+            productOrder.setCloseDate(resultSet.getTimestamp("close_date").toLocalDateTime());
 
         return productOrder;
     }

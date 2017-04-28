@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.ProductOrder;
+import com.grad.project.nc.model.User;
 import com.grad.project.nc.persistence.mappers.ProductOrderRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -86,7 +87,7 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
                 "status_id, responsible_id, open_date, close_date FROM product_order";
 
             return connection.prepareStatement(statement);
-    }, new ProductOrderRowMapper());
+        }, new ProductOrderRowMapper());
     }
 
     @Override
@@ -99,5 +100,14 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
 
             return preparedStatement;
         });
+    }
+
+    Collection<ProductOrder> getOrdersByUser(User userProxy) {return findMultiple(connection -> {
+        String statement = "SELECT product_order_id, product_instance_id, product_order.user_id, category_id, " +
+                "status_id, responsible_id, open_date, close_date FROM product_order " +
+                "INNER JOIN \"user\" ON \"user\".user_id = product_order.user_id";
+
+            return connection.prepareStatement(statement);
+        }, new ProductOrderRowMapper());
     }
 }

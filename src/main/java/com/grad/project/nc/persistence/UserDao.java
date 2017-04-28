@@ -1,8 +1,6 @@
 package com.grad.project.nc.persistence;
 
-import com.grad.project.nc.model.Domain;
-import com.grad.project.nc.model.Role;
-import com.grad.project.nc.model.User;
+import com.grad.project.nc.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -22,13 +20,18 @@ public class UserDao extends AbstractDao<User> {
 
     RoleDao roleDao;
     DomainDao domainDao;
+    ProductOrderDao productOrderDao;
+    ComplainDao complainDao;
 
     @Autowired
-    UserDao(JdbcTemplate jdbcTemplate, RoleDao roleDao, DomainDao domainDao) {
+    UserDao(JdbcTemplate jdbcTemplate, RoleDao roleDao, DomainDao domainDao, ProductOrderDao productOrderDao,
+            ComplainDao complainDao) {
         super(jdbcTemplate);
 
         this.roleDao = roleDao;
         this.domainDao = domainDao;
+        this.complainDao = complainDao;
+        this.productOrderDao = productOrderDao;
     }
 
     @Override
@@ -152,6 +155,24 @@ public class UserDao extends AbstractDao<User> {
             }
 
             return super.getDomains();
+        }
+
+        @Override
+        public List<ProductOrder> getOrders() {
+            if (super.getOrders() == null) {
+                super.setOrders(new LinkedList<>(productOrderDao.getOrdersByUser(this)));
+            }
+
+            return super.getOrders();
+        }
+
+        @Override
+        public List<Complain> getComplains() {
+            if (super.getComplains() == null) {
+                super.setComplains(new LinkedList<>(complainDao.getComplainsByUser(this)));
+            }
+
+            return super.getComplains();
         }
     }
 
