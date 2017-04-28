@@ -51,7 +51,7 @@ abstract class AbstractDao<T> implements CrudDao<T> {
 
     }
 
-    Collection<T> findMultiple(PreparedStatementCreator statementCreator, RowMapper<T> mapper) {
+    <E> Collection<E> findMultiple(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
         return jdbcTemplate.query(statementCreator, mapper);
     }
 }

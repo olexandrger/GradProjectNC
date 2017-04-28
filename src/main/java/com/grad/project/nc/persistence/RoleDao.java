@@ -77,13 +77,13 @@ public class RoleDao implements CrudDao<Role>{
     }
 
 
-    private static final class RoleRowMapper implements RowMapper<Role> {
+    static final class RoleRowMapper implements RowMapper<Role> {
         @Override
         public Role mapRow(ResultSet rs, int rowNum) throws SQLException {
             Role role = new Role();
 
             role.setRoleId(rs.getLong("role_id"));
-            role.setRoleName(rs.getString("name_name"));
+            role.setRoleName(rs.getString("role_name"));
 
             return role;
         }
