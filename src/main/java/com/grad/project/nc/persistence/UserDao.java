@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +20,21 @@ import java.util.*;
 @Repository
 public class UserDao extends AbstractDao<User> {
 
-    CrudDao<Role> rolesDao;
+    RoleDao roleDao;
+    DomainDao domainDao;
 
     @Autowired
-    UserDao(JdbcTemplate jdbcTemplate, CrudDao<Role> rolesDao) {
+    UserDao(JdbcTemplate jdbcTemplate, RoleDao roleDao, DomainDao domainDao) {
         super(jdbcTemplate);
 
-        this.rolesDao = rolesDao;
+        this.roleDao = roleDao;
+        this.domainDao = domainDao;
     }
 
     @Override
     public User add(User user){
 
-        //TODO add roles saving
+        //TODO add lists saving
 
         KeyHolder keyHolder = executeInsert(connection -> {
             String statement = "INSERT INTO \"user\" (email, password, first_name, last_name, phone_number)" +
@@ -136,20 +139,19 @@ public class UserDao extends AbstractDao<User> {
         @Override
         public List<Role> getRoles() {
             if (super.getRoles() == null) {
-                Collection<Role> roles = findMultiple(connection -> {
-                    String query = "SELECT role.role_id, role.role_name FROM role " +
-                            "INNER JOIN user_role ON role.role_id = user_role.role_id WHERE user_role.user_id = ?";
-
-                    PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setLong(1, getUserId());
-
-                    return statement;
-                }, new RoleDao.RoleRowMapper());
-
-                super.setRoles(new LinkedList<>(roles));
+                super.setRoles(new LinkedList<>(roleDao.getRolesByUser(this)));
             }
 
             return super.getRoles();
+        }
+
+        @Override
+        public List<Domain> getDomains() {
+            if (super.getDomains() == null) {
+                super.setDomains(new LinkedList<>(domainDao.getDomainsByUser(this)));
+            }
+
+            return super.getDomains();
         }
     }
 

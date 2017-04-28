@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Domain;
+import com.grad.project.nc.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,12 +18,13 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 @Repository
-public class DomainDao implements CrudDao<Domain> {
+public class DomainDao extends AbstractDao<Domain> {
 
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public DomainDao(JdbcTemplate jdbcTemplate){
+        super(jdbcTemplate);
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -64,10 +66,10 @@ public class DomainDao implements CrudDao<Domain> {
 
     @Override
     public Domain find(long id) {
-        final String SELECT_QUERY = "SELECT domain_name" +
+        final String SELECT_QUERY = "SELECT domain_id,domain_name" +
                 ",address_id" +
                 ",domain_type_id" +
-                "FROM domain " +
+                " FROM domain " +
                 "WHERE domain_id = ?";
 
         Domain domain = null;
@@ -87,7 +89,7 @@ public class DomainDao implements CrudDao<Domain> {
         final String SELECT_QUERY = "SELECT domain_id,domain_name" +
                 ",address_id" +
                 ",domain_type_id" +
-                "FROM domain ";
+                " FROM domain ";
         return jdbcTemplate.query(SELECT_QUERY, new DomainRowMapper());
 
     }
@@ -99,7 +101,19 @@ public class DomainDao implements CrudDao<Domain> {
 
     }
 
-    private static final class DomainRowMapper implements RowMapper<Domain>{
+    Collection<Domain> getDomainsByUser(User user) {
+        return findMultiple(connection -> {
+            String query = "SELECT domain.domain_id, domain.domain_name, domain.address_id, domain.domain_type_id FROM domain " +
+                    "INNER JOIN user_domain ON domain.domain_id = user_domain.domain_id WHERE user_domain.user_id = ?";
+
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setLong(1, user.getUserId());
+
+            return statement;
+        }, new DomainRowMapper());
+    }
+
+    private final class DomainRowMapper implements RowMapper<Domain>{
 
         @Override
         public Domain mapRow(ResultSet rs, int rowNum) throws SQLException {

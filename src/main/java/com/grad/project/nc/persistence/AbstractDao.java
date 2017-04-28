@@ -36,8 +36,8 @@ abstract class AbstractDao<T> implements CrudDao<T> {
         jdbcTemplate.update(statementCreator);
     }
 
-    T findOne(PreparedStatementCreator statementCreator, RowMapper<T> mapper) {
-        List<T> results = jdbcTemplate.query(statementCreator, mapper);
+    <E> E findOne(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
+        List<E> results = jdbcTemplate.query(statementCreator, mapper);
 
         if (results.size() > 1) {
             throw new NonUniqueResultException();

@@ -15,4 +15,7 @@ public class User {
     private String lastName;
     private String phoneNumber;
     private List<Role> roles;
+    private List<Domain> domains;
+    private List<ProductOrder> orders;
+    private List<Complain> complains;
 }
