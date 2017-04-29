@@ -3,6 +3,7 @@ package com.grad.project.nc.controller.api;
 import com.grad.project.nc.model.Region;
 import com.grad.project.nc.persistence.CrudDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +16,7 @@ public class RegionsController {
     private CrudDao<Region> regionsDao;
 
     @Autowired
-    public RegionsController(CrudDao<Region> regionsDao) {
+    public RegionsController(@Qualifier("regionDao") CrudDao<Region> regionsDao) {
         this.regionsDao = regionsDao;
     }
 
