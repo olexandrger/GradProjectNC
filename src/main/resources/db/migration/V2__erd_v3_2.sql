@@ -3,6 +3,44 @@
 -- Created on: 26.04.2017 1:55:01
 -- Diagram Version: 
 -- =============================================================================
+DROP TABLE "role" CASCADE;
+DROP TABLE "user_role" CASCADE;
+DROP TABLE "user" CASCADE;
+DROP TABLE "domain" CASCADE;
+DROP TABLE "user_domain" CASCADE;
+DROP TABLE "address" CASCADE;
+DROP TABLE "building" CASCADE;
+
+
+DROP TABLE "street" CASCADE;
+DROP TABLE "city" CASCADE;
+DROP TABLE "region" CASCADE;
+DROP TABLE "product_region_price" CASCADE;
+DROP TABLE "discount" CASCADE;
+DROP TABLE "discount_price" CASCADE;
+DROP TABLE "product_type" CASCADE;
+DROP TABLE "product_characteristic" CASCADE;
+DROP TABLE "product" CASCADE;
+DROP TABLE "data_type" CASCADE;
+
+
+DROP TABLE "product_characteristic_value" CASCADE;
+
+DROP TABLE "value" CASCADE;
+
+DROP TABLE "product_instance" CASCADE;
+
+DROP TABLE "complain" CASCADE;
+
+DROP TABLE "domain_type" CASCADE;
+
+DROP TABLE "product_order" CASCADE;
+
+DROP TABLE "category" CASCADE;
+
+DROP TABLE "category_type" CASCADE;
+DROP TABLE "status" CASCADE;
+DROP TABLE "status_type" CASCADE;
 
 
 CREATE TABLE "role" (

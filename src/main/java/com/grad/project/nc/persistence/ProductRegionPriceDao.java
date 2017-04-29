@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.ProductRegionPrice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -18,7 +19,7 @@ import java.util.Map;
  * Created by Roman Savuliak on 26.04.2017.
  */
 @Repository
-public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice>{
+public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -51,18 +52,26 @@ public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice>{
 
         jdbcTemplate.update(UPDATE_QUERY, new Object[]{
                 productRegionPrice.getProductId()
-                ,productRegionPrice.getRegionID()
-                ,productRegionPrice.getPrice()
-                ,productRegionPrice.getPriceId()});
+                , productRegionPrice.getRegionID()
+                , productRegionPrice.getPrice()
+                , productRegionPrice.getPriceId()});
 
-        return productRegionPrice;    }
+        return productRegionPrice;
+    }
 
     @Override
     @Transactional
     public ProductRegionPrice find(long id) {
         final String SELECT_QUERY = "SELECT price_id, product_id, region_id, price FROM product_region_price WHERE price_id = ?";
-        ProductRegionPrice productRegionPrice = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new ProductRegionPriceRowMapper());
-        return productRegionPrice;    }
+        ProductRegionPrice productRegionPrice = null;
+        try {
+           productRegionPrice = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new ProductRegionPriceRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
+
+        return productRegionPrice;
+    }
 
     @Override
     @Transactional

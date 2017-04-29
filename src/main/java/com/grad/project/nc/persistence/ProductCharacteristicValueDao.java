@@ -1,8 +1,10 @@
 package com.grad.project.nc.persistence;
 
+import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductCharacteristicValue;
 import com.grad.project.nc.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -17,7 +19,7 @@ import java.util.Collection;
  * Created by Alex on 4/25/2017.
  */
 @Repository
-public class ProductCharacteristicValueDao  {
+public class ProductCharacteristicValueDao   {
 
     private JdbcTemplate jdbcTemplate;
 
@@ -27,6 +29,7 @@ public class ProductCharacteristicValueDao  {
     }
 
 
+
     @Transactional
     public ProductCharacteristicValue add(ProductCharacteristicValue entity) {
         String QUERY = "INSERT INTO product_characteristic_value(product_id,product_characteristic_id,value_id) VALUES (?,?,?) ";
@@ -34,6 +37,7 @@ public class ProductCharacteristicValueDao  {
 
         return entity;
     }
+
 
 
     @Transactional
@@ -56,15 +60,22 @@ public class ProductCharacteristicValueDao  {
                 "FROM product_characteristic_value" +
                 " WHERE (product_id = ? AND product_characteristic_id = ? )";
 
-        ProductCharacteristicValue productCharacteristicValue = jdbcTemplate.queryForObject(QUERY
-                ,new Object[]{productId,productCharacteristicId}
-                ,new ProductCharacteristicValueRowMapper());
+        ProductCharacteristicValue productCharacteristicValue = null;
+        try {
+            productCharacteristicValue = jdbcTemplate.queryForObject(QUERY
+                    , new Object[]{productId, productCharacteristicId}
+                    , new ProductCharacteristicValueRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
 
         return  productCharacteristicValue;
 
     }
 
 
+
+    @Transactional
     public Collection<ProductCharacteristicValue> findAll() {
         final String QUERY = "SELECT product_id" +
                 ",product_characteristic_id" +

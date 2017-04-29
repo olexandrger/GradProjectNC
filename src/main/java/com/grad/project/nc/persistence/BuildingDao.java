@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Building;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -61,7 +62,13 @@ public class BuildingDao implements CrudDao<Building> {
                 "FROM building " +
                 "WHERE building_id = ?";
 
-        return jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, mapper);
+        Building building = null;
+        try {
+            building = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, mapper);
+        } catch (EmptyResultDataAccessException ex){
+
+        }
+        return building;
 
     }
 

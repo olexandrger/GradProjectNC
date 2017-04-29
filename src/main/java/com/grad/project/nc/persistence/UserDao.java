@@ -1,106 +1,187 @@
 package com.grad.project.nc.persistence;
 
-import com.grad.project.nc.model.User;
+import com.grad.project.nc.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.sql.Statement;
+import java.util.*;
 
-/**
- * Created by Roman Savuliak on 26.04.2017.
- */
-public class UserDao implements CrudDao<User>{
+@Repository
+public class UserDao extends AbstractDao<User> {
+
+    RoleDao roleDao;
+    DomainDao domainDao;
+    ProductOrderDao productOrderDao;
+    ComplainDao complainDao;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    UserDao(JdbcTemplate jdbcTemplate, RoleDao roleDao, DomainDao domainDao, ProductOrderDao productOrderDao,
+            ComplainDao complainDao) {
+        super(jdbcTemplate);
+
+        this.roleDao = roleDao;
+        this.domainDao = domainDao;
+        this.complainDao = complainDao;
+        this.productOrderDao = productOrderDao;
+    }
 
     @Override
-    @Transactional
-    public User add(User user) {
+    public User add(User user){
 
-        SimpleJdbcInsert insertUserQuery = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("user")
-                .usingGeneratedKeyColumns("user_id");
+        //TODO add lists saving
 
-        Map<String, Object> parameters = new HashMap<String, Object>(5);
-        parameters.put("email", user.getEmail());
-        parameters.put("password", user.getPassword());
-        parameters.put("first_name", user.getFirstName());
-        parameters.put("last_name", user.getLastName());
-        parameters.put("phone_number", user.getPhoneNumber());
+        KeyHolder keyHolder = executeInsert(connection -> {
+            String statement = "INSERT INTO \"user\" (email, password, first_name, last_name, phone_number)" +
+                    " VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
 
-        Number newId = insertUserQuery.executeAndReturnKey(parameters);
-        user.setUser_id(newId.longValue());
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setString(3, user.getFirstName());
+            preparedStatement.setString(4, user.getLastName());
+            preparedStatement.setString(5, user.getPhoneNumber());
+
+            return preparedStatement;
+        });
+
+        user.setUserId(getLongValue(keyHolder, "user_id"));
+
         return user;
     }
 
     @Override
-    @Transactional
     public User update(User user) {
-        final String UPDATE_QUERY = "UPDATE user SET" +
-                " email = ?" +
-                ", password = ?" +
-                ", first_name = ? " +
-                ", last_name = ? " +
-                ", phone_number = ? " +
-                "WHERE user_id = ? ";
 
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{
-                user.getEmail()
-                ,user.getPassword()
-                ,user.getFirstName()
-                ,user.getLastName()
-                ,user.getPhoneNumber()
-                ,user.getUser_id()});
+        executeUpdate(connection -> {
+            String query = "UPDATE \"user\" SET email = ?, password = ?," +
+                "first_name = ? , last_name = ? , phone_number = ? WHERE user_id = ? ";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setString(3, user.getFirstName());
+            preparedStatement.setString(4, user.getLastName());
+            preparedStatement.setString(5, user.getPhoneNumber());
+
+            return preparedStatement;
+        });
 
         return user;
     }
 
     @Override
-    @Transactional
     public User find(long id) {
-        final String SELECT_QUERY = "SELECT user_id, email, password, first_name, last_name, phone_number FROM user WHERE user_id = ?";
-        User user = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new UserRowMapper());
-        return user;
+        return findOne(connection -> {
+            String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\" WHERE user_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+
+            preparedStatement.setLong(1, id);
+
+            return preparedStatement;
+        }, new UserRowMapper());
     }
 
     @Override
     @Transactional
     public Collection<User> findAll() {
-        final String SELECT_QUERY = "SELECT user_id, email, password, first_name, last_name, phone_number FROM user";
-        return jdbcTemplate.query(SELECT_QUERY, new UserRowMapper());
+        return findMultiple(connection -> {
+            String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\"";
+            return connection.prepareStatement(statement);
+        }, new UserRowMapper());
     }
 
     @Override
-    @Transactional
     public void delete(User user) {
-        final String DELETE_QUERY = "DELETE FROM user WHERE user_id = ?";
-        jdbcTemplate.update(DELETE_QUERY, user.getUser_id());
+        executeUpdate(connection -> {
+            String statement = "DELETE FROM \"user\" WHERE user_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+
+            preparedStatement.setLong(1, user.getUserId());
+            return preparedStatement;
+        });
     }
 
     @Transactional
-    public Optional<User> findByUsername(String email) {
-        String sql = "SELECT * FROM users where email = ?;";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(
-                sql,
-                new Object[]{email},
-                new UserRowMapper()));
+    public Optional<User> findByEmail(String email) {
+        User result = findOne(connection -> {
+            String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\" WHERE email = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+
+            preparedStatement.setString(1, email);
+
+            return preparedStatement;
+        }, new UserRowMapper());
+
+        return Optional.of(result);
+    }
+/*
+    @Transactional
+    public void addUserRole(User user, Role role){
+
+        SimpleJdbcInsert insertUserQuery = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("user_role");
+
+        Map<String, Object> parameters = new HashMap<>(2);
+        parameters.put("user_id", user.getUser_id());
+        parameters.put("role_id", role.getRoleId());
+
+        insertUserQuery.execute(parameters);
+    }
+*/
+    private class UserProxy extends User {
+        @Override
+        public List<Role> getRoles() {
+            if (super.getRoles() == null) {
+                super.setRoles(new LinkedList<>(roleDao.getRolesByUser(this)));
+            }
+
+            return super.getRoles();
+        }
+
+        @Override
+        public List<Domain> getDomains() {
+            if (super.getDomains() == null) {
+                super.setDomains(new LinkedList<>(domainDao.getDomainsByUser(this)));
+            }
+
+            return super.getDomains();
+        }
+
+        @Override
+        public List<ProductOrder> getOrders() {
+            if (super.getOrders() == null) {
+                super.setOrders(new LinkedList<>(productOrderDao.getOrdersByUser(this)));
+            }
+
+            return super.getOrders();
+        }
+
+        @Override
+        public List<Complain> getComplains() {
+            if (super.getComplains() == null) {
+                super.setComplains(new LinkedList<>(complainDao.getComplainsByUser(this)));
+            }
+
+            return super.getComplains();
+        }
     }
 
-    private static final class UserRowMapper implements RowMapper<User> {
+    private final class UserRowMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            User user = new User();
+            User user = new UserProxy();
 
-            user.setUser_id(rs.getLong("user_id"));
+            user.setUserId(rs.getLong("user_id"));
             user.setEmail(rs.getString("email"));
             user.setPassword(rs.getString("password"));
             user.setFirstName(rs.getString("first_name"));

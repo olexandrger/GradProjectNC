@@ -28,9 +28,9 @@
                     <form method="post">
                         <input name="${_csrf.parameterName}" value="${_csrf.token}" type="hidden">
                         <div class="form-group">
-                            <label for="email">Username</label>
-                            <input type="text" class="form-control" id="email" placeholder="Username"
-                                   name="email">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" placeholder="Username"
+                                   name="username">
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>

@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.DomainType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -64,8 +65,14 @@ public class DomainTypeDao implements CrudDao<DomainType>  {
     public DomainType find(long id) {
         final String SELECT_QUERY = "SELECT domain_type_name FROM domain_type WHERE domain_type_id = ?";
 
-        DomainType domainType = jdbcTemplate.queryForObject(SELECT_QUERY,
-                new Object[]{id}, new DomainTypeRowMapper());
+
+        DomainType domainType = null;
+        try {
+            domainType = jdbcTemplate.queryForObject(SELECT_QUERY,
+                    new Object[]{id}, new DomainTypeRowMapper());
+        } catch (EmptyResultDataAccessException ex){
+
+        }
 
         return domainType;
     }
