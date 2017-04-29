@@ -27,7 +27,7 @@ public class ComplainDao extends AbstractDao<Complain> {
 
         KeyHolder keyHolder = executeInsert(connection -> {
             String statement = "INSERT INTO complain (user_id, product_instance_id, complain_title, content, " +
-                    "status_id, responsible_id, response, open_date, close_date, category_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "status_id, responsible_id, response, open_date, close_date, complain_reason_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement preparedStatement = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
 
@@ -40,12 +40,12 @@ public class ComplainDao extends AbstractDao<Complain> {
             preparedStatement.setString(7, entity.getResponse());
             preparedStatement.setTimestamp(8, Timestamp.valueOf(entity.getOpenDate()));
             preparedStatement.setTimestamp(9, Timestamp.valueOf(entity.getOpenDate()));
-            preparedStatement.setLong(10, entity.getCategoryId());
+            preparedStatement.setLong(10, entity.getComplainReasonId());
 
             return preparedStatement;
         });
 
-        entity.setCategoryId(getLongValue(keyHolder, "category_id"));
+        entity.setComplainId(getLongValue(keyHolder, "complain_id"));
 
         return entity;
     }
@@ -55,7 +55,7 @@ public class ComplainDao extends AbstractDao<Complain> {
 
         executeUpdate(connection -> {
             String statement = "UPDATE complain SET user_id=?, product_instance_id=?, complain_title=?, content=?, " +
-                    "status_id=?, responsible_id=?, response=?, open_date=?, close_date=?, category_id=? WHERE complain_id=?";
+                    "status_id=?, responsible_id=?, response=?, open_date=?, close_date=?, complain_reason_id=? WHERE complain_id=?";
 
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
@@ -68,7 +68,7 @@ public class ComplainDao extends AbstractDao<Complain> {
             preparedStatement.setString(7, entity.getResponse());
             preparedStatement.setTimestamp(8, Timestamp.valueOf(entity.getOpenDate()));
             preparedStatement.setTimestamp(9, Timestamp.valueOf(entity.getOpenDate()));
-            preparedStatement.setLong(10, entity.getCategoryId());
+            preparedStatement.setLong(10, entity.getComplainReasonId());
             preparedStatement.setLong(11, entity.getComplainId());
 
 
@@ -83,7 +83,7 @@ public class ComplainDao extends AbstractDao<Complain> {
 
         return findOne(connection -> {
             String statement = "SELECT complain_id, user_id, product_instance_id, complain_title, content, " +
-                    "status_id, responsible_id, response, open_date, close_date, category_id " +
+                    "status_id, responsible_id, response, open_date, close_date, complain_reason_id " +
                     "FROM complain WHERE complain_id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
@@ -98,7 +98,7 @@ public class ComplainDao extends AbstractDao<Complain> {
 
         return findMultiple(connection -> {
             String statement = "SELECT complain_id, user_id, product_instance_id, complain_title, content, " +
-                    "status_id, responsible_id, response, open_date, close_date, category_id " +
+                    "status_id, responsible_id, response, open_date, close_date, complain_reason_id " +
                     "FROM complain";
 
             return connection.prepareStatement(statement);
@@ -120,7 +120,7 @@ public class ComplainDao extends AbstractDao<Complain> {
     Collection<Complain> getComplainsByUser(User user) {
         return findMultiple(connection -> {
             String query = "SELECT complain_id, complain.user_id, product_instance_id, complain_title, content, " +
-                    "status_id, responsible_id, response, open_date, close_date, category_id " +
+                    "status_id, responsible_id, response, open_date, close_date, complain_reason_id " +
                     "FROM complain INNER JOIN \"user\" ON complain.user_id=\"user\".user_id WHERE \"user\".user_id=?";
             PreparedStatement statement = connection.prepareStatement(query);
 
@@ -139,7 +139,7 @@ public class ComplainDao extends AbstractDao<Complain> {
             Complain complain = new ComplainProxy();
 
 
-            complain.setCategoryId(resultSet.getLong("complain_id"));
+            complain.setComplainId(resultSet.getLong("complain_id"));
             complain.setUserId(resultSet.getLong("user_id"));
             complain.setProductInstanceId(resultSet.getLong("product_instance_id"));
             complain.setComplainTitle(resultSet.getString("complain_title"));
@@ -147,7 +147,7 @@ public class ComplainDao extends AbstractDao<Complain> {
             complain.setStatusId(resultSet.getLong("status_id"));
             complain.setResponsibleId(resultSet.getLong("responsible_id"));
             complain.setResponse(resultSet.getString("response"));
-            complain.setCategoryId(resultSet.getLong("category_id"));
+            complain.setComplainReasonId(resultSet.getLong("complain_reason_id"));
             complain.setOpenDate(resultSet.getTimestamp("open_date").toLocalDateTime());
 
             if (resultSet.getTimestamp("close_date") != null) {

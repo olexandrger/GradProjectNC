@@ -2,7 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductCharacteristicValue;
-import com.grad.project.nc.model.Value;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,8 +32,8 @@ public class ProductCharacteristicValueDao   {
 
     @Transactional
     public ProductCharacteristicValue add(ProductCharacteristicValue entity) {
-        String QUERY = "INSERT INTO product_characteristic_value(product_id,product_characteristic_id,value_id) VALUES (?,?,?) ";
-        jdbcTemplate.update(QUERY, new Object[]{entity.getProductId(),entity.getProductCharacteristicId(),entity.getValueId()});
+        String QUERY = "INSERT INTO product_characteristic_value(product_id,product_characteristic_id, number_value , date_value , string_value  ) VALUES (?,?,?,?,?) ";
+        jdbcTemplate.update(QUERY, new Object[]{entity.getProductId(),entity.getProductCharacteristicId(),entity.getNumberValue(),entity.getDateValue(),entity.getStringValue()});
 
         return entity;
     }
@@ -43,8 +43,8 @@ public class ProductCharacteristicValueDao   {
     @Transactional
     public ProductCharacteristicValue update(ProductCharacteristicValue entity) {
 
-        String QUERY = "UPDATE product_characteristic_value SET value_id = ? WHERE (product_id = ? AND product_characteristic_id = ?)";
-        jdbcTemplate.update(QUERY, new Object[]{entity.getValueId(),entity.getProductId(),entity.getProductCharacteristicId()});
+        String QUERY = "UPDATE product_characteristic_value SET number_value = ? , date_value = ?, string_value = ? WHERE (product_id = ? AND product_characteristic_id = ?)";
+        jdbcTemplate.update(QUERY, new Object[]{entity.getNumberValue(),entity.getDateValue(),entity.getStringValue(),entity.getProductId(),entity.getProductCharacteristicId()});
 
         return entity;
     }
@@ -56,7 +56,7 @@ public class ProductCharacteristicValueDao   {
 
         final String QUERY = "SELECT product_id" +
                 ",product_characteristic_id" +
-                ",value_id " +
+                ", number_value , date_value , string_value " +
                 "FROM product_characteristic_value" +
                 " WHERE (product_id = ? AND product_characteristic_id = ? )";
 
@@ -79,7 +79,7 @@ public class ProductCharacteristicValueDao   {
     public Collection<ProductCharacteristicValue> findAll() {
         final String QUERY = "SELECT product_id" +
                 ",product_characteristic_id" +
-                ",value_id " +
+                ", number_value , date_value , string_value " +
                 "FROM product_characteristic_value" ;
         return jdbcTemplate.query(QUERY, new ProductCharacteristicValueRowMapper());
     }
@@ -99,7 +99,11 @@ public class ProductCharacteristicValueDao   {
 
             productCharacteristicValue.setProductId(rs.getLong("product_id"));
             productCharacteristicValue.setProductCharacteristicId(rs.getLong("product_characteristic_id"));
-            productCharacteristicValue.setValueId(rs.getLong("value_id"));
+
+
+            productCharacteristicValue.setNumberValue(rs.getDouble("number_value"));
+            productCharacteristicValue.setDateValue(rs.getTimestamp("date_value").toLocalDateTime());
+            productCharacteristicValue.setStringValue(rs.getString("string_value"));
             return productCharacteristicValue;
         }
     }

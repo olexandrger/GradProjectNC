@@ -19,5 +19,5 @@ public class Complain {
     private String response;
     private LocalDateTime openDate;
     private LocalDateTime closeDate;
-    private Long categoryId;
+    private Long complainReasonId;
 }
