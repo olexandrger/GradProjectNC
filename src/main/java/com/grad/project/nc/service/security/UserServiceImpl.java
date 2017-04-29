@@ -7,6 +7,7 @@ import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.RoleDao;
 import com.grad.project.nc.persistence.UserDao;
 import com.grad.project.nc.persistence.UserOLDDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService{
 
@@ -49,7 +51,12 @@ public class UserServiceImpl implements UserService{
         user.setRoles(new LinkedList<>());
 
         roles.forEach(roleName -> {
-            user.getRoles().add(roleDao.getRoleByName(roleName));
+            Role role = roleDao.getRoleByName(roleName);
+            if (role != null) {
+                user.getRoles().add(role);
+            } else {
+                log.error("Cannot find role " + roleName);
+            }
         });
 
         userDao.add(user);
