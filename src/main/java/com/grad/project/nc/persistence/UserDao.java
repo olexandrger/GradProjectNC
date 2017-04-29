@@ -122,7 +122,7 @@ public class UserDao extends AbstractDao<User> {
             return preparedStatement;
         }, new UserRowMapper());
 
-        return Optional.of(result);
+        return Optional.ofNullable(result);
     }
 /*
     @Transactional

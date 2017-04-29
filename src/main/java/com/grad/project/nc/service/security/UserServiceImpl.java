@@ -1,6 +1,9 @@
 package com.grad.project.nc.service.security;
 
+import com.grad.project.nc.model.User;
 import com.grad.project.nc.model.UserOLD;
+import com.grad.project.nc.persistence.CrudDao;
+import com.grad.project.nc.persistence.UserDao;
 import com.grad.project.nc.persistence.UserOLDDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,19 +15,21 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService{
 
     @Autowired
-    private UserOLDDao userOLDDao;
+    private UserDao userDao;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userOLDDao.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("user was not found!"));
+        return userDao.findByEmail(username).orElseThrow(()-> new UsernameNotFoundException("user was not found!"));
     }
 
     @Override
-    public void createUser(UserOLD userOLD) {
-        userOLD.setPassword(bCryptPasswordEncoder.encode(userOLD.getPassword()));
-        userOLDDao.createUser(userOLD);
+    public void createUser(User user) {
+        user.setFirstName("test");
+        user.setLastName("user");
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userDao.add(user);
     }
 }
