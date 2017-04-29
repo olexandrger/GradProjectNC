@@ -1,9 +1,11 @@
 package com.grad.project.nc.service.locations;
 
 public interface Location {
-    String getRegionName(String address);
-
-    double getRegionLng(String address);
-
-    double getRegionLat(String address);
+    boolean doRequestForJSON(String address);
+    String getFullAddress(String language);
+    String getRegionName();
+    String getLocationId();
+    double getRegionLng();
+    double getRegionLat();
 }
+
