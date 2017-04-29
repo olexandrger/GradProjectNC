@@ -1,48 +1,8 @@
 ﻿-- =============================================================================
--- Diagram Name: erd_v3_2
--- Created on: 26.04.2017 1:55:01
+-- Diagram Name: erd_v3_3
+-- Created on: 29.04.2017 2:09:36
 -- Diagram Version: 
 -- =============================================================================
-DROP TABLE "role" CASCADE;
-DROP TABLE "user_role" CASCADE;
-DROP TABLE "user" CASCADE;
-DROP TABLE "domain" CASCADE;
-DROP TABLE "user_domain" CASCADE;
-DROP TABLE "address" CASCADE;
-DROP TABLE "building" CASCADE;
-
-
-DROP TABLE "street" CASCADE;
-DROP TABLE "city" CASCADE;
-DROP TABLE "region" CASCADE;
-DROP TABLE "product_region_price" CASCADE;
-DROP TABLE "discount" CASCADE;
-DROP TABLE "discount_price" CASCADE;
-DROP TABLE "product_type" CASCADE;
-DROP TABLE "product_characteristic" CASCADE;
-DROP TABLE "product" CASCADE;
-DROP TABLE "data_type" CASCADE;
-
-
-DROP TABLE "product_characteristic_value" CASCADE;
-
-DROP TABLE "value" CASCADE;
-
-DROP TABLE "product_instance" CASCADE;
-
-DROP TABLE "complain" CASCADE;
-
-DROP TABLE "domain_type" CASCADE;
-
-DROP TABLE "product_order" CASCADE;
-
-DROP TABLE "category" CASCADE;
-
-DROP TABLE "category_type" CASCADE;
-DROP TABLE "status" CASCADE;
-DROP TABLE "status_type" CASCADE;
-
-
 CREATE TABLE "role" (
 	"role_id" SERIAL NOT NULL,
 	"role_name" varchar(60) NOT NULL,
@@ -82,30 +42,23 @@ CREATE TABLE "user_domain" (
 
 CREATE TABLE "address" (
 	"address_id" SERIAL NOT NULL,
-	"apartment_number" int4 NOT NULL,
-	"building_id" int4 NOT NULL,
+	"apartment_number" varchar(30) NOT NULL,
+	"location_id" int4 NOT NULL,
 	PRIMARY KEY("address_id")
 );
 
-CREATE TABLE "building" (
-	"building_id" SERIAL NOT NULL,
-	"building_number" varchar(30) NOT NULL,
-	"street_id" int4 NOT NULL,
-	PRIMARY KEY("building_id")
+CREATE TABLE "location" (
+	"location_id" SERIAL NOT NULL,
+	"google_place_id" varchar(60) NOT NULL,
+	"google_region_id" int4 NOT NULL,
+	PRIMARY KEY("location_id")
 );
 
-CREATE TABLE "street" (
-	"street_id" SERIAL NOT NULL,
-	"street_name" varchar(60) NOT NULL,
-	"city_id" int4 NOT NULL,
-	PRIMARY KEY("street_id")
-);
-
-CREATE TABLE "city" (
-	"city_id" SERIAL NOT NULL,
-	"city_name" varchar(60) NOT NULL,
+CREATE TABLE "google_region" (
+	"google_region_id" SERIAL NOT NULL,
+	"google_region_name" varchar(120) NOT NULL,
 	"region_id" int4 NOT NULL,
-	PRIMARY KEY("city_id")
+	PRIMARY KEY("google_region_id")
 );
 
 CREATE TABLE "region" (
@@ -170,22 +123,15 @@ CREATE TABLE "data_type" (
 CREATE TABLE "product_characteristic_value" (
 	"product_id" int4 NOT NULL,
 	"product_characteristic_id" int4 NOT NULL,
-	"value_id" int4 NOT NULL,
-	PRIMARY KEY("product_id","product_characteristic_id")
-);
-
-CREATE TABLE "value" (
-	"value_id" SERIAL NOT NULL,
-	"product_characteristic_id" int4 NOT NULL,
 	"number_value" numeric,
 	"date_value" timestamp(0),
 	"string_value" varchar,
-	PRIMARY KEY("value_id")
+	PRIMARY KEY("product_id","product_characteristic_id")
 );
 
 CREATE TABLE "product_instance" (
 	"instance_id" SERIAL NOT NULL,
-	"product_id" int4 NOT NULL,
+	"price_id" int4 NOT NULL,
 	"domain_id" int4 NOT NULL,
 	"status_id" int4 NOT NULL,
 	PRIMARY KEY("instance_id")
@@ -202,7 +148,7 @@ CREATE TABLE "complain" (
 	"response" varchar(240),
 	"open_date" timestamp(0) NOT NULL,
 	"close_date" timestamp(0),
-	"category_id" int4 NOT NULL,
+	"complain_reason_id" int4 NOT NULL,
 	PRIMARY KEY("complain_id")
 );
 
@@ -216,7 +162,7 @@ CREATE TABLE "product_order" (
 	"product_order_id" SERIAL NOT NULL,
 	"product_instance_id" int4 NOT NULL,
 	"user_id" int4 NOT NULL,
-	"category_id" int4 NOT NULL,
+	"order_aim_id" int4 NOT NULL,
 	"status_id" int4 NOT NULL,
 	"responsible_id" int4,
 	"open_date" timestamp(0) NOT NULL,
@@ -235,19 +181,6 @@ CREATE TABLE "category_type" (
 	"category_type_id" SERIAL NOT NULL,
 	"category_type_name" varchar(30) NOT NULL,
 	PRIMARY KEY("category_type_id")
-);
-
-CREATE TABLE "status" (
-	"status_id" SERIAL NOT NULL,
-	"status_name" varchar(30) NOT NULL,
-	"status_type_id" int4 NOT NULL,
-	PRIMARY KEY("status_id")
-);
-
-CREATE TABLE "status_type" (
-	"status_type_id" SERIAL NOT NULL,
-	"status_type_name" varchar(30) NOT NULL,
-	PRIMARY KEY("status_type_id")
 );
 
 
@@ -293,28 +226,21 @@ ALTER TABLE "user_domain" ADD CONSTRAINT "Ref_user_domain_to_domain" FOREIGN KEY
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "address" ADD CONSTRAINT "Ref_address_to_building" FOREIGN KEY ("building_id")
-	REFERENCES "building"("building_id")
+ALTER TABLE "address" ADD CONSTRAINT "Ref_address_to_location" FOREIGN KEY ("location_id")
+	REFERENCES "location"("location_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "building" ADD CONSTRAINT "Ref_building_to_street" FOREIGN KEY ("street_id")
-	REFERENCES "street"("street_id")
+ALTER TABLE "location" ADD CONSTRAINT "Ref_location_to_google_region" FOREIGN KEY ("google_region_id")
+	REFERENCES "google_region"("google_region_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "street" ADD CONSTRAINT "Ref_street_to_city" FOREIGN KEY ("city_id")
-	REFERENCES "city"("city_id")
-	MATCH SIMPLE
-	ON DELETE NO ACTION
-	ON UPDATE NO ACTION
-	NOT DEFERRABLE;
-
-ALTER TABLE "city" ADD CONSTRAINT "Ref_city_to_region" FOREIGN KEY ("region_id")
+ALTER TABLE "google_region" ADD CONSTRAINT "Ref_google_region_to_region" FOREIGN KEY ("region_id")
 	REFERENCES "region"("region_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
@@ -384,27 +310,6 @@ ALTER TABLE "product_characteristic_value" ADD CONSTRAINT "Ref_product_character
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "product_characteristic_value" ADD CONSTRAINT "Ref_product_characteristic_value_to_value" FOREIGN KEY ("value_id")
-	REFERENCES "value"("value_id")
-	MATCH SIMPLE
-	ON DELETE NO ACTION
-	ON UPDATE NO ACTION
-	NOT DEFERRABLE;
-
-ALTER TABLE "value" ADD CONSTRAINT "Ref_value_to_product_characteristic" FOREIGN KEY ("product_characteristic_id")
-	REFERENCES "product_characteristic"("product_characteristic_id")
-	MATCH SIMPLE
-	ON DELETE NO ACTION
-	ON UPDATE NO ACTION
-	NOT DEFERRABLE;
-
-ALTER TABLE "product_instance" ADD CONSTRAINT "Ref_product_instance_to_product" FOREIGN KEY ("product_id")
-	REFERENCES "product"("product_id")
-	MATCH SIMPLE
-	ON DELETE NO ACTION
-	ON UPDATE NO ACTION
-	NOT DEFERRABLE;
-
 ALTER TABLE "product_instance" ADD CONSTRAINT "Ref_product_instance_to_domain" FOREIGN KEY ("domain_id")
 	REFERENCES "domain"("domain_id")
 	MATCH SIMPLE
@@ -412,8 +317,15 @@ ALTER TABLE "product_instance" ADD CONSTRAINT "Ref_product_instance_to_domain" F
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "product_instance" ADD CONSTRAINT "Ref_product_instance_to_status" FOREIGN KEY ("status_id")
-	REFERENCES "status"("status_id")
+ALTER TABLE "product_instance" ADD CONSTRAINT "Ref_product_instance_to_product_region_price" FOREIGN KEY ("price_id")
+	REFERENCES "product_region_price"("price_id")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE;
+
+ALTER TABLE "product_instance" ADD CONSTRAINT "Ref_product_instance_to_category" FOREIGN KEY ("status_id")
+	REFERENCES "category"("category_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
@@ -440,14 +352,14 @@ ALTER TABLE "complain" ADD CONSTRAINT "Ref_complain_to_product_instance" FOREIGN
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "complain" ADD CONSTRAINT "Ref_complain_to_status" FOREIGN KEY ("status_id")
-	REFERENCES "status"("status_id")
+ALTER TABLE "complain" ADD CONSTRAINT "Ref_complain_status_to_category" FOREIGN KEY ("status_id")
+	REFERENCES "category"("category_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "complain" ADD CONSTRAINT "Ref_complain_to_category" FOREIGN KEY ("category_id")
+ALTER TABLE "complain" ADD CONSTRAINT "Ref_complain_to_category" FOREIGN KEY ("complain_reason_id")
 	REFERENCES "category"("category_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
@@ -475,15 +387,15 @@ ALTER TABLE "product_order" ADD CONSTRAINT "Ref_product_order_to_product_instanc
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "product_order" ADD CONSTRAINT "Ref_product_order_to_category" FOREIGN KEY ("category_id")
+ALTER TABLE "product_order" ADD CONSTRAINT "Ref_product_order_aim_to_category" FOREIGN KEY ("order_aim_id")
 	REFERENCES "category"("category_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE;
 
-ALTER TABLE "product_order" ADD CONSTRAINT "Ref_product_order_to_status" FOREIGN KEY ("status_id")
-	REFERENCES "status"("status_id")
+ALTER TABLE "product_order" ADD CONSTRAINT "Ref_product_order_status_to_category" FOREIGN KEY ("status_id")
+	REFERENCES "category"("category_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
@@ -491,13 +403,6 @@ ALTER TABLE "product_order" ADD CONSTRAINT "Ref_product_order_to_status" FOREIGN
 
 ALTER TABLE "category" ADD CONSTRAINT "Ref_category_to_category_type" FOREIGN KEY ("category_type_id")
 	REFERENCES "category_type"("category_type_id")
-	MATCH SIMPLE
-	ON DELETE NO ACTION
-	ON UPDATE NO ACTION
-	NOT DEFERRABLE;
-
-ALTER TABLE "status" ADD CONSTRAINT "Ref_status_to_status_type" FOREIGN KEY ("status_type_id")
-	REFERENCES "status_type"("status_type_id")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION

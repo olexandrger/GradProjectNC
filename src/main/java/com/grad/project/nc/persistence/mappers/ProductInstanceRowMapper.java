@@ -12,7 +12,7 @@ public class ProductInstanceRowMapper implements RowMapper<ProductInstance>{
         ProductInstance productInstance = new ProductInstance();
 
         productInstance.setInstanceId(resultSet.getLong("instance_id"));
-        productInstance.setProductId(resultSet.getLong("product_id"));
+        productInstance.setPriceId(resultSet.getLong("price_id"));
         productInstance.setDomainId(resultSet.getLong("domain_id"));
         productInstance.setStatusId(resultSet.getLong("status_id"));
 

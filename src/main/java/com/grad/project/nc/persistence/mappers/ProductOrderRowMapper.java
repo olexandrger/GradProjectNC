@@ -14,7 +14,7 @@ public class ProductOrderRowMapper implements RowMapper<ProductOrder> {
         productOrder.setProductOrderId(resultSet.getLong("product_order_id"));
         productOrder.setProductInstanceId(resultSet.getLong("product_instance_id"));
         productOrder.setUserId(resultSet.getLong("user_id"));
-        productOrder.setCategoryId(resultSet.getLong("category_id"));
+        productOrder.setOrderAimId(resultSet.getLong("order_aim_id"));
         productOrder.setStatusId(resultSet.getLong("status_id"));
         productOrder.setResponsibleId(resultSet.getLong("responsible_id"));
         productOrder.setOpenDate(resultSet.getTimestamp("open_date").toLocalDateTime());

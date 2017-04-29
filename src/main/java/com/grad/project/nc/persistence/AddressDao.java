@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class AddressDao implements CrudDao<Address> {
                 .withTableName("address").usingGeneratedKeyColumns("address_id");
         Map<String, Object> parameters = new HashMap<>(2);
         parameters.put("apartment_number", address.getApartmentNumber());
-        parameters.put("building_id", address.getBuildingId());
+        parameters.put("location_id", address.getLocation_id());
         Number newId = insertAddressQuery.executeAndReturnKey(parameters);
         address.setAddressId(newId.longValue());
         return address;
@@ -43,7 +42,7 @@ public class AddressDao implements CrudDao<Address> {
     @Override
     @Transactional
     public Address find(long id) {
-        final String SELECT_QUERY = "SELECT address_id, apartment_number, building_id" +
+        final String SELECT_QUERY = "SELECT address_id, apartment_number, location_id" +
                 " FROM address WHERE address_id = ?";
 
         Address address = null;
@@ -60,7 +59,7 @@ public class AddressDao implements CrudDao<Address> {
     @Override
     @Transactional
     public Collection<Address> findAll() {
-        final String SELECT_ALL_QUERY = "SELECT address_id, apartment_number, building_id" +
+        final String SELECT_ALL_QUERY = "SELECT address_id, apartment_number, location_id" +
                 " FROM address";
         return jdbcTemplate.query(SELECT_ALL_QUERY, mapper);
 
@@ -70,12 +69,12 @@ public class AddressDao implements CrudDao<Address> {
     @Transactional
     public Address update(Address address) {
         final String UPDATE_QUERY = "UPDATE address " +
-                "SET apartment_number = ?, building_id = ? " +
+                "SET apartment_number = ?, location_id = ? " +
                 "WHERE address_id = ?";
 
         jdbcTemplate.update(UPDATE_QUERY, new Object[]{
                 address.getApartmentNumber(),
-                address.getBuildingId(),
+                address.getLocation_id(),
                 address.getAddressId()});
         return address;
     }
@@ -95,7 +94,7 @@ public class AddressDao implements CrudDao<Address> {
             Address address = new Address();
             address.setAddressId(resultSet.getLong("address_id"));
             address.setApartmentNumber(resultSet.getInt("apartment_number"));
-            address.setBuildingId(resultSet.getLong("building_id"));
+            address.setLocation_id(resultSet.getLong("location_id"));
             return address;
         }
     }

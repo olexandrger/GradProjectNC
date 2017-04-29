@@ -23,10 +23,10 @@ public class ProductInstanceDao extends AbstractDao<ProductInstance>{
     public ProductInstance add(ProductInstance entity) {
 
         KeyHolder keyHolder = executeInsert(connection -> {
-            String statement = "INSERT INTO product_instance (product_id, domain_id, status_id) VALUES (?, ?, ?)";
+            String statement = "INSERT INTO product_instance (price_id, domain_id, status_id) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
 
-            preparedStatement.setLong(1, entity.getProductId());
+            preparedStatement.setLong(1, entity.getPriceId());
             preparedStatement.setLong(2, entity.getDomainId());
             preparedStatement.setLong(3, entity.getStatusId());
 
@@ -41,10 +41,10 @@ public class ProductInstanceDao extends AbstractDao<ProductInstance>{
     @Override
     public ProductInstance update(ProductInstance entity) {
         executeUpdate(connection -> {
-            String statement = "UPDATE product_instance SET product_id=?, domain_id=?, status_id=? WHERE instance_id=?";
+            String statement = "UPDATE product_instance SET price_id = ?, domain_id = ?, status_id = ? WHERE instance_id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
-            preparedStatement.setLong(1, entity.getProductId());
+            preparedStatement.setLong(1, entity.getPriceId());
             preparedStatement.setLong(2, entity.getDomainId());
             preparedStatement.setLong(3, entity.getStatusId());
             preparedStatement.setLong(4, entity.getInstanceId());
@@ -58,7 +58,7 @@ public class ProductInstanceDao extends AbstractDao<ProductInstance>{
     @Override
     public ProductInstance find(long id) {
         return findOne(connection -> {
-            String statement = "SELECT instance_id, product_id, domain_id, status_id FROM product_instance WHERE instance_id=?";
+            String statement = "SELECT instance_id, price_id, domain_id, status_id FROM product_instance WHERE instance_id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
             preparedStatement.setLong(1, id);
@@ -71,7 +71,7 @@ public class ProductInstanceDao extends AbstractDao<ProductInstance>{
     @Override
     public Collection<ProductInstance> findAll() {
         return findMultiple(connection -> {
-            String statement = "SELECT instance_id, product_id, domain_id, status_id FROM product_instance";
+            String statement = "SELECT instance_id, price_id, domain_id, status_id FROM product_instance";
             return connection.prepareStatement(statement);
         }, new ProductInstanceRowMapper());
     }

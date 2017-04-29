@@ -104,7 +104,10 @@ public class DiscountDao implements CrudDao<Discount>{
             discount.setDiscountTitle(rs.getString("discount_title"));
             discount.setDiscount(rs.getDouble("discount"));
             discount.setStartDate(rs.getTimestamp("start_date").toLocalDateTime());
-            discount.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
+
+            if (rs.getTimestamp("end_date") != null) {
+                discount.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
+            }
 
             return discount;
         }

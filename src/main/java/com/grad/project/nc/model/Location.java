@@ -4,13 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Created by Alex on 4/24/2017.
+ * Created by Alex on 4/29/2017.
  */
 @Data
 @NoArgsConstructor
-public class Region {
+public class Location {
+    private Long locationId;
+    private String googlePlaceId;
     private Long regionId;
-    private String regionName;
-
 
 }

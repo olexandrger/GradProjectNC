@@ -13,35 +13,38 @@ INSERT INTO "data_type" ("data_type") VALUES
     ('DATE'),
     ('STRING');
 
-INSERT INTO "status_type" ("status_type_name") VALUES
-    ('PRODUCT_INSTANCE_STATUS'),
+INSERT INTO "category_type" ("category_type_name") VALUES
+    ('PRODUCT_ORDER_STATUS'),
     ('COMPLAIN_STATUS'),
-    ('PRODUCT_ORDER_STATUS');
+    ('PRODUCT_INSTANCE_STATUS'),
+    ('PRODUCT_ORDER_AIM'),
+    ('COMPLAIN_REASON');
 
-INSERT INTO "status" ("status_name", "status_type_id") VALUES
-    ('CREATED', 3),
-    ('IN_PROGRESS', 3),
-    ('CANCELLED', 3),
-    ('COMPLETED', 3);
+INSERT INTO "category" ("category_name", "category_type_id") VALUES
+    ('CREATED', 1),
+    ('IN_PROGRESS', 1),
+    ('CANCELLED', 1),
+    ('COMPLETED', 1);
 
-INSERT INTO "status" ("status_name", "status_type_id") VALUES
+INSERT INTO "category" ("category_name", "category_type_id") VALUES
     ('CREATED', 2),
     ('UNDER_CONSIDERATION', 2),
     ('CONSIDERATION_COMPLETED', 2),
     ('REJECTED', 2);
 
-INSERT INTO "status" ("status_name", "status_type_id") VALUES
-    ('CREATED', 1),
-    ('ACTIVATED', 1),
-    ('SUSPENDED', 1),
-    ('DEACTIVATED', 1);
-
-INSERT INTO "category_type" ("category_type_name") VALUES
-    ('PRODUCT_ORDER_CATEGORY'),
-    ('COMPLAIN_CATEGORY');
+INSERT INTO "category" ("category_name", "category_type_id") VALUES
+    ('CREATED', 3),
+    ('ACTIVATED', 3),
+    ('SUSPENDED', 3),
+    ('DEACTIVATED', 3);
 
 INSERT INTO "category" ("category_name", "category_type_id") VALUES
-    ('SERVICE_PROBLEMS', 2),
-    ('ORDER_PROBLEMS', 2),
-    ('PRODUCT_CHARACTERISTICS_PROBLEMS', 2),
-    ('TECHNICAL_PROBLEMS', 2);
+    ('CREATE', 4),
+    ('SUSPEND', 4),
+    ('DEACTIVATE', 4),
+    ('CANCEL', 4);
+
+INSERT INTO "category" ("category_name", "category_type_id") VALUES
+    ('SERVICE_PROBLEMS', 5),
+    ('ORDER_PROBLEMS', 5),
+    ('TECHNICAL_PROBLEMS', 5);
