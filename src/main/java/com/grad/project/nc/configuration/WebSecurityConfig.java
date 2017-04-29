@@ -45,9 +45,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                    .antMatchers("/*", "/css/*", "/js/*", "/api/*").permitAll()
+                    .antMatchers("/*", "/css/*", "/js/*", "/api/**").permitAll()
                     .antMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
-                    .antMatchers("/customer/**", "/api/customer/**").hasRole("CUSTOMER")
+                    .antMatchers("/client/**", "/api/client/**").hasRole("CLIENT")
 //                    .antMatchers("/api/**").authenticated()
                 .and()
                     .formLogin()
@@ -57,7 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .failureForwardUrl("/login/failed")
                 .and()
                     .logout()
-                        .logoutSuccessUrl("/logout")
+                        .logoutSuccessUrl("/login/logout")
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
     }
 

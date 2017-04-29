@@ -1,31 +1,31 @@
 package com.grad.project.nc.controller.api;
 
-import com.grad.project.nc.controller.api.data.ResponseHolder;
-import org.springframework.stereotype.Controller;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
 public class AuthenticationController {
+
     @RequestMapping("/login/success")
-    public String loginSuccess() {
-        return "redirect:/api/name";
+    public Map loginSuccess() {
+        return Collections.singletonMap("status", "success");
     }
 
     @RequestMapping("/login/failed")
     @ResponseBody
-    public ResponseHolder loginFailed() {
-        ResponseHolder response = new ResponseHolder();
-        response.setStatus("failed");
-        return response;
+    public Map loginFailed() {
+        return Collections.singletonMap("status", "failed");
     }
 
-    @RequestMapping("/logout")
+    @RequestMapping("/login/logout")
     @ResponseBody
-    public ResponseHolder logoutSuccess() {
-        ResponseHolder response = new ResponseHolder();
-        response.setStatus("success");
-        return response;
+    public Map logoutSuccess() {
+        return Collections.singletonMap("status", "success");
     }
+
 }

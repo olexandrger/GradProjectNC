@@ -34,11 +34,39 @@ public class UserDao extends AbstractDao<User> {
         this.productOrderDao = productOrderDao;
     }
 
+    private void saveUserRoles(User user) {
+        executeUpdate(connection -> {
+            String query = "DELETE FROM user_role WHERE user_id=?";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setLong(1, user.getUserId());
+
+            return statement;
+        });
+
+        if (user.getRoles() != null && user.getRoles().size() > 0) {
+            executeUpdate(connection -> {
+                String query = "INSERT INTO user_role(user_id, role_id) VALUES (?, ?)";
+                for (int i = 1; i < user.getRoles().size(); i++) {
+                    query += ",(?, ?)";
+                }
+
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                int i = 1;
+                for (Role role : user.getRoles()) {
+                    statement.setLong(i, user.getUserId());
+                    i++;
+                    statement.setLong(i, role.getRoleId());
+                    i++;
+                }
+                return statement;
+            });
+        }
+    }
+
     @Override
     public User add(User user){
-
-        //TODO add lists saving
-
         KeyHolder keyHolder = executeInsert(connection -> {
             String statement = "INSERT INTO \"user\" (email, password, first_name, last_name, phone_number)" +
                     " VALUES (?, ?, ?, ?, ?)";
@@ -54,6 +82,8 @@ public class UserDao extends AbstractDao<User> {
         });
 
         user.setUserId(getLongValue(keyHolder, "user_id"));
+
+        saveUserRoles(user);
 
         return user;
     }
@@ -75,6 +105,8 @@ public class UserDao extends AbstractDao<User> {
 
             return preparedStatement;
         });
+
+        saveUserRoles(user);
 
         return user;
     }

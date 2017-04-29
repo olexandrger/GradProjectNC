@@ -4,6 +4,8 @@ import com.grad.project.nc.model.User;
 import com.grad.project.nc.model.UserOLD;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.util.List;
+
 public interface UserService extends UserDetailsService {
-    void createUser(User user);
+    User createUser(String fistName, String lastName, String email, String password, String phone, List<String> roles);
 }

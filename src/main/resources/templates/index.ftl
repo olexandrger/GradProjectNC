@@ -42,24 +42,39 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        Kyiv<span class="caret"></span>
+                <li class="dropdown" id="region-select">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="region-selected">
+                        <!--<span class="caret"></span>-->
                     </a>
+                    <ul class="dropdown-menu"><!--
+                        <li><a href="#">Region 1</a></li>
+                        <li><a href="#">Region 2</a></li>
+                        <li><a href="#">Region 3</a></li>-->
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="hidden" data-toggle="modal" id="navbar-login-button" data-target="#login-modal">Login</a>
+                </li>
+                <li>
+                    <a href="#" class="hidden" data-toggle="modal" id="navbar-registration-button" data-target="#registration-modal">Register</a>
+                </li>
+                <li id="navbar-account">
+                    <a href="#" class="dropdown-toggle hidden" data-toggle="dropdown"  id="navbar-account-button">
+                        Welcome, user!<span class="caret"></span>
+                    </a>
+
                     <ul class="dropdown-menu">
                         <li><a href="#">Region 1</a></li>
                         <li><a href="#">Region 2</a></li>
                         <li><a href="#">Region 3</a></li>
                     </ul>
                 </li>
-                <li><a href="#" data-toggle="modal" data-target="#login-modal">Login</a></li>
-                <li><a href="#" data-toggle="modal" data-target="#registration-modal">Register</a></li>
             </ul>
             </div>
         </div>
     </nav>
 
-    <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Login modal" aria-hidden="true" style="display: none;">
+        <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Login modal" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header" align="center">
@@ -67,6 +82,7 @@
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                     </button>
                     <h1>Login to Your Account</h1>
+                    <div id="login-header-alert"></div>
                 </div>
                 <div class="modal-body">
                     <form id="login-form">
@@ -95,16 +111,17 @@
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                     </button>
                     <h1>Create new account</h1>
+                    <div id="registration-header-alert"></div>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="registration-form">
                         <div class="form-group">
-                            <label for="first-name">First name</label>
-                            <input type="text" class="form-control" name="first-name" placeholder="First name">
+                            <label for="firstName">First name</label>
+                            <input type="text" class="form-control" name="firstName" placeholder="First name">
                         </div>
                         <div class="form-group">
-                            <label for="last-name">Last name</label>
-                            <input type="text" class="form-control" name="last-name" placeholder="Last name">
+                            <label for="lastName">Last name</label>
+                            <input type="text" class="form-control" name="lastName" placeholder="Last name">
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
@@ -115,13 +132,17 @@
                             <input type="password" class="form-control" name="password" placeholder="Password">
                         </div>
                         <div class="form-group">
-                            <label for="repeat-password">Repeat password</label>
-                            <input type="password" class="form-control" name="repeat-password" placeholder="Repeat password">
+                            <label for="repeatPassword">Repeat password</label>
+                            <input type="password" class="form-control" name="repeatPassword" placeholder="Repeat password">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" class="form-control" name="phone" placeholder="Phone">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="register()">Login</button>
                 </div>
             </div>
         </div>

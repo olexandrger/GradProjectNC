@@ -81,6 +81,17 @@ public class RoleDao extends AbstractDao<Role>{
         jdbcTemplate.update(DELETE_QUERY, role.getRoleId());
     }
 
+    public Role getRoleByName(String roleName) {
+        return findOne(connection -> {
+            String query = "SELECT role_id, role_name FROM role WHERE role_name = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setString(1, roleName);
+
+            return statement;
+        }, new RoleRowMapper());
+    }
+
     Collection<Role> getRolesByUser(User user) {
         return findMultiple(connection -> {
             String query = "SELECT role.role_id, role.role_name FROM role " +
@@ -90,7 +101,7 @@ public class RoleDao extends AbstractDao<Role>{
             statement.setLong(1, user.getUserId());
 
             return statement;
-        }, new RoleDao.RoleRowMapper());
+        }, new RoleRowMapper());
     }
 
     final class RoleRowMapper implements RowMapper<Role> {
