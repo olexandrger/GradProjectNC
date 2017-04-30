@@ -2,11 +2,11 @@ package com.grad.project.nc.service.security;
 
 import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.User;
-import com.grad.project.nc.model.UserOLD;
+
 import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.RoleDao;
 import com.grad.project.nc.persistence.UserDao;
-import com.grad.project.nc.persistence.UserOLDDao;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

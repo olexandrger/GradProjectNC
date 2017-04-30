@@ -1,7 +1,7 @@
 package com.grad.project.nc.service.security;
 
 import com.grad.project.nc.model.User;
-import com.grad.project.nc.model.UserOLD;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
