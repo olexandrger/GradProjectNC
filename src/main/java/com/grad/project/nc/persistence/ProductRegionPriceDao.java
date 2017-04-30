@@ -1,6 +1,8 @@
 package com.grad.project.nc.persistence;
 
+import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
+import com.grad.project.nc.model.Region;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -86,6 +88,7 @@ public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice> {
 
         jdbcTemplate.update(DELETE_QUERY, productRegionPrice.getPriceId());
     }
+
 
     private static final class ProductRegionPriceRowMapper implements RowMapper<ProductRegionPrice> {
         @Override

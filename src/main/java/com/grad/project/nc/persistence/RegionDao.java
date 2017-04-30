@@ -79,6 +79,9 @@ public class RegionDao implements CrudDao<Region>{
 
     public Region findByGoogleRegion(GoogleRegion googleRegion){
 
+        //TODO
+        return new Region();
+
     }
 
     private static final class RegionRowMapper implements RowMapper<Region> {

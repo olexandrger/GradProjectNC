@@ -11,9 +11,11 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Alex on 4/25/2017.
@@ -89,6 +91,16 @@ public class ProductCharacteristicValueDao   {
 
         final String DELETE_QUERY = "DELETE FROM product_characteristic_value WHERE (product_id = ? AND product_characteristic_id = ? )";
         jdbcTemplate.update(DELETE_QUERY,entity.getProductId(),entity.getProductCharacteristicId());
+
+    }
+
+    public List<ProductCharacteristicValue> findByProductId(Long id){
+
+        final String QUERY = "SELECT product_id" +
+                ",product_characteristic_id" +
+                ", number_value , date_value , string_value " +
+                "FROM product_characteristic_value WHERE product_id = ?" ;
+        return jdbcTemplate.query(QUERY,new Object[]{id}, new ProductCharacteristicValueRowMapper());
 
     }
 
