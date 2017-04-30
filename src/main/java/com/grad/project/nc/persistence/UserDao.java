@@ -18,20 +18,24 @@ import java.util.*;
 @Repository
 public class UserDao extends AbstractDao<User> {
 
-    RoleDao roleDao;
-    DomainDao domainDao;
-    ProductOrderDao productOrderDao;
-    ComplainDao complainDao;
+    @Autowired
+    private RoleDao roleDao;
+    @Autowired
+    private DomainDao domainDao;
+    @Autowired
+    private ProductOrderDao productOrderDao;
+    @Autowired
+    private ComplainDao complainDao;
 
     @Autowired
-    UserDao(JdbcTemplate jdbcTemplate, RoleDao roleDao, DomainDao domainDao, ProductOrderDao productOrderDao,
-            ComplainDao complainDao) {
+    UserDao(JdbcTemplate jdbcTemplate/*, RoleDao roleDao, DomainDao domainDao, ProductOrderDao productOrderDao,
+            ComplainDao complainDao*/) {
         super(jdbcTemplate);
-
+/*
         this.roleDao = roleDao;
         this.domainDao = domainDao;
         this.complainDao = complainDao;
-        this.productOrderDao = productOrderDao;
+        this.productOrderDao = productOrderDao;*/
     }
 
     @Override
@@ -134,9 +138,7 @@ public class UserDao extends AbstractDao<User> {
         });
     }
 
-    @Transactional
-    private void saveUserRoles(User user) {
-        user.getRoles(); //TODO addUserRole() and removeUserRole()
+    private void deleteUserRoles(User user) {
         executeUpdate(connection -> {
             String query = "DELETE FROM user_role WHERE user_id=?";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -145,8 +147,13 @@ public class UserDao extends AbstractDao<User> {
 
             return statement;
         });
+    }
+
+    private void saveUserRoles(User user) {
 
         if (user.getRoles() != null && user.getRoles().size() > 0) {
+            deleteUserRoles(user);
+
             executeUpdate(connection -> {
                 String query = "INSERT INTO user_role(user_id, role_id) VALUES (?, ?)";
                 for (int i = 1; i < user.getRoles().size(); i++) {
@@ -164,6 +171,8 @@ public class UserDao extends AbstractDao<User> {
                 }
                 return statement;
             });
+        } else {
+            deleteUserRoles(user);
         }
     }
 
