@@ -3,26 +3,26 @@ package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Created by Roman Savuliak on 26.04.2017.
  */
 @Repository
-public class RoleDao extends AbstractDao<Role>{
+public class RoleDao extends AbstractDao<Role> {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
+    //JdbcTemplate jdbcTemplate;
+
 
     @Autowired
     RoleDao(JdbcTemplate jdbcTemplate) {
@@ -30,7 +30,6 @@ public class RoleDao extends AbstractDao<Role>{
     }
 
     @Override
-    @Transactional
     public Role add(Role role) {
 
         KeyHolder keyHolder= executeInsert(connection -> {
@@ -49,14 +48,18 @@ public class RoleDao extends AbstractDao<Role>{
     @Override
     @Transactional
     public Role update(Role role) {
-        final String UPDATE_QUERY = "UPDATE role SET role_name = ?" + "WHERE role_id = ?";
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{role.getRoleName(), role.getRoleId()});
+        executeUpdate(connection -> {
+            final String UPDATE_QUERY = "UPDATE role SET role_name = ? WHERE role_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY);
+            preparedStatement.setString(1, role.getRoleName());
+            preparedStatement.setLong(2, role.getRoleId());
+            return preparedStatement;
+        });
         return role;
     }
 
     @Override
-    @Transactional
-    public Role find(long id){
+    public Role find(long id) {
 
         return findOne(connection -> {
             final String SELECT_QUERY = "SELECT role_id, role_name FROM role WHERE role_id = ?";
@@ -68,7 +71,6 @@ public class RoleDao extends AbstractDao<Role>{
     }
 
     @Override
-    @Transactional
     public Collection<Role> findAll() {
         return findMultiple(connection -> {
             final String SELECT_QUERY = "SELECT role_id, role_name FROM role";
@@ -88,7 +90,6 @@ public class RoleDao extends AbstractDao<Role>{
             return preparedStatement;
         });
     }
-
 
     public Role getRoleByName(String roleName) {
         return findOne(connection -> {
@@ -110,10 +111,11 @@ public class RoleDao extends AbstractDao<Role>{
             statement.setLong(1, user.getUserId());
 
             return statement;
-        }, new RoleRowMapper());
+        }, new RoleDao.RoleRowMapper());
     }
 
-    final class RoleRowMapper implements RowMapper<Role> {
+
+    private final class RoleRowMapper implements RowMapper<Role> {
         @Override
         public Role mapRow(ResultSet rs, int rowNum) throws SQLException {
             Role role = new Role();
