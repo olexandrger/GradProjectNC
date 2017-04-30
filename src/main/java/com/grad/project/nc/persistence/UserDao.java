@@ -53,9 +53,7 @@ public class UserDao extends AbstractDao<User> {
             return preparedStatement;
         });
 
-        user.setUserId(getLongValue(keyHolder, "user_id"));
-
-        return user;
+        return find(getLongValue(keyHolder, "user_id"));
     }
 
     @Override
