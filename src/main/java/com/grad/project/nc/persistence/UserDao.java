@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,6 +38,12 @@ public class UserDao extends AbstractDao<User> {
         this.complainDao = complainDao;
         this.productOrderDao = productOrderDao;*/
     }
+
+    @PostConstruct
+    private void initDao(){
+        this.domainDao.setUserDao(this);
+    }
+
 
     @Override
     public User add(User user) {
@@ -216,7 +223,7 @@ public class UserDao extends AbstractDao<User> {
             return preparedStatement;
         }, new UserRowMapper());
 
-        return Optional.of(result);
+        return Optional.ofNullable(result);
     }
 
     /*

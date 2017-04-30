@@ -5,32 +5,33 @@ import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.model.DomainType;
 import com.grad.project.nc.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
-import java.util.List;
 
 @Repository
 public class DomainDao extends AbstractDao<Domain> {
-
-    // private JdbcTemplate jdbcTemplate;
 
     AddressDao addressDao;
     DomainTypeDao domainTypeDao;
     UserDao userDao;
 
     @Autowired
-    public DomainDao(JdbcTemplate jdbcTemplate, DomainTypeDao domainTypeDao, AddressDao addressDao, UserDao userDao) {
+    public DomainDao(JdbcTemplate jdbcTemplate, DomainTypeDao domainTypeDao, AddressDao addressDao) {
         super(jdbcTemplate);
         this.addressDao = addressDao;
         this.domainTypeDao = domainTypeDao;
+        //this.userDao = userDao;
+    }
+
+    public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 
