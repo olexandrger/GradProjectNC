@@ -7,9 +7,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -20,68 +22,97 @@ import java.util.Map;
  * Created by Roman Savuliak on 25.04.2017.
  */
 @Repository
-public class RegionDao implements CrudDao<Region>{
+public class RegionDao extends AbstractDao<Region> {
+
+    RegionRowMapper regionRowMapper = new RegionRowMapper();
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    RegionDao(JdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
+    }
 
     @Override
     @Transactional
     public Region add(Region region) {
-
-        SimpleJdbcInsert insertRegionQuery = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("region")
-                .usingGeneratedKeyColumns("region_id");
-
-        Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put("region_name", region.getRegionName());
-
-        Number newId = insertRegionQuery.executeAndReturnKey(parameters);
-        region.setRegionId(newId.longValue());
-
-        return region;
+        KeyHolder keyHolder = executeInsert(connection -> {
+            final String INSERT_QUERY =
+                    "INSERT INTO region (region.region_name) " +
+                            "VALUES ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_QUERY);
+            preparedStatement.setString(1, region.getRegionName());
+            return preparedStatement;
+        });
+        return find(getLongValue(keyHolder, "region_id"));
     }
 
     @Override
     @Transactional
     public Region update(Region region) {
-        final String UPDATE_QUERY = "UPDATE region SET region_name = ?" + "WHERE region_id = ?";
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{region.getRegionName(), region.getRegionId()});
+
+        executeUpdate(connection -> {
+            final String UPDATE_QUERY =
+                    "UPDATE region " +
+                            "SET region_name = ? " +
+                            "WHERE region_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY);
+            preparedStatement.setString(1, region.getRegionName());
+            preparedStatement.setLong(2, region.getRegionId());
+            return preparedStatement;
+        });
+
         return region;
     }
 
     @Override
-    @Transactional
     public Region find(long id) {
-        final String SELECT_QUERY = "SELECT region_id, region_name FROM region WHERE region_id = ?";
-        Region region = null;
-        try{
-            region = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RegionRowMapper());
-        } catch (EmptyResultDataAccessException ex){
-
-        }
-        return region;
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "region_id, " +
+                            "region_name " +
+                            "FROM region " +
+                            "WHERE region_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, id);
+            return preparedStatement;
+        }, regionRowMapper);
     }
 
     @Override
-    @Transactional
     public Collection<Region> findAll() {
-        final String SELECT_QUERY = "SELECT region_id, region_name FROM region";
-        return jdbcTemplate.query(SELECT_QUERY, new RegionRowMapper());
+        return findMultiple(connection -> {
+            final String SELECT_QUERY = "SELECT region_id, region_name FROM region";
+            return connection.prepareStatement(SELECT_QUERY);
+        }, regionRowMapper);
     }
 
     @Override
     @Transactional
     public void delete(Region region) {
-        final String DELETE_QUERY = "DELETE FROM region WHERE region_id = ?";
-        jdbcTemplate.update(DELETE_QUERY, region.getRegionId());
+        executeUpdate(connection -> {
+            final String DELETE_QUERY = "DELETE FROM region WHERE region_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_QUERY);
+            preparedStatement.setLong(1, region.getRegionId());
+            return preparedStatement;
+        });
     }
 
-    public Region findByGoogleRegion(GoogleRegion googleRegion){
-
-        //TODO
-        return new Region();
-
+    public Region findByGoogleRegion(GoogleRegion googleRegion) {
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "r.region_id, " +
+                            "r.region_name " +
+                            "FROM region r " +
+                            "WHERE r.region_id = " +
+                            "(SELECT " +
+                            "gr.region_id " +
+                            "FROM google_region gr " +
+                            "WHERE gr.google_region_id = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, googleRegion.getGoogleRegionId());
+            return preparedStatement;
+        }, regionRowMapper);
     }
 
     private static final class RegionRowMapper implements RowMapper<Region> {
