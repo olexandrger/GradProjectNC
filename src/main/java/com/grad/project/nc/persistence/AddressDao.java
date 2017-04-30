@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Address;
+import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.model.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -96,9 +97,25 @@ public class AddressDao extends AbstractDao<Address> {
         executeUpdate(connection -> {
             final String DELETE_QUERY = "DELETE FROM address WHERE address_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_QUERY);
-            preparedStatement.setLong(1,adress.getAddressId());
+            preparedStatement.setLong(1, adress.getAddressId());
             return preparedStatement;
         });
+    }
+
+    public Address getAddressByDomain(Domain domain) {
+        return findOne(connection -> {
+            final String QUERY = "SELECT " +
+                    "address_id, " +
+                    "apartment_number " +
+                    "FROM address " +
+                    "WHERE address_id = " +
+                    "(SELECT d.address_id " +
+                    "FROM \"domain\" d " +
+                    "WHERE d.domain_id = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
+            preparedStatement.setLong(1, domain.getDomainId());
+            return preparedStatement;
+        }, mapper);
     }
 
     private class AddressProxy extends Address {
