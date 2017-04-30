@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import com.grad.project.nc.model.Domain;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
