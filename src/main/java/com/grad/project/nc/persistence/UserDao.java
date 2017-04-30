@@ -34,6 +34,108 @@ public class UserDao extends AbstractDao<User> {
         this.productOrderDao = productOrderDao;
     }
 
+    @Override
+    public User add(User user) {
+
+        //TODO add lists saving
+
+        KeyHolder keyHolder = executeInsert(connection -> {
+            String statement = "INSERT INTO \"user\" (email, password, first_name, last_name, phone_number)" +
+                    " VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setString(3, user.getFirstName());
+            preparedStatement.setString(4, user.getLastName());
+            preparedStatement.setString(5, user.getPhoneNumber());
+
+            return preparedStatement;
+        });
+
+        user.setUserId(getLongValue(keyHolder, "user_id"));
+
+        return user;
+    }
+
+    @Override
+    @Transactional
+    public User update(User user) {
+
+        executeUpdate(connection -> {
+            String query = "UPDATE \"user\" SET email = ?, password = ?," +
+                    "first_name = ? , last_name = ? , phone_number = ? WHERE user_id = ? ";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setString(3, user.getFirstName());
+            preparedStatement.setString(4, user.getLastName());
+            preparedStatement.setString(5, user.getPhoneNumber());
+
+            return preparedStatement;
+        });
+
+        saveUserRoles(user);
+        saveUserDomains(user);
+        return user;
+    }
+
+    @Override
+    public User find(long id) {
+        return findOne(connection -> {
+            String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\" WHERE user_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+
+            preparedStatement.setLong(1, id);
+
+            return preparedStatement;
+        }, new UserRowMapper());
+    }
+
+    @Override
+    @Transactional
+    public Collection<User> findAll() {
+        return findMultiple(connection -> {
+            String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\"";
+            return connection.prepareStatement(statement);
+        }, new UserRowMapper());
+    }
+
+    public Collection<User> findByDomain(Domain domain) {
+        return findMultiple(connection -> {
+            final String QUERY =
+                    "SELECT " +
+                            "u.user_id, " +
+                            "u.email, " +
+                            "u.password, " +
+                            "u.first_name, " +
+                            "u.last_name, " +
+                            "u.phone_number " +
+                            "FROM user u " +
+                            "INNER JOIN user_domain ud " +
+                            "ON u.user_id = ud.user_id " +
+                            "WHERE ud.domain_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
+            preparedStatement.setLong(1, domain.getDomainId());
+            return preparedStatement;
+
+        }, new UserRowMapper());
+
+    }
+
+    @Override
+    public void delete(User user) {
+        executeUpdate(connection -> {
+            String statement = "DELETE FROM \"user\" WHERE user_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+
+            preparedStatement.setLong(1, user.getUserId());
+            return preparedStatement;
+        });
+    }
+
     @Transactional
     private void saveUserRoles(User user) {
         user.getRoles(); //TODO addUserRole() and removeUserRole()
@@ -96,84 +198,6 @@ public class UserDao extends AbstractDao<User> {
         }
     }
 
-    @Override
-    public User add(User user){
-        KeyHolder keyHolder = executeInsert(connection -> {
-            String statement = "INSERT INTO \"user\" (email, password, first_name, last_name, phone_number)" +
-                    " VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
-
-            preparedStatement.setString(1, user.getEmail());
-            preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setString(3, user.getFirstName());
-            preparedStatement.setString(4, user.getLastName());
-            preparedStatement.setString(5, user.getPhoneNumber());
-
-            return preparedStatement;
-        });
-
-        user.setUserId(getLongValue(keyHolder, "user_id"));
-
-        saveUserRoles(user);
-
-        return user;
-    }
-
-    @Override
-    public User update(User user) {
-
-        executeUpdate(connection -> {
-            String query = "UPDATE \"user\" SET email = ?, password = ?," +
-                "first_name = ? , last_name = ? , phone_number = ? WHERE user_id = ? ";
-
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-            preparedStatement.setString(1, user.getEmail());
-            preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setString(3, user.getFirstName());
-            preparedStatement.setString(4, user.getLastName());
-            preparedStatement.setString(5, user.getPhoneNumber());
-
-            return preparedStatement;
-        });
-
-        saveUserRoles(user);
-
-        return user;
-    }
-
-    @Override
-    public User find(long id) {
-        return findOne(connection -> {
-            String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\" WHERE user_id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(statement);
-
-            preparedStatement.setLong(1, id);
-
-            return preparedStatement;
-        }, new UserRowMapper());
-    }
-
-    @Override
-    @Transactional
-    public Collection<User> findAll() {
-        return findMultiple(connection -> {
-            String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\"";
-            return connection.prepareStatement(statement);
-        }, new UserRowMapper());
-    }
-
-    @Override
-    public void delete(User user) {
-        executeUpdate(connection -> {
-            String statement = "DELETE FROM \"user\" WHERE user_id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(statement);
-
-            preparedStatement.setLong(1, user.getUserId());
-            return preparedStatement;
-        });
-    }
-
     @Transactional
     public Optional<User> findByEmail(String email) {
         User result = findOne(connection -> {
@@ -185,22 +209,23 @@ public class UserDao extends AbstractDao<User> {
             return preparedStatement;
         }, new UserRowMapper());
 
-        return Optional.ofNullable(result);
+        return Optional.of(result);
     }
-/*
-    @Transactional
-    public void addUserRole(User user, Role role){
 
-        SimpleJdbcInsert insertUserQuery = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("user_role");
+    /*
+        @Transactional
+        public void addUserRole(User user, Role role){
 
-        Map<String, Object> parameters = new HashMap<>(2);
-        parameters.put("user_id", user.getUser_id());
-        parameters.put("role_id", role.getRoleId());
+            SimpleJdbcInsert insertUserQuery = new SimpleJdbcInsert(jdbcTemplate)
+                    .withTableName("user_role");
 
-        insertUserQuery.execute(parameters);
-    }
-*/
+            Map<String, Object> parameters = new HashMap<>(2);
+            parameters.put("user_id", user.getUser_id());
+            parameters.put("role_id", role.getRoleId());
+
+            insertUserQuery.execute(parameters);
+        }
+    */
     private class UserProxy extends User {
         @Override
         public List<Role> getRoles() {
