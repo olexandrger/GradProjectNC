@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class Address {
     private Long addressId;
     private int apartmentNumber;
-    private Long location_id;
+    private Location location;
 
 
 }

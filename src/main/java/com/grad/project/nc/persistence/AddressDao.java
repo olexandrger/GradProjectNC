@@ -1,14 +1,18 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Address;
+import com.grad.project.nc.model.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -19,86 +23,104 @@ import java.util.Map;
  * Created by DeniG on 25.04.2017.
  */
 @Repository
-public class AddressDao implements CrudDao<Address> {
+public class AddressDao extends AbstractDao<Address> {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
+    private LocationDao locationDao;
 
     private RowMapper<Address> mapper = new AddressMapper();
+
+    @Autowired
+    public AddressDao(JdbcTemplate jdbcTemplate, LocationDao locationDao) {
+        super(jdbcTemplate);
+        this.locationDao = locationDao;
+    }
 
     @Override
     @Transactional
     public Address add(Address address) {
-        SimpleJdbcInsert insertAddressQuery = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("address").usingGeneratedKeyColumns("address_id");
-        Map<String, Object> parameters = new HashMap<>(2);
-        parameters.put("apartment_number", address.getApartmentNumber());
-        parameters.put("location_id", address.getLocation_id());
-        Number newId = insertAddressQuery.executeAndReturnKey(parameters);
-        address.setAddressId(newId.longValue());
-        return address;
+        KeyHolder keyHolder = executeInsert(connection -> {
+            String query = "INSERT INTO address(address.apartment_number, address.location_id) VALUE (?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, address.getApartmentNumber());
+            preparedStatement.setLong(2, address.getLocation().getLocationId());
+            return preparedStatement;
+        });
+
+        return find(address.getAddressId());
+
     }
 
     @Override
-    @Transactional
     public Address find(long id) {
-        final String SELECT_QUERY = "SELECT address_id, apartment_number, location_id" +
-                " FROM address WHERE address_id = ?";
-
-        Address address = null;
-        try {
-            address = jdbcTemplate.queryForObject(SELECT_QUERY,
-                    new Object[]{id}, mapper);
-        } catch (EmptyResultDataAccessException ex){
-
-        }
-        return address;
+        return findOne(connection -> {
+            final String SELECT_QUERY = "SELECT address_id, apartment_number" +
+                    " FROM address WHERE address_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, id);
+            return preparedStatement;
+        }, mapper);
 
     }
 
     @Override
-    @Transactional
     public Collection<Address> findAll() {
-        final String SELECT_ALL_QUERY = "SELECT address_id, apartment_number, location_id" +
-                " FROM address";
-        return jdbcTemplate.query(SELECT_ALL_QUERY, mapper);
+        return findMultiple(connection -> {
+            final String SELECT_ALL_QUERY = "SELECT address_id, apartment_number " +
+                    " FROM address";
+            return connection.prepareStatement(SELECT_ALL_QUERY);
+
+        }, mapper);
 
     }
 
     @Override
     @Transactional
     public Address update(Address address) {
-        final String UPDATE_QUERY = "UPDATE address " +
-                "SET apartment_number = ?, location_id = ? " +
-                "WHERE address_id = ?";
-
-        jdbcTemplate.update(UPDATE_QUERY, new Object[]{
-                address.getApartmentNumber(),
-                address.getLocation_id(),
-                address.getAddressId()});
+        executeUpdate(connection -> {
+            final String UPDATE_QUERY = "UPDATE address " +
+                    "SET apartment_number = ?, location_id = ? " +
+                    "WHERE address_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY);
+            preparedStatement.setInt(1, address.getApartmentNumber());
+            preparedStatement.setLong(2, address.getLocation().getLocationId());
+            preparedStatement.setLong(3, address.getAddressId());
+            return preparedStatement;
+        });
         return address;
     }
 
     @Override
     @Transactional
     public void delete(Address adress) {
-        final String DELETE_QUERY = "DELETE FROM address WHERE address_id = ?";
-
-        jdbcTemplate.update(DELETE_QUERY, adress.getAddressId());
+        executeUpdate(connection -> {
+            final String DELETE_QUERY = "DELETE FROM address WHERE address_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_QUERY);
+            preparedStatement.setLong(1,adress.getAddressId());
+            return preparedStatement;
+        });
     }
 
-    private static class AddressMapper implements RowMapper<Address> {
-
+    private class AddressProxy extends Address {
         @Override
-        public Address mapRow(ResultSet resultSet, int i) throws SQLException {
-            Address address = new Address();
-            address.setAddressId(resultSet.getLong("address_id"));
-            address.setApartmentNumber(resultSet.getInt("apartment_number"));
-            address.setLocation_id(resultSet.getLong("location_id"));
-            return address;
+        public Location getLocation() {
+            if (super.getLocation() == null) {
+                super.setLocation(locationDao.getLocationByAddress(this));
+            }
+            return super.getLocation();
         }
     }
 
+    private class AddressMapper implements RowMapper<Address> {
+
+        @Override
+        public Address mapRow(ResultSet resultSet, int i) throws SQLException {
+            Address address = new AddressProxy();
+            address.setAddressId(resultSet.getLong("address_id"));
+            address.setApartmentNumber(resultSet.getInt("apartment_number"));
+            return address;
+        }
+    }
 
 
 }
