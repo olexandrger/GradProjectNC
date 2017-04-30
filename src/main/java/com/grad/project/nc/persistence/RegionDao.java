@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.grad.project.nc.model.GoogleRegion;
 import com.grad.project.nc.model.Region;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -74,6 +75,10 @@ public class RegionDao implements CrudDao<Region>{
     public void delete(Region region) {
         final String DELETE_QUERY = "DELETE FROM region WHERE region_id = ?";
         jdbcTemplate.update(DELETE_QUERY, region.getRegionId());
+    }
+
+    public Region findByGoogleRegion(GoogleRegion googleRegion){
+
     }
 
     private static final class RegionRowMapper implements RowMapper<Region> {

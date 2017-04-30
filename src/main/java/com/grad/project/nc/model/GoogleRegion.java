@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 public class GoogleRegion {
     private Long googleRegionId;
     private String googleRegionName;
-    private Long regionId;
+    private Region region;
 }
