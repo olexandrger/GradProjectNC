@@ -34,7 +34,9 @@ public class UserDao extends AbstractDao<User> {
         this.productOrderDao = productOrderDao;
     }
 
+    @Transactional
     private void saveUserRoles(User user) {
+        user.getRoles(); //TODO addUserRole() and removeUserRole()
         executeUpdate(connection -> {
             String query = "DELETE FROM user_role WHERE user_id=?";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -62,6 +64,35 @@ public class UserDao extends AbstractDao<User> {
                 }
                 return statement;
             });
+        }
+    }
+
+    @Transactional
+    private void saveUserDomains(User user) {
+
+        Collection<Domain> domains = user.getDomains(); //TODO
+        executeUpdate(connection -> {
+            String query = "DELETE  FROM user_domain WHERE user_id =?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setLong(1, user.getUserId());
+            return preparedStatement;
+        });
+        if (domains != null && domains.size() > 0) {
+            executeUpdate(connection -> {
+                String query = "INSERT INTO user_domain(user_id, domain_id) VALUES (?, ?)";
+                for (int i = 1; i < domains.size(); i++) {
+                    query += ",(?, ?)";
+                }
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                int i = 0;
+                for (Domain domain : domains) {
+                    preparedStatement.setLong(++i, user.getUserId());
+                    preparedStatement.setLong(++i, domain.getDomainId());
+                }
+                return preparedStatement;
+            });
+
+
         }
     }
 
