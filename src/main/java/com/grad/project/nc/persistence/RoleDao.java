@@ -32,15 +32,16 @@ public class RoleDao extends AbstractDao<Role>{
     @Override
     @Transactional
     public Role add(Role role) {
-        SimpleJdbcInsert insertRoleQuery = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("role")
-                .usingGeneratedKeyColumns("role_id");
 
-        Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put("role_name", role.getRoleName());
+        KeyHolder keyHolder= executeInsert(connection -> {
+            //language=GenericSQL
+            String query = "INSERT INTO role (role.role_name) VALUES (?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, role.getRoleName());
+            return preparedStatement;
+        });
 
-        Number newId = insertRoleQuery.executeAndReturnKey(parameters);
-        role.setRoleId(newId.longValue());
+        role.setRoleId(getLongValue(keyHolder, "role_id"));
 
         return role;
     }
@@ -55,31 +56,39 @@ public class RoleDao extends AbstractDao<Role>{
 
     @Override
     @Transactional
-    public Role find(long id) {
-        final String SELECT_QUERY = "SELECT role_id, role_name FROM role WHERE role_id = ?";
-        Role role = null;
-        try{
-            role =jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new RoleRowMapper());
-        } catch (EmptyResultDataAccessException ex){
+    public Role find(long id){
 
-        }
-        return role;
+        return findOne(connection -> {
+            final String SELECT_QUERY = "SELECT role_id, role_name FROM role WHERE role_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, id);
+            return preparedStatement;
+        }, new RoleRowMapper());
+
     }
 
     @Override
     @Transactional
     public Collection<Role> findAll() {
-        final String SELECT_QUERY = "SELECT role_id, role_name FROM role";
-        return jdbcTemplate.query(SELECT_QUERY, new RoleRowMapper());
+        return findMultiple(connection -> {
+            final String SELECT_QUERY = "SELECT role_id, role_name FROM role";
+            return connection.prepareStatement(SELECT_QUERY);
+        }, new RoleRowMapper());
+
     }
 
 
     @Override
     @Transactional
     public void delete(Role role) {
-        final String DELETE_QUERY = "DELETE FROM role WHERE role_id = ?";
-        jdbcTemplate.update(DELETE_QUERY, role.getRoleId());
+        executeUpdate(connection -> {
+            final String DELETE_QUERY = "DELETE FROM role WHERE role_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_QUERY);
+            preparedStatement.setLong(1, role.getRoleId());
+            return preparedStatement;
+        });
     }
+
 
     public Role getRoleByName(String roleName) {
         return findOne(connection -> {
