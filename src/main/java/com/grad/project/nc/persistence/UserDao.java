@@ -40,7 +40,7 @@ public class UserDao extends AbstractDao<User> {
     }
 
     @PostConstruct
-    private void initDao(){
+    private void initDao() {
         this.domainDao.setUserDao(this);
     }
 
@@ -183,32 +183,38 @@ public class UserDao extends AbstractDao<User> {
         }
     }
 
-    @Transactional
-    private void saveUserDomains(User user) {
-
-        Collection<Domain> domains = user.getDomains(); //TODO
+    private void deleteUserDomains(User user) {
         executeUpdate(connection -> {
-            String query = "DELETE  FROM user_domain WHERE user_id =?";
+            String query =
+                    "DELETE  " +
+                            "FROM user_domain " +
+                            "WHERE user_id =?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setLong(1, user.getUserId());
             return preparedStatement;
         });
-        if (domains != null && domains.size() > 0) {
+    }
+
+    @Transactional
+    private void saveUserDomains(User user) {
+
+        if (user.getDomains() != null && user.getDomains().size() > 0) {
+            deleteUserDomains(user);
             executeUpdate(connection -> {
                 String query = "INSERT INTO user_domain(user_id, domain_id) VALUES (?, ?)";
-                for (int i = 1; i < domains.size(); i++) {
+                for (int i = 1; i < user.getDomains().size(); i++) {
                     query += ",(?, ?)";
                 }
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 int i = 0;
-                for (Domain domain : domains) {
+                for (Domain domain : user.getDomains()) {
                     preparedStatement.setLong(++i, user.getUserId());
                     preparedStatement.setLong(++i, domain.getDomainId());
                 }
                 return preparedStatement;
             });
-
-
+        } else {
+            deleteUserDomains(user);
         }
     }
 

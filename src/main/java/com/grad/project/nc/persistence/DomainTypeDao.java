@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import com.grad.project.nc.model.Domain;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -44,6 +46,7 @@ public class DomainTypeDao extends AbstractDao<DomainType> {
     }
 
     @Override
+    @Transactional
     public DomainType update(DomainType entity) {
         executeUpdate(connection -> {
             final String UPDATE_QUERY = "UPDATE domain_type SET domain_type_name = ? WHERE domain_type_id = ? ";

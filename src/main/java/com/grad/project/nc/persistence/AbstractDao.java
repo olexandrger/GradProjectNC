@@ -22,21 +22,21 @@ abstract class AbstractDao<T> implements CrudDao<T> {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    Long getLongValue(KeyHolder keyHolder, String keyName) {
+    protected Long getLongValue(KeyHolder keyHolder, String keyName) {
         return ((Number)keyHolder.getKeys().get(keyName)).longValue();
     }
 
-    KeyHolder executeInsert(PreparedStatementCreator statementCreator) {
+    protected KeyHolder executeInsert(PreparedStatementCreator statementCreator) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(statementCreator, keyHolder);
         return keyHolder;
     }
 
-    void executeUpdate(PreparedStatementCreator statementCreator) {
+    protected void executeUpdate(PreparedStatementCreator statementCreator) {
         jdbcTemplate.update(statementCreator);
     }
 
-    <E> E findOne(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
+    protected <E> E findOne(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
         List<E> results = jdbcTemplate.query(statementCreator, mapper);
 
         if (results.size() > 1) {
@@ -51,7 +51,7 @@ abstract class AbstractDao<T> implements CrudDao<T> {
 
     }
 
-    <E> Collection<E> findMultiple(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
+    protected <E> Collection<E> findMultiple(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
         return jdbcTemplate.query(statementCreator, mapper);
     }
 }

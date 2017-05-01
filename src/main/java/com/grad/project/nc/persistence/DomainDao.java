@@ -48,9 +48,7 @@ public class DomainDao extends AbstractDao<Domain> {
 
         });
 
-        domain.setDomainId(keyHolder.getKey().longValue());
-
-        return domain;
+        return find(getLongValue(keyHolder, "domain_id"));
     }
 
     @Override
@@ -74,6 +72,7 @@ public class DomainDao extends AbstractDao<Domain> {
             return preparedStatement;
 
         });
+        saveAllUsers(entity);
 
         return entity;
     }
@@ -115,7 +114,7 @@ public class DomainDao extends AbstractDao<Domain> {
     public void delete(Domain entity) {
 
         executeUpdate(connection -> {
-            final String DELETE_QUERY = "DELETE FROM domain WHERE domain_id = ?";
+            final String DELETE_QUERY = "DELETE FROM \"domain\" WHERE domain_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_QUERY);
             preparedStatement.setLong(1, entity.getDomainId());
             return preparedStatement;
@@ -142,6 +141,41 @@ public class DomainDao extends AbstractDao<Domain> {
             return statement;
         }, new DomainRowMapper());
     }
+
+    private void deleteDomainUsers(Domain domain){
+        executeUpdate(connection -> {
+            final String DELETE_ALL_QUERY =
+                    "DELETE " +
+                            "FROM user_domain " +
+                            "WHERE domain_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ALL_QUERY);
+            preparedStatement.setLong(1, domain.getDomainId());
+            return preparedStatement;
+        });
+    }
+
+    private void saveAllUsers(Domain domain){
+        if(domain.getUsers() != null && domain.getUsers().size()>0){
+            deleteDomainUsers(domain);
+            executeUpdate(connection -> {
+                String INSERT_QUERY = "INSERT INTO user_domain (user_domain.user_id, user_domain.domain_id) VALUES (?, ?)";
+                for (int i = 1; i < domain.getUsers().size(); i++) {
+                    INSERT_QUERY += ",(?, ?)";
+                }
+                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_QUERY);
+                int i =0;
+                for(User user : domain.getUsers()){
+                    preparedStatement.setLong(++i, user.getUserId());
+                    preparedStatement.setLong(++i, domain.getDomainId());
+                }
+                return preparedStatement;
+            });
+        } else {
+            deleteDomainUsers(domain);
+        }
+
+    }
+
 
 
     private class DomainProxy extends Domain {
@@ -170,6 +204,7 @@ public class DomainDao extends AbstractDao<Domain> {
             return super.getUsers();
         }
     }
+
 
     private final class DomainRowMapper implements RowMapper<Domain> {
 
