@@ -67,7 +67,7 @@ public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice> {
         final String SELECT_QUERY = "SELECT price_id, product_id, region_id, price FROM product_region_price WHERE price_id = ?";
         ProductRegionPrice productRegionPrice = null;
         try {
-           productRegionPrice = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new ProductRegionPriceRowMapper());
+            productRegionPrice = jdbcTemplate.queryForObject(SELECT_QUERY, new Object[]{id}, new ProductRegionPriceRowMapper());
         } catch (EmptyResultDataAccessException ex){
 
         }
