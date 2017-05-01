@@ -1,7 +1,9 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.GoogleRegion;
+import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.Region;
+import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -113,6 +115,10 @@ public class RegionDao extends AbstractDao<Region> {
             preparedStatement.setLong(1, googleRegion.getGoogleRegionId());
             return preparedStatement;
         }, regionRowMapper);
+    }
+
+    public Region fingRegionByProductRegionPrice(ProductRegionPrice ProductRegionPrice){
+
     }
 
     private static final class RegionRowMapper implements RowMapper<Region> {

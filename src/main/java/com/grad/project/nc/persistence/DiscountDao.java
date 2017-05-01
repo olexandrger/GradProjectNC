@@ -169,6 +169,10 @@ public class DiscountDao extends AbstractDao<Discount> {
         }
     }
 
+    public Collection<Discount> findByProductRegionPrise(ProductRegionPrice productRegionPrice){
+
+    }
+
     private class DiscountProxy extends Discount{
         @Override
         public Collection<ProductRegionPrice> getProductRegionPrices() {
