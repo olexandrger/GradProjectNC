@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sun.util.resources.cldr.ga.CalendarData_ga_IE;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,7 +58,7 @@ public class ProductTypesController {
         }).collect(Collectors.toList());
     }
 
-    @RequestMapping("/productTypes/update")
+    @RequestMapping(value = "/productTypes/update", method = RequestMethod.POST)
     public Map<String, String> updateType(@RequestBody Type type) {
         Map<String, String> result = new HashMap<>();
 

@@ -78,24 +78,21 @@ function addProductValue(name, measure, dataType) {
 function saveSelected() {
     var _csrf = $('meta[name=_csrf]').attr("content");
 
-    productTypeData[selected].name = $("#product-type-name-input").val();
-    productTypeData[selected].description = $("#product-type-description-input").val();
-    productTypeData[selected].characteristics = [];
+    var savedId = selected;
+
+    productTypeData[savedId].name = $("#product-type-name-input").val();
+    productTypeData[savedId].description = $("#product-type-description-input").val();
+    productTypeData[savedId].characteristics = [];
 
     $("#product-type-values").find(".product-characteristic-input").each(function (element) {
-        console.log({
-            name: $(this).find("input[name='characteristic-name']").val(),
-            measure: $(this).find("input[name='characteristic-measure']").val(),
-            dataTypeId: $(this).find("input[name='characteristic-dataTypeId']").val()
-        });
-       productTypeData[selected].characteristics.push({
+       productTypeData[savedId].characteristics.push({
            name: $(this).find("input[name='characteristic-name']").val(),
            measure: $(this).find("input[name='characteristic-measure']").val(),
            dataTypeId: $(this).find("select").val()
        });
     });
 
-    console.log("Sending\n" + JSON.stringify(productTypeData[selected]));
+    console.log("Sending\n" + JSON.stringify(productTypeData[savedId]));
 
     $.ajax({
         type: 'POST',
@@ -110,6 +107,8 @@ function saveSelected() {
             var alert;
             if (data.status == 'success') {
                 console.log("Saving success! " + JSON.stringify(data));
+
+                $("#product-types-list").find("a:nth-child(" + (savedId+1) + ")").html(productTypeData[savedId].name);
 
                 alert = $('<div id="new-product-type-alert" class="alert alert-success" role="alert">' +
                     '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +

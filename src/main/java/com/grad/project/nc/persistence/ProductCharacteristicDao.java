@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.ProductCharacteristic;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 
 @Repository
+@Slf4j
 public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> {
 
     private JdbcTemplate jdbcTemplate;
@@ -28,7 +30,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
     @Transactional
     @Override
     public ProductCharacteristic add(ProductCharacteristic productCharacteristic) {
-
+        log.info("ADDING PRODUCT CHARACTERISTIC");
         SimpleJdbcInsert insertProductQuery = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("product_characteristic")
                 .usingGeneratedKeyColumns("product_characteristic_id");
@@ -119,7 +121,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
                 ",pch.measure" +
                 ",pch.data_type_id" +
                 " FROM product_characteristic pch " +
-                "INNER JOIN product_characteristic_value pv ON pch.product_characteristic_id = pv.product_characteristic_id WHERE pv.product_id = ?";
+                " WHERE pch.product_type_id = ?";
 
         return jdbcTemplate.query(SELECT_QUERY,new Object[]{productId},new ProductCharacteristicRowMapper());
 

@@ -118,7 +118,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="register()">Login</button>
+                <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="register()">Register</button>
             </div>
         </div>
     </div>
