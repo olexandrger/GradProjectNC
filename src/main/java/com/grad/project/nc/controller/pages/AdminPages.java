@@ -9,4 +9,10 @@ public class AdminPages {
     public String productsPage() {
         return "/admin/products";
     }
+
+
+    @RequestMapping("/admin/productTypes")
+    public String categoriesPage() {
+        return "/admin/productTypes";
+    }
 }

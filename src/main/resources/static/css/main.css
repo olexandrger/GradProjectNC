@@ -7,3 +7,11 @@
 .carousel-indicators {
     bottom: -20px;
 }
+
+.product-characteristic-input {
+    margin-bottom: 5px;
+}
+
+.product-characteristic-input select {
+    min-width: 110px;
+}

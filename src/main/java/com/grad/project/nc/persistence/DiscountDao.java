@@ -192,7 +192,6 @@ public class DiscountDao extends AbstractDao<Discount> {
             preparedStatement.setLong(1, productRegionPrice.getPriceId());
             return preparedStatement;
         }, mapper);
-
     }
 
     private class DiscountProxy extends Discount{

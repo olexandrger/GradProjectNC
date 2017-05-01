@@ -50,7 +50,7 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
             return preparedStatement;
         });
 
-        return find(getLongValue(keyHolder, "user_id"));
+        return find(getLongValue(keyHolder, "product_type_id"));
 
     }
 

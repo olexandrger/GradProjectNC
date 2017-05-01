@@ -24,9 +24,6 @@
 
 <#include "../resources/navbar.ftl"/>
 
-<div class="row">
-    <div class="col-md-4 col-md-offset-4"><h2>HERE WILL BE THE EDITOR FOR PRODUCTS, CATEGORIES AND CHARACTERISTICS</h2></div>
-</div>
 
 </div>
 </body>
