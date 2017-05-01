@@ -6,7 +6,7 @@ import lombok.Data;
 public class RegistrationResponseHolder {
 
     private String status;
-    private String messageError;
-    private String url;
+    private String message;
+//    private String url;
 
 }

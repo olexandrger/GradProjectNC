@@ -33,24 +33,7 @@ function displayAuthenticatedNavigationBar(data) {
     console.log("Adding logout");
     var ref = document.createElement("a");
     ref.appendChild(document.createTextNode("Logout"));
-    ref.onclick = function () {
-        console.log("Logout");
-        var _csrf = $('meta[name=_csrf]').attr("content");
-        $.ajax({
-            type: 'POST',
-            url: '/logout',
-            headers: {
-                'X-CSRF-TOKEN': _csrf
-            },
-            success: function (data) {
-                console.log("Logout success! " + JSON.stringify(data));
-                getAccountInformation();
-            },
-            error: function (data) {
-                console.error("Logout failure! " + JSON.stringify(data));
-            }
-        });
-    };
+    ref.onclick = logout;
     var li = document.createElement("li");
     li.appendChild(ref);
     list.append(li);
@@ -65,7 +48,7 @@ function getAccountInformation() {
 
     $.ajax({
         type: 'GET',
-        url: "/api/account",
+        url: "/api/user/account",
         headers: {
             'X-CSRF-TOKEN': _csrf
         },
@@ -79,6 +62,27 @@ function getAccountInformation() {
         },
         error: function(data) {
             console.error("Fetching information abound account failed! " + JSON.stringify(data));
+        }
+    });
+}
+
+function logout() {
+    //TODO if user is not on allowed page, redirect him to main page
+
+    console.log("Logout");
+    var _csrf = $('meta[name=_csrf]').attr("content");
+    $.ajax({
+        type: 'POST',
+        url: '/logout',
+        headers: {
+            'X-CSRF-TOKEN': _csrf
+        },
+        success: function (data) {
+            console.log("Logout success! " + JSON.stringify(data));
+            location.reload();
+        },
+        error: function (data) {
+            console.error("Logout failure! " + JSON.stringify(data));
         }
     });
 }
@@ -104,7 +108,7 @@ function login() {
             console.log("Login success! " + JSON.stringify(data));
             if (data.status == "success") {
                 $('#login-modal').modal('toggle');
-                getAccountInformation();
+                location.reload();
             } else {
                 var alert = $('<div id="login-header-alert" class="alert alert-danger" role="alert">' +
                     "Login failed</div>");
@@ -134,17 +138,26 @@ function register() {
         headers: {
             'X-CSRF-TOKEN': _csrf
         },
-        data: {
+        processData: false,
+        contentType: 'application/json',
+        data: JSON.stringify({
             firstName: firstName,
             lastName: lastName,
             email: email,
             password: password,
             phone: phone
-        },
+        }),
         success: function (data) {
-            console.log("Registration success! " + JSON.stringify(data));
-            var alert = $('<div id="registration-header-alert" class="alert alert-success" role="alert">' +
-                "You\'ve been registered successfully<br/>Now you can log in</div>");
+            var alert;
+            if (data.status == 'success') {
+                console.log("Registration success! " + JSON.stringify(data));
+                alert = $('<div id="registration-header-alert" class="alert alert-success" role="alert">' +
+                    data.message + "</div>");
+            } else {
+                console.log("Registration error! " + JSON.stringify(data));
+                alert = $('<div id="registration-header-alert" class="alert alert-danger" role="alert">' +
+                    data.message + '</div>');
+            }
 
             $("#registration-header-alert").replaceWith(alert);
         },
@@ -166,7 +179,7 @@ function selectRegion(regionName) {
 
 function loadRegions() {
     $.ajax({
-        url: "/api/regions/all",
+        url: "/api/user/regions/all",
         success: function(data) {
 
             var list = $("#region-select").find("ul");

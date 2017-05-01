@@ -80,7 +80,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendTemplateEmail(User user, Template template, String sender, String subject) {
-        //TODO after ERD completion change it to user's email
         String userAddress = user.getEmail();
 
         try {

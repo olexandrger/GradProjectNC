@@ -46,13 +46,13 @@ public class RegistrationController {
         RegistrationResponseHolder registrationResponse = new RegistrationResponseHolder();
 
         if (!registrationService.register(user)) {
-            registrationResponse.setMessageError(registrationService.getMessageError());
+            registrationResponse.setMessage(registrationService.getMessageError());
         } else {
-            registrationResponse.setUrl("/login");
+            registrationResponse.setMessage("You've been registered successfully");
+            emailService.sendRegistrationEmail(user);
         }
-        registrationResponse.setStatus(registrationService.getStatus());
 
-        emailService.sendRegistrationEmail(user);
+        registrationResponse.setStatus(registrationService.getStatus());
 
         return registrationResponse;
     }

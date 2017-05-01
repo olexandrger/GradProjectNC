@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/regions/")
+@RequestMapping("/api/user/regions/")
 public class RegionsController {
     private CrudDao<Region> regionsDao;
 
