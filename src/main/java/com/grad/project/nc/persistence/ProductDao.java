@@ -23,6 +23,8 @@ public class ProductDao extends AbstractDao<Product> {
     @Autowired
     private ProductCharacteristicDao productCharacteristicDao;
 
+    private ProductRowMapper mapper = new ProductRowMapper();
+
 
     @Autowired
     public ProductDao(JdbcTemplate jdbcTemplate/*, ProductTypeDao productTypeDao, ProductCharacteristicValueDao productCharacteristicValueDao*/){
@@ -69,7 +71,7 @@ public class ProductDao extends AbstractDao<Product> {
             preparedStatement.setLong(1, id);
 
             return preparedStatement;
-        }, new ProductRowMapper());
+        }, mapper);
 
     }
 
@@ -127,7 +129,7 @@ public class ProductDao extends AbstractDao<Product> {
                    // ",product_type_id " +
                     "FROM product ";
             return connection.prepareStatement(statement);
-        }, new ProductRowMapper());
+        }, mapper);
 
     }
 
@@ -192,7 +194,7 @@ public class ProductDao extends AbstractDao<Product> {
             preparedStatement.setLong(1, region.getRegionId());
             return preparedStatement;
 
-        }, new ProductRowMapper());
+        }, mapper);
     }
 
     //TODO Discuss if name of product unique or not
@@ -226,12 +228,29 @@ public class ProductDao extends AbstractDao<Product> {
             preparedStatement.setLong(1, productType.getProductTypeId());
             return preparedStatement;
 
-        }, new ProductRowMapper());
+        }, mapper);
 
     }
 
-    public Product getProductByProductRegionPrise(ProductRegionPrice productRegionPrice){
+    public Product getProductByProductRegionPrise(ProductRegionPrice productRegionPrice) {
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "pr.product_id, " +
+                            "pr.product_name, " +
+                            "pr.product_description, " +
+                            "pr.product_type_id " +
+                            "FROM product pr " +
+                            "WHERE pr.product_id = " +
+                            "(SELECT " +
+                            "prp.product_id " +
+                            "FROM product_region_price prp " +
+                            "WHERE prp.price_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, productRegionPrice.getPriceId());
+            return preparedStatement;
 
+        }, mapper);
     }
 
     public static final class ProductRowMapper implements RowMapper<Product> {
