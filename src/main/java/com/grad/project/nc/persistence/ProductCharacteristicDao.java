@@ -111,6 +111,20 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
         return jdbcTemplate.query(SELECT_QUERY,new ProductCharacteristicRowMapper());
     }
 
+    public Collection<ProductCharacteristic> findByProductId(Long productId){
+
+        final String SELECT_QUERY = "SELECT pch.product_characteristic_id" +
+                ",pch.product_type_id" +
+                ",pch.characteristic_name" +
+                ",pch.measure" +
+                ",pch.data_type_id" +
+                " FROM product_characteristic pch " +
+                "INNER JOIN product_characteristic_value pv ON pch.product_characteristic_id = pv.product_characteristic_id WHERE pv.product_id = ?";
+
+        return jdbcTemplate.query(SELECT_QUERY,new Object[]{productId},new ProductCharacteristicRowMapper());
+
+    }
+
     private static final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
         @Override
         public ProductCharacteristic mapRow(ResultSet rs, int rowNum) throws SQLException {

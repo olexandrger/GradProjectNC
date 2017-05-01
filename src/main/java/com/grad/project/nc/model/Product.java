@@ -14,9 +14,10 @@ public class Product {
     private Long productId;
     private String name;
     private String description;
-    private Long productTypeId;
+
     private ProductType productType;
     private List<ProductCharacteristicValue> productCharacteristicValues;
+    private List<ProductCharacteristic> productCharacteristics;
 
 
 }

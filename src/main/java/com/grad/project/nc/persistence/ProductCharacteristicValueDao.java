@@ -42,6 +42,8 @@ public class ProductCharacteristicValueDao   {
 
 
 
+
+
     @Transactional
     public ProductCharacteristicValue update(ProductCharacteristicValue entity) {
 
