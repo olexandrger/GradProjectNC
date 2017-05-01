@@ -4,7 +4,6 @@ import com.grad.project.nc.model.User;
 import com.grad.project.nc.persistence.RoleDao;
 import com.grad.project.nc.persistence.UserDao;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +17,6 @@ import java.util.*;
 public class AccountController {
 
     private UserDao userDao;
-
     private RoleDao roleDao;
 
     @Autowired
@@ -27,7 +25,7 @@ public class AccountController {
         this.roleDao = roleDao;
     }
 
-    @RequestMapping(value = "/api/account", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/user/account", method = RequestMethod.GET)
     public Map<String, Object> getName() {
         Map<String, Object> result = new HashMap<>();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -41,11 +39,11 @@ public class AccountController {
 
             List<Link> profileLinks = new LinkedList<>();
 
-            if (user.getRoles().contains(roleDao.getRoleByName("CLIENT"))) {
+            if (user.getRoles().contains(roleDao.getRoleByName("ROLE_CLIENT"))) {
                 profileLinks.add(new Link("Domains", "/client/domains"));
             }
 
-            if (user.getRoles().contains(roleDao.getRoleByName("ADMIN"))) {
+            if (user.getRoles().contains(roleDao.getRoleByName("ROLE_ADMIN"))) {
                 profileLinks.add(new Link("Edit products", "/admin/products"));
             }
 
