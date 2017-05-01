@@ -3,7 +3,6 @@ var dataTypeData;
 
 var numberOfAdded = 0;
 var selected = -1;
-//TODO correctIdAfterSave
 
 function addProductType() {
     var list = $("#product-types-list");
@@ -76,8 +75,6 @@ function addProductValue(name, measure, dataType) {
 }
 
 function saveSelected() {
-    var _csrf = $('meta[name=_csrf]').attr("content");
-
     var savedId = selected;
 
     productTypeData[savedId].name = $("#product-type-name-input").val();
@@ -98,7 +95,7 @@ function saveSelected() {
         type: 'POST',
         url: '/api/admin/productTypes/update',
         headers: {
-            'X-CSRF-TOKEN': _csrf
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
         },
         processData: false,
         contentType: 'application/json',
@@ -138,7 +135,52 @@ function saveSelected() {
 }
 
 function deleteSelected() {
+    if (productTypeData[selected].id < 0) {
+        $("#product-types-list").find("a:nth-child(" + (selected+1) + ")").addClass("hidden");
+        selectItem(-1);
+    } else {
+        $.ajax({
+            type: 'POST',
+            url: '/api/admin/productTypes/delete',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+            },
+            processData: false,
+            contentType: 'application/json',
+            data: JSON.stringify({id: productTypeData[selected].id}),
+            success: function (data) {
+                var alert;
+                if (data.status == 'success') {
+                    console.log("Deleting success! " + JSON.stringify(data));
 
+                    $("#product-types-list").find("a:nth-child(" + (selected+1) + ")").addClass("hidden");
+                    selectItem(-1);
+                    alert = $('<div id="new-product-type-alert" class="alert alert-success" role="alert">' +
+                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                        data.message + '</div>');
+                } else {
+                    console.log("Deleting error! " + JSON.stringify(data));
+                    alert = $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
+                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                        data.message + '</div>');
+                }
+
+                $("#new-product-type-alert").remove();
+
+                alert.insertAfter($("#new-product-type-alert-place"));
+
+            },
+            error: function (data) {
+                console.error("Deleting error! " + JSON.stringify(data));
+
+                $("#new-product-type-alert").remove();
+
+                $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                    'Product changes failed </div>').insertAfter($("#new-product-type-alert-place"));
+            }
+        });
+    }
 }
 
 function selectItem(x) {

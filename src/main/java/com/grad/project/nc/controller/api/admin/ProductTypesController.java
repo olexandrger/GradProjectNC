@@ -58,6 +58,18 @@ public class ProductTypesController {
         }).collect(Collectors.toList());
     }
 
+    @RequestMapping(value = "productTypes/delete", method = RequestMethod.POST)
+    public Map<String, String> deleteType(@RequestBody Map<String, Integer> productTypeId) {
+        Map<String, String> result = new HashMap<>();
+        //TODO implement
+        log.info("Deleting product type with id " + productTypeId.get("id"));
+
+        //Change status to "error" and put appropriate message if needed
+        result.put("status", "success");
+        result.put("message", "Product deleted successfully");
+        return result;
+    }
+
     @RequestMapping(value = "/productTypes/update", method = RequestMethod.POST)
     public Map<String, String> updateType(@RequestBody Type type) {
         Map<String, String> result = new HashMap<>();
@@ -69,10 +81,10 @@ public class ProductTypesController {
             productType.setProductTypeDescription(type.getDescription());
 
             if (productTypeDao.find(type.getId()) != null) {
-                productTypeDao.update(productType);
+                productType = productTypeDao.update(productType);
                 result.put("message", "Product successfully updated");
             } else {
-                productTypeDao.add(productType);
+                productType = productTypeDao.add(productType);
                 result.put("message", "Product successfully added");
             }
             result.put("status", "success");
@@ -89,17 +101,22 @@ public class ProductTypesController {
 
                 ProductCharacteristic characteristic = new ProductCharacteristic();
                 characteristic.setCharacteristicName(c.getName());
-                //TODO change it to dataType selected previously
+                /*
+                * TODO change it to dataType selected previously
+                * (productCharacteristic needs to hold link to productType instead of just id)
+                */
                 characteristic.setDataTypeId(c.getDataTypeId());
                 characteristic.setMeasure(c.getMeasure());
-                characteristic.setProductTypeId(type.getId());
+                characteristic.setProductTypeId(productType.getProductTypeId());
 
                 productCharacteristicDao.add(characteristic);
             }
 
         } catch (DataAccessException exception) {
             result.put("status", "error");
-            result.put("message", exception.getMessage());
+            //result.put("message", exception.getMessage());
+            result.put("message", "Can not add info to database");
+
             return result;
         }
 
