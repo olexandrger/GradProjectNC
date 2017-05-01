@@ -134,17 +134,26 @@ function register() {
         headers: {
             'X-CSRF-TOKEN': _csrf
         },
-        data: {
+        processData: false,
+        contentType: 'application/json',
+        data: JSON.stringify({
             firstName: firstName,
             lastName: lastName,
             email: email,
             password: password,
             phone: phone
-        },
+        }),
         success: function (data) {
-            console.log("Registration success! " + JSON.stringify(data));
-            var alert = $('<div id="registration-header-alert" class="alert alert-success" role="alert">' +
-                "You\'ve been registered successfully<br/>Now you can log in</div>");
+            var alert;
+            if (data.status == 'success') {
+                console.log("Registration success! " + JSON.stringify(data));
+                alert = $('<div id="registration-header-alert" class="alert alert-success" role="alert">' +
+                    data.message + "</div>");
+            } else {
+                console.log("Registration error! " + JSON.stringify(data));
+                alert = $('<div id="registration-header-alert" class="alert alert-danger" role="alert">' +
+                    data.message + '</div>');
+            }
 
             $("#registration-header-alert").replaceWith(alert);
         },
