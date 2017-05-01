@@ -10,34 +10,33 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 
 
 @Repository
 public class ProductDao extends AbstractDao<Product> {
-
+    @Autowired
     private ProductTypeDao productTypeDao;
+    @Autowired
     private ProductCharacteristicValueDao productCharacteristicValueDao;
-    private ProductRowMapper productRowMapper = new ProductRowMapper();
+    @Autowired
+    private ProductCharacteristicDao productCharacteristicDao;
 
 
     @Autowired
-    public ProductDao(JdbcTemplate jdbcTemplate, ProductTypeDao productTypeDao, ProductCharacteristicValueDao productCharacteristicValueDao) {
+    public ProductDao(JdbcTemplate jdbcTemplate/*, ProductTypeDao productTypeDao, ProductCharacteristicValueDao productCharacteristicValueDao*/){
 
         super(jdbcTemplate);
-        this.productTypeDao = productTypeDao;
-        this.productCharacteristicValueDao = productCharacteristicValueDao;
+        //this.productTypeDao = productTypeDao;
+        //this.productCharacteristicValueDao = productCharacteristicValueDao;
     }
 
     @Override
     public Product add(Product product) {
 
 
-        //TODO add lists saving
+        //
 
         KeyHolder keyHolder = executeInsert(connection -> {
             String statement = "INSERT INTO \"product\" (product_name, product_description, product_type_id)" +
@@ -46,27 +45,31 @@ public class ProductDao extends AbstractDao<Product> {
 
             preparedStatement.setString(1, product.getName());
             preparedStatement.setString(2, product.getDescription());
-            preparedStatement.setLong(3, product.getProductTypeId());
+            preparedStatement.setLong(3, product.getProductType().getProductTypeId());
 
             return preparedStatement;
         });
 
-        return find(getLongValue(keyHolder, "user_id"));
+        product.setProductId(getLongValue(keyHolder, "product_id"));
+
+        saveProductCharacteristicValues(product);
+
+        return find(getLongValue(keyHolder, "product_id"));
 
     }
 
     @Transactional
     @Override
-    public Product find(long id) {
+    public Product find(long id)  {
 
         return findOne(connection -> {
-            String statement = "SELECT product_id,product_name,product_description,product_type_id FROM product WHERE product_id = ?";
+            String statement = "SELECT product_id,product_name,product_description FROM product WHERE product_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
             preparedStatement.setLong(1, id);
 
             return preparedStatement;
-        }, productRowMapper);
+        }, new ProductRowMapper());
 
     }
 
@@ -76,7 +79,8 @@ public class ProductDao extends AbstractDao<Product> {
 
 
         executeUpdate(connection -> {
-            String query = "UPDATE product SET product_name = ?" +
+            String query = "UPDATE product SET " +
+                    "product_name = ?" +
                     ", product_description = ?" +
                     ", product_type_id = ? " +
                     "WHERE product_id = ? ";
@@ -85,21 +89,22 @@ public class ProductDao extends AbstractDao<Product> {
 
             preparedStatement.setString(1, product.getName());
             preparedStatement.setString(2, product.getDescription());
-            preparedStatement.setLong(3, product.getProductTypeId());
+            preparedStatement.setLong(3, product.getProductType().getProductTypeId());
             preparedStatement.setLong(4, product.getProductId());
 
 
             return preparedStatement;
         });
 
-        //TODO add object fields saving
+
+        saveProductCharacteristicValues(product);
 
         return product;
     }
 
     @Transactional
     @Override
-    public void delete(Product entity) {
+    public void delete(Product entity){
 
         executeUpdate(connection -> {
             String statement = "DELETE FROM product WHERE product_id = ?";
@@ -119,57 +124,102 @@ public class ProductDao extends AbstractDao<Product> {
             String statement = "SELECT product_id" +
                     ",product_name" +
                     ",product_description" +
-                    ",product_type_id " +
+                   // ",product_type_id " +
                     "FROM product ";
             return connection.prepareStatement(statement);
-        }, productRowMapper);
+        }, new ProductRowMapper());
 
     }
 
-    public Collection<Product> findProductsByRegion(Region region) {
+    private void deleteProductCharacteristicValues(Product product){
+
+        executeUpdate(connection -> {
+            String query = "DELETE FROM product_characteristic_value WHERE product_id =?";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setLong(1, product.getProductId());
+
+            return statement;
+        });
+
+    }
+    private void saveProductCharacteristicValues(Product product){
+
+        if(product.getProductCharacteristicValues() != null && product.getProductCharacteristicValues().size() > 0){
+
+            deleteProductCharacteristicValues(product);
+
+            executeUpdate(connection -> {
+                String query = "INSERT INTO product_characteristic_value(product_id,product_characteristic_id, number_value , date_value , string_value  ) VALUES (?,?,?,?,?)";
+                for (int i = 1; i < product.getProductCharacteristicValues().size(); i++) {
+                    query += ",(?,?,?,?,?)";
+                }
+
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                int i = 1;
+                for (ProductCharacteristicValue productCharacteristicValue : product.getProductCharacteristicValues()) {
+                    statement.setLong(i, productCharacteristicValue.getProductId());
+                    i++;
+                    statement.setLong(i, productCharacteristicValue.getProductCharacteristicId());
+                    i++;
+                    statement.setDouble(i, productCharacteristicValue.getNumberValue());
+                    i++;
+                    statement.setTimestamp(i, Timestamp.valueOf(productCharacteristicValue.getDateValue()));
+                    i++;
+                    statement.setString(i, productCharacteristicValue.getStringValue());
+                    i++;
+                }
+                return statement;
+            });
+
+        }else {
+            deleteProductCharacteristicValues(product);
+        }
+
+    }
+
+    public Collection<Product> findProductsByRegion(Region region){
 
         return findMultiple(connection -> {
             final String QUERY =
                     "SELECT p.product_id" +
                             ",p.product_name" +
-                            ",p.product_description" +
-                            ",p.product_type_id " +
-                            "FROM product p" +
-                            "INNER JOIN product_region_price prp " +
+                            ",p.product_description FROM product p INNER JOIN product_region_price prp " +
                             "ON p.product_id = prp.product_id " +
                             "WHERE prp.region_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
             preparedStatement.setLong(1, region.getRegionId());
             return preparedStatement;
 
-        }, productRowMapper);
+        }, new ProductRowMapper());
     }
 
     //TODO Discuss if name of product unique or not
     @Transactional
     public Optional<Product> findByName(String name) {
         Product result = findOne(connection -> {
-            String statement = "SELECT product_id,product_name,product_description,product_type_id FROM product WHERE product_name = ?";
+            String statement = "SELECT product_id,product_name,product_description" +
+                    //",product_type_id " +
+                    "FROM product WHERE product_name = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
             preparedStatement.setString(1, name);
 
             return preparedStatement;
-        }, productRowMapper);
+        }, new ProductRowMapper());
 
         return Optional.of(result);
     }
-
     @Transactional
-    public Collection<Product> findProductsByType(ProductType productType) {
+    public Collection<Product> findProductsByType(ProductType productType){
 
         return findMultiple(connection -> {
             final String QUERY =
-                    "SELECT " +
-                            "product_id" +
+                    "SELECT product_id" +
                             ",product_name" +
                             ",product_description" +
-                            ",product_type_id " +
+                         //   ",product_type_id " +
                             "FROM product " +
                             "WHERE product_type_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
@@ -180,25 +230,8 @@ public class ProductDao extends AbstractDao<Product> {
 
     }
 
-    public Product getProductByProductRegionPrise(ProductRegionPrice productRegionPrice) {
-        return findOne(connection -> {
-            final String SELECT_QUERY =
-                    "SELECT " +
-                            "pr.product_id, " +
-                            "pr.product_name, " +
-                            "pr.product_description, " +
-                            "pr.product_type_id " +
-                            "FROM product pr " +
-                            "WHERE pr.product_id = " +
-                            "(SELECT " +
-                            "prp.product_id " +
-                            "FROM product_region_price prp " +
-                            "WHERE prp.price_id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
-            preparedStatement.setLong(1, productRegionPrice.getPriceId());
-            return preparedStatement;
+    public Product getProductByProductRegionPrise(ProductRegionPrice productRegionPrice){
 
-        }, productRowMapper);
     }
 
     public static final class ProductRowMapper implements RowMapper<Product> {
@@ -210,18 +243,17 @@ public class ProductDao extends AbstractDao<Product> {
             product.setProductId(rs.getLong("product_id"));
             product.setName(rs.getString("product_name"));
             product.setDescription(rs.getString("product_description"));
-            product.setProductTypeId(rs.getLong("product_type_id"));
 
             return product;
         }
     }
 
-    private class ProductProxy extends Product {
+    private class ProductProxy extends Product{
         @Override
         public ProductType getProductType() {
 
             if (super.getProductType() == null) {
-                super.setProductType(productTypeDao.find(this.getProductTypeId()));
+                super.setProductType(productTypeDao.getProductTypeByProduct(this));
             }
 
             return super.getProductType();
@@ -229,12 +261,22 @@ public class ProductDao extends AbstractDao<Product> {
 
         @Override
         public List<ProductCharacteristicValue> getProductCharacteristicValues() {
-            if (super.getProductCharacteristicValues() == null) {
+            if (super.getProductCharacteristicValues() == null){
                 super.setProductCharacteristicValues(productCharacteristicValueDao.findByProductId(this.getProductId()));
             }
 
             return super.getProductCharacteristicValues();
         }
+
+        public List<ProductCharacteristic> getProductCharacteristics() {
+            if (super.getProductCharacteristics() == null){
+                super.setProductCharacteristics(new LinkedList<>(productCharacteristicDao.findByProductId(this.getProductId())));
+            }
+
+            return super.getProductCharacteristics();
+        }
+
+
     }
 
 
