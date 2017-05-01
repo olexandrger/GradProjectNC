@@ -173,6 +173,8 @@ public class ProductDao extends AbstractDao<Product> {
                 return statement;
             });
 
+        }else {
+            deleteProductCharacteristicValues(product);
         }
 
     }
