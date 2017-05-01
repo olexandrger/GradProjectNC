@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -22,10 +23,10 @@ import java.util.Map;
  * Created by Roman Savuliak on 26.04.2017.
  */
 @Repository
-public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice> {
+public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    ProductRegionPriceRowMapper mapper = new ProductRegionPriceRowMapper();
+
 
     @Override
     @Transactional
@@ -90,6 +91,20 @@ public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice> {
 
     public Collection<ProductRegionPrice> getProductRegionPricesByDiscount(Discount discount){
 
+        return findMultiple(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "price_id, " +
+                            "product_id, " +
+                            "region_id, price " +
+                            "FROM product_region_price prp " +
+                            "INNER JOIN discount_price dp " +
+                            "ON prp.price_id=dp.price_id " +
+                            "WHERE dp.discount_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1,discount.getDiscountId() );
+            return preparedStatement;
+        }, mapper);
     }
 
 
