@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.Region;
@@ -62,7 +63,6 @@ public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice> {
     }
 
     @Override
-    @Transactional
     public ProductRegionPrice find(long id) {
         final String SELECT_QUERY = "SELECT price_id, product_id, region_id, price FROM product_region_price WHERE price_id = ?";
         ProductRegionPrice productRegionPrice = null;
@@ -76,7 +76,6 @@ public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice> {
     }
 
     @Override
-    @Transactional
     public Collection<ProductRegionPrice> findAll() {
         final String SELECT_QUERY = "SELECT price_id, product_id, region_id, price FROM product_region_price";
         return jdbcTemplate.query(SELECT_QUERY, new ProductRegionPriceRowMapper());
@@ -87,6 +86,10 @@ public class ProductRegionPriceDao implements CrudDao<ProductRegionPrice> {
         final String DELETE_QUERY = "DELETE FROM product_region_price WHERE price_id = ?";
 
         jdbcTemplate.update(DELETE_QUERY, productRegionPrice.getPriceId());
+    }
+
+    public Collection<ProductRegionPrice> getProductRegionPricesByDiscount(Discount discount){
+
     }
 
 
