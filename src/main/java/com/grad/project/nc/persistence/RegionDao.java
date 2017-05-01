@@ -117,7 +117,22 @@ public class RegionDao extends AbstractDao<Region> {
         }, regionRowMapper);
     }
 
-    public Region fingRegionByProductRegionPrice(ProductRegionPrice ProductRegionPrice){
+    public Region fingRegionByProductRegionPrice(ProductRegionPrice productRegionPrice){
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "r.region_id, " +
+                            "r.region_name " +
+                            "FROM region r " +
+                            "WHERE r.region_id = " +
+                            "(SELECT " +
+                            "prp.region_id " +
+                            "FROM product_region_price prp " +
+                            "WHERE prp.price_id = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, productRegionPrice.getPriceId());
+            return preparedStatement;
+        }, regionRowMapper);
 
     }
 

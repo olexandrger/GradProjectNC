@@ -22,10 +22,11 @@ public class ProductDao extends AbstractDao<Product> {
 
     private ProductTypeDao productTypeDao;
     private ProductCharacteristicValueDao productCharacteristicValueDao;
+    private ProductRowMapper productRowMapper = new ProductRowMapper();
 
 
     @Autowired
-    public ProductDao(JdbcTemplate jdbcTemplate, ProductTypeDao productTypeDao, ProductCharacteristicValueDao productCharacteristicValueDao){
+    public ProductDao(JdbcTemplate jdbcTemplate, ProductTypeDao productTypeDao, ProductCharacteristicValueDao productCharacteristicValueDao) {
 
         super(jdbcTemplate);
         this.productTypeDao = productTypeDao;
@@ -56,7 +57,7 @@ public class ProductDao extends AbstractDao<Product> {
 
     @Transactional
     @Override
-    public Product find(long id)  {
+    public Product find(long id) {
 
         return findOne(connection -> {
             String statement = "SELECT product_id,product_name,product_description,product_type_id FROM product WHERE product_id = ?";
@@ -65,7 +66,7 @@ public class ProductDao extends AbstractDao<Product> {
             preparedStatement.setLong(1, id);
 
             return preparedStatement;
-        }, new ProductRowMapper());
+        }, productRowMapper);
 
     }
 
@@ -98,7 +99,7 @@ public class ProductDao extends AbstractDao<Product> {
 
     @Transactional
     @Override
-    public void delete(Product entity){
+    public void delete(Product entity) {
 
         executeUpdate(connection -> {
             String statement = "DELETE FROM product WHERE product_id = ?";
@@ -121,11 +122,11 @@ public class ProductDao extends AbstractDao<Product> {
                     ",product_type_id " +
                     "FROM product ";
             return connection.prepareStatement(statement);
-        }, new ProductRowMapper());
+        }, productRowMapper);
 
     }
 
-    public Collection<Product> findProductsByRegion(Region region){
+    public Collection<Product> findProductsByRegion(Region region) {
 
         return findMultiple(connection -> {
             final String QUERY =
@@ -141,7 +142,7 @@ public class ProductDao extends AbstractDao<Product> {
             preparedStatement.setLong(1, region.getRegionId());
             return preparedStatement;
 
-        }, new ProductRowMapper());
+        }, productRowMapper);
     }
 
     //TODO Discuss if name of product unique or not
@@ -154,16 +155,18 @@ public class ProductDao extends AbstractDao<Product> {
             preparedStatement.setString(1, name);
 
             return preparedStatement;
-        }, new ProductRowMapper());
+        }, productRowMapper);
 
         return Optional.of(result);
     }
+
     @Transactional
-    public Collection<Product> findProductsByType(ProductType productType){
+    public Collection<Product> findProductsByType(ProductType productType) {
 
         return findMultiple(connection -> {
             final String QUERY =
-                    "SELECT product_id" +
+                    "SELECT " +
+                            "product_id" +
                             ",product_name" +
                             ",product_description" +
                             ",product_type_id " +
@@ -177,8 +180,25 @@ public class ProductDao extends AbstractDao<Product> {
 
     }
 
-    public Product getProductByProductRegionPrise(ProductRegionPrice productRegionPrice){
+    public Product getProductByProductRegionPrise(ProductRegionPrice productRegionPrice) {
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "pr.product_id, " +
+                            "pr.product_name, " +
+                            "pr.product_description, " +
+                            "pr.product_type_id " +
+                            "FROM product pr " +
+                            "WHERE pr.product_id = " +
+                            "(SELECT " +
+                            "prp.product_id " +
+                            "FROM product_region_price prp " +
+                            "WHERE prp.price_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, productRegionPrice.getPriceId());
+            return preparedStatement;
 
+        }, productRowMapper);
     }
 
     public static final class ProductRowMapper implements RowMapper<Product> {
@@ -196,7 +216,7 @@ public class ProductDao extends AbstractDao<Product> {
         }
     }
 
-    private class ProductProxy extends Product{
+    private class ProductProxy extends Product {
         @Override
         public ProductType getProductType() {
 
@@ -209,7 +229,7 @@ public class ProductDao extends AbstractDao<Product> {
 
         @Override
         public List<ProductCharacteristicValue> getProductCharacteristicValues() {
-            if (super.getProductCharacteristicValues() == null){
+            if (super.getProductCharacteristicValues() == null) {
                 super.setProductCharacteristicValues(productCharacteristicValueDao.findByProductId(this.getProductId()));
             }
 

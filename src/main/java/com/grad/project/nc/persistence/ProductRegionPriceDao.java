@@ -28,17 +28,23 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
 
     ProductRegionPriceRowMapper mapper = new ProductRegionPriceRowMapper();
 
+
     private DiscountDao discountDao;
     private ProductDao productDao;
     private RegionDao regionDao;
 
 
     @Autowired
-    public ProductRegionPriceDao(JdbcTemplate jdbcTemplate, DiscountDao discountDao, ProductDao productDao, RegionDao regionDao) {
+    public ProductRegionPriceDao(JdbcTemplate jdbcTemplate, /*  DiscountDao discountDao, */ProductDao productDao, RegionDao regionDao) {
         super(jdbcTemplate);
-        this.discountDao = discountDao;
+        //this.discountDao = discountDao;
         this.productDao = productDao;
         this.regionDao = regionDao;
+
+    }
+
+    public void setDiscountDao(DiscountDao discountDao) {
+        this.discountDao = discountDao;
     }
 
     @Override

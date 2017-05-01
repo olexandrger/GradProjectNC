@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,6 +34,11 @@ public class DiscountDao extends AbstractDao<Discount> {
     public DiscountDao(JdbcTemplate jdbcTemplate, ProductRegionPriceDao productRegionPriceDao) {
         super(jdbcTemplate);
         this.productRegionPriceDao = productRegionPriceDao;
+    }
+
+    @PostConstruct
+    private void initDiscountDao(){
+        this.productRegionPriceDao.setDiscountDao(this);
     }
 
     @Override
@@ -170,6 +176,22 @@ public class DiscountDao extends AbstractDao<Discount> {
     }
 
     public Collection<Discount> findByProductRegionPrise(ProductRegionPrice productRegionPrice){
+        return findMultiple(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "d.discount_id, " +
+                            "d.discount_title " +
+                            "d.discount, " +
+                            "d.start_date, " +
+                            "d.end_date " +
+                            "FROM discount d " +
+                            "INNER JOIN discount_price dp " +
+                            "ON d.discount_id = dp.discount_id " +
+                            "WHERE dp.price_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, productRegionPrice.getPriceId());
+            return preparedStatement;
+        }, mapper);
 
     }
 
