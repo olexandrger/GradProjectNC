@@ -22,6 +22,8 @@ public class ProductDao extends AbstractDao<Product> {
     private ProductCharacteristicValueDao productCharacteristicValueDao;
     @Autowired
     private ProductCharacteristicDao productCharacteristicDao;
+    @Autowired
+    private CategoryDao categoryDao;
 
     private ProductRowMapper mapper = new ProductRowMapper();
 
@@ -41,13 +43,14 @@ public class ProductDao extends AbstractDao<Product> {
         //
 
         KeyHolder keyHolder = executeInsert(connection -> {
-            String statement = "INSERT INTO \"product\" (product_name, product_description, product_type_id)" +
-                    " VALUES (?, ?, ?)";
+            String statement = "INSERT INTO \"product\" (product_name, product_description, product_type_id, product_status_id)" +
+                    " VALUES (?, ?, ?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1, product.getName());
             preparedStatement.setString(2, product.getDescription());
             preparedStatement.setLong(3, product.getProductType().getProductTypeId());
+            preparedStatement.setLong(4,product.getStatus().getCategoryId());
 
             return preparedStatement;
         });
@@ -84,7 +87,8 @@ public class ProductDao extends AbstractDao<Product> {
             String query = "UPDATE product SET " +
                     "product_name = ?" +
                     ", product_description = ?" +
-                    ", product_type_id = ? " +
+                    ", product_type_id = ? , " +
+                    "product_status_id =? " +
                     "WHERE product_id = ? ";
 
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -92,7 +96,8 @@ public class ProductDao extends AbstractDao<Product> {
             preparedStatement.setString(1, product.getName());
             preparedStatement.setString(2, product.getDescription());
             preparedStatement.setLong(3, product.getProductType().getProductTypeId());
-            preparedStatement.setLong(4, product.getProductId());
+            preparedStatement.setLong(4, product.getStatus().getCategoryId());
+            preparedStatement.setLong(5, product.getProductId());
 
 
             return preparedStatement;
@@ -244,8 +249,7 @@ public class ProductDao extends AbstractDao<Product> {
                             "WHERE pr.product_id = " +
                             "(SELECT " +
                             "prp.product_id " +
-                            "FROM product_region_price prp " +
-                            "WHERE prp.price_id = ?";
+                            "FROM product_region_price prp WHERE prp.price_id = ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
             preparedStatement.setLong(1, productRegionPrice.getPriceId());
             return preparedStatement;
@@ -295,7 +299,15 @@ public class ProductDao extends AbstractDao<Product> {
             return super.getProductCharacteristics();
         }
 
+        @Override
+        public Category getStatus() {
 
+            if (super.getStatus() == null) {
+                super.setStatus(categoryDao.findProductStatusByProduct(this));
+            }
+
+            return super.getStatus();
+        }
     }
 
 

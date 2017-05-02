@@ -2,6 +2,7 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Category;
 import com.grad.project.nc.model.Complain;
+import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.persistence.mappers.CategoryRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +98,11 @@ public class CategoryDao extends AbstractDao<Category> {
     }
 
     public Category findComplainReasonByComplain(Complain complain){
+        return null; //TODO find method
+    }
+    public Category findProductStatusByProduct(Product product){
+
+
         return null; //TODO find method
     }
 }
