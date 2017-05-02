@@ -119,16 +119,19 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
 
         }, new ProductTypeRowMapper());
     }
+
     public ProductType getProductTypeByProduct(Product product){
 
         return findOne(connection -> {
             final String SELECT_QUERY =
                     "SELECT pt.product_type_id, pt.product_type_name, pt.product_type_description FROM product_type pt " +
-                            "WHERE pt.product_type_id = " +
-                            "(SELECT " +
-                            "p.product_type_id " +
-                            "FROM product p " +
-                            "WHERE p.product_id = ?)";
+                            "INNER JOIN product p ON p.product_type_id=pt.product_type_id WHERE p.product_id=?";
+//                    "SELECT pt.product_type_id, pt.product_type_name, pt.product_type_description FROM product_type pt " +
+//                            "WHERE pt.product_type_id = " +
+//                            "(SELECT " +
+//                            "p.product_type_id " +
+//                            "FROM product p " +
+//                            "WHERE p.product_id = ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
             preparedStatement.setLong(1, product.getProductId());
             return preparedStatement;
