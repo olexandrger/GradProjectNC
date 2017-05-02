@@ -28,6 +28,8 @@ public class UserDao extends AbstractDao<User> {
     @Autowired
     private ComplainDao complainDao;
 
+    private UserRowMapper mapper = new UserRowMapper();
+
     @Autowired
     UserDao(JdbcTemplate jdbcTemplate/*, RoleDao roleDao, DomainDao domainDao, ProductOrderDao productOrderDao,
             ComplainDao complainDao*/) {
@@ -100,7 +102,7 @@ public class UserDao extends AbstractDao<User> {
             preparedStatement.setLong(1, id);
 
             return preparedStatement;
-        }, new UserRowMapper());
+        }, mapper);
     }
 
     @Override
@@ -109,7 +111,7 @@ public class UserDao extends AbstractDao<User> {
         return findMultiple(connection -> {
             String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\"";
             return connection.prepareStatement(statement);
-        }, new UserRowMapper());
+        }, mapper);
     }
 
     public Collection<User> findByDomain(Domain domain) {
@@ -130,7 +132,7 @@ public class UserDao extends AbstractDao<User> {
             preparedStatement.setLong(1, domain.getDomainId());
             return preparedStatement;
 
-        }, new UserRowMapper());
+        }, mapper);
 
     }
 
@@ -227,24 +229,94 @@ public class UserDao extends AbstractDao<User> {
             preparedStatement.setString(1, email);
 
             return preparedStatement;
-        }, new UserRowMapper());
+        }, mapper);
 
         return Optional.ofNullable(result);
     }
 
-    public User findUserByProductOrder(ProductOrder productOrder){
-        return null; //TODO find metod
+    public User findUserByProductOrder(ProductOrder productOrder) {
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "u.user_id, " +
+                            "u.email, " +
+                            "u.password, " +
+                            "u.first_name, " +
+                            "u.last_name, " +
+                            "u.phone_number " +
+                            "FROM \"user\" u " +
+                            "WHERE u.user_id = (" +
+                            "SELECT po.user_id " +
+                            "FROM product_order po " +
+                            "WHERE po.product_order_id = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, productOrder.getProductOrderId());
+            return preparedStatement;
+        }, mapper);
     }
 
-    public User findResponsibleByProductOrder(ProductOrder productOrder){
-        return null; //TODO find metod
+    public User findResponsibleByProductOrder(ProductOrder productOrder) {
+
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "u.user_id, " +
+                            "u.email, " +
+                            "u.password, " +
+                            "u.first_name, " +
+                            "u.last_name, " +
+                            "u.phone_number " +
+                            "FROM \"user\" u " +
+                            "WHERE u.user_id = (" +
+                            "SELECT po.responsible_id " +
+                            "FROM product_order po " +
+                            "WHERE po.product_order_id = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, productOrder.getProductOrderId());
+            return preparedStatement;
+        }, mapper);
     }
 
-    public User findUserComplain(Complain complain){
-        return null; //TODO find metod
+    public User findUserComplain(Complain complain) {
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "u.user_id, " +
+                            "u.email, " +
+                            "u.password, " +
+                            "u.first_name, " +
+                            "u.last_name, " +
+                            "u.phone_number " +
+                            "FROM \"user\" u " +
+                            "WHERE u.user_id = " +
+                            "(SELECT c.user_id " +
+                            "FROM complain c " +
+                            "WHERE c.complain_id = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, complain.getComplainId());
+            return preparedStatement;
+        }, mapper);
     }
-    public User findResponsibleByComplain(Complain complain){
-        return null; //TODO find metod
+
+    public User findResponsibleByComplain(Complain complain) {
+        return findOne(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "u.user_id, " +
+                            "u.email, " +
+                            "u.password, " +
+                            "u.first_name, " +
+                            "u.last_name, " +
+                            "u.phone_number " +
+                            "FROM \"user\" u " +
+                            "WHERE u.user_id = " +
+                            "(SELECT c.responsible_id " +
+                            "FROM complain c " +
+                            "WHERE c.complain_id = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, complain.getComplainId());
+            return preparedStatement;
+        }, mapper);
     }
 
     /*
