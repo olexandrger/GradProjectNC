@@ -95,10 +95,12 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
                 "\"product_characteristic_id\", \"number_value\", \"date_value\", \"string_value\") " +
                 "VALUES (?, ?, ?, ?, ?)";
 
+        List<Object[]> batchArgs = new ArrayList<>();
         for (ProductCharacteristicValue value : product.getProductCharacteristicValues()) {
-            jdbcTemplate.update(insertQuery, product.getProductId(), value.getProductCharacteristicId(),
-                    value.getNumberValue(), value.getDateValue(), value.getStringValue());
+            batchArgs.add(new Object[]{product.getProductId(), value.getProductCharacteristicId(),
+                    value.getNumberValue(), value.getDateValue(), value.getStringValue()});
         }
+        jdbcTemplate.batchUpdate(insertQuery, batchArgs);
     }
 
     @Override
