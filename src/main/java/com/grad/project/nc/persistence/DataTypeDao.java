@@ -114,7 +114,7 @@ public class DataTypeDao extends AbstractDao<DataType> {
         public List<ProductCharacteristic> getProductCharacteristics() {
 
             if (super.getProductCharacteristics() == null){
-                super.setProductCharacteristics(new LinkedList<>(productCharacteristicDao.findByProductId(this.getDataTypeId())));
+                super.setProductCharacteristics(new LinkedList<>(productCharacteristicDao.findByProductTypeId(this.getDataTypeId())));
             }
 
             return super.getProductCharacteristics();

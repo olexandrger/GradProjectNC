@@ -209,7 +209,7 @@ public class ComplainDao extends AbstractDao<Complain> {
         @Override
         public Category getStatus() {
             if(super.getStatus() == null){
-                super.setStatus(categoryDao.findComplainStatusByComplain(this));
+                super.setStatus(categoryDao.findComplainStatus(this.getComplainId()));
             }
             return super.getStatus();
         }
@@ -225,7 +225,7 @@ public class ComplainDao extends AbstractDao<Complain> {
         @Override
         public Category getComplainReason() {
             if(super.getComplainReason() == null){
-                super.setComplainReason(categoryDao.findComplainReasonByComplain(this));
+                super.setComplainReason(categoryDao.findComplainReason(this.getComplainId()));
             }
             return super.getComplainReason();
         }

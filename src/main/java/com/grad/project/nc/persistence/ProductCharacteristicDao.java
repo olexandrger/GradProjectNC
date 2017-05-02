@@ -114,7 +114,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
         return jdbcTemplate.query(SELECT_QUERY,new ProductCharacteristicRowMapper());
     }
 
-    public Collection<ProductCharacteristic> findByProductId(Long productId){
+    public List<ProductCharacteristic> findByProductTypeId(Long productTypeId){
 
         final String SELECT_QUERY = "SELECT pch.product_characteristic_id" +
                 ",pch.product_type_id" +
@@ -124,8 +124,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
                 " FROM product_characteristic pch " +
                 " WHERE pch.product_type_id = ?";
 
-        return jdbcTemplate.query(SELECT_QUERY,new Object[]{productId},new ProductCharacteristicRowMapper());
-
+        return jdbcTemplate.query(SELECT_QUERY, new ProductCharacteristicRowMapper(), productTypeId);
     }
 
 

@@ -5,10 +5,8 @@ import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.Region;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * reated by DeniG on 5/01/2017.
@@ -189,7 +185,7 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
         @Override
         public Product getProduct() {
             if (super.getProduct() == null) {
-                super.setProduct(productDao.getProductByProductRegionPrise(this));
+                super.setProduct(productDao.getProductByProductRegionPrice(this));
             }
             return super.getProduct();
         }

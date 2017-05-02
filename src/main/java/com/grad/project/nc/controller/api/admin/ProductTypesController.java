@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +50,7 @@ public class ProductTypesController {
             type.setId(productType.getProductTypeId());
             type.setName(productType.getProductTypeName());
             type.setDescription(productType.getProductTypeDescription());
-            type.setCharacteristics(productCharacteristicDao.findByProductId(type.getId()).stream()
+            type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
                     .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
                                                         item.getMeasure(), item.getDataTypeId()))
                     .collect(Collectors.toList()));

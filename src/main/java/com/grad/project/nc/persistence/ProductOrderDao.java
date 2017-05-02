@@ -175,7 +175,7 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
         @Override
         public Category getOrderAim() {
             if(super.getOrderAim() == null){
-                super.setOrderAim(categoryDao.findAimByProductOrder(this));
+                super.setOrderAim(categoryDao.findProductOrderAim(this.getProductOrderId()));
             }
             return super.getOrderAim();
         }
@@ -183,7 +183,7 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
         @Override
         public Category getStatus() {
             if(super.getStatus() == null){
-                super.setStatus(categoryDao.findOrderStatusByProductOrder(this));
+                super.setStatus(categoryDao.findProductOrderStatus(this.getProductOrderId()));
             }
             return super.getStatus();
         }

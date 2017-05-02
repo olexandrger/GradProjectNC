@@ -1,24 +1,23 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.persistence.exceptions.NonUniqueResultException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
 
-@Repository
-abstract class AbstractDao<T> implements CrudDao<T> {
+public abstract class AbstractDao<T> implements CrudDao<T>{
 
-    private final JdbcTemplate jdbcTemplate;
+    protected final JdbcTemplate jdbcTemplate;
 
-    AbstractDao(JdbcTemplate jdbcTemplate) {
+    protected AbstractDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -32,23 +31,51 @@ abstract class AbstractDao<T> implements CrudDao<T> {
         return keyHolder;
     }
 
+    protected Long executeInsertWithId(String insertQuery, String pkColumnName, Object... params) {
+        final PreparedStatementCreator psc = connection -> {
+            final PreparedStatement ps = connection.prepareStatement(insertQuery,
+                    Statement.RETURN_GENERATED_KEYS);
+            if (params != null && params.length > 0) {
+                new ArgumentPreparedStatementSetter(params).setValues(ps);
+            }
+            return ps;
+        };
+
+        final KeyHolder holder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(psc, holder);
+
+        return ((Number) holder.getKeys().get(pkColumnName)).longValue();
+    }
+
     protected void executeUpdate(PreparedStatementCreator statementCreator) {
         jdbcTemplate.update(statementCreator);
     }
 
     protected <E> E findOne(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
-        List<E> results = jdbcTemplate.query(statementCreator, mapper);
+        List<E> result = jdbcTemplate.query(statementCreator, mapper);
 
-        if (results.size() > 1) {
+        if (result.size() > 1) {
             throw new NonUniqueResultException();
         }
 
-        if (results.size() == 0) {
+        if (result.size() == 0) {
             return null;
         }
 
-        return results.get(0);
+        return result.get(0);
+    }
 
+    protected T findOne(String query, RowMapper<T> mapper, Object... params) {
+        List<T> result = jdbcTemplate.query(query, mapper, params);
+
+        if (result.size() > 1) {
+            throw new NonUniqueResultException();
+        }
+        if (result.size() == 0) {
+            return null;
+        }
+        return result.get(0);
     }
 
     protected <E> Collection<E> findMultiple(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
