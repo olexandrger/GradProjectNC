@@ -17,7 +17,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
@@ -34,28 +33,20 @@ public class EmailServiceImpl implements EmailService {
 
     private Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
 
-    @Value("${email.sender}")
-    private String senderAddress;
+    @Value("#{${email.templates.registration}}")
+    private Map<String, String> registrationParams;
 
-    @Value("${email.templates.prefix}")
-    private String templatesPathPrefix;
+    public EmailServiceImpl(@Value("${email.config.templatesPath}") String templatesPathPrefix,
+                            @Value("${email.config.server.host}") String serverHost,
+                            @Value("${email.config.server.port}") Integer serverPort,
+                            @Value("${email.config.server.login}") String serverLogin,
+                            @Value("${email.config.server.password}") String serverPassword) {
 
-    @Value("${email.server.host}")
-    private String serverHost;
-    @Value("${email.server.port}")
-    private Integer serverPort;
-    @Value("${email.server.login}")
-    private String serverLogin;
-    @Value("${email.server.password}")
-    private String serverPassword;
-
-    @PostConstruct
-    private void init() {
-        initMailSender();
-        initFreemarkerConfiguration();
+        initMailSender(serverHost, serverPort, serverLogin, serverPassword);
+        initFreemarkerConfiguration(templatesPathPrefix);
     }
 
-    private void initMailSender() {
+    private void initMailSender(String serverHost, Integer serverPort, String serverLogin, String serverPassword) {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
         sender.setHost(serverHost);
         sender.setUsername(serverLogin);
@@ -64,7 +55,7 @@ public class EmailServiceImpl implements EmailService {
         this.mailSender = sender;
     }
 
-    private void initFreemarkerConfiguration() {
+    private void initFreemarkerConfiguration(String templatesPathPrefix) {
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_25);
 
         TemplateLoader loader = new ClassTemplateLoader(this.getClass(), templatesPathPrefix);
@@ -89,8 +80,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendTemplateEmail(User user, Template template, String sender, String subject) {
-        //TODO after ERD completion change it to user's email
-        String userAddress = user.getUsername();
+        String userAddress = user.getEmail();
 
         try {
             Map<String, Object> context = new HashMap<>();
@@ -103,25 +93,20 @@ public class EmailServiceImpl implements EmailService {
             logger.error("Can not process email template", e);
         }
     }
-
-    private Template createTemplateFromString(String templateString) {
-        //Generate template cache name so they can be used again
-        //return new Template("name", new StringReader(templateString), );
-        return null;
-    }
-
-    private Template getTemplateFromResources(String templateName) throws IOException {
-        return freemarkerConfiguration.getTemplate(templateName + ".ftl");
-    }
-
+    /*
+        private Template createTemplateFromString(String templateString) {
+            //Generate template cache name so they can be used again
+            //return new Template("name", new StringReader(templateString), );
+        }
+    */
     @Override
     @Async
     public void sendRegistrationEmail(User user) {
         logger.info("Sending registration email to " + user.getUsername());
 
         try {
-            Template mailTemplate = getTemplateFromResources("registration");
-            sendTemplateEmail(user, mailTemplate, senderAddress, "Welcome");
+            Template mailTemplate = freemarkerConfiguration.getTemplate(registrationParams.get("template"));
+            sendTemplateEmail(user, mailTemplate, registrationParams.get("sender"), registrationParams.get("subject"));
         } catch (IOException e) {
             logger.error("Can not load email template", e);
         }

@@ -8,7 +8,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -23,6 +25,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    /*
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -34,6 +37,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
     }
+    */
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint());
+
+        http
+                .authorizeRequests()
+                    .antMatchers("/*", "/css/*", "/js/*", "/api/user/**").permitAll()
+                    .antMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
+                    .antMatchers("/client/**", "/api/client/**").hasRole("CLIENT")
+//                    .antMatchers("/api/**").authenticated()
+                .and()
+                    .formLogin()
+                        .loginPage("/login")
+                        .usernameParameter("email")
+                        .successForwardUrl("/login/success")
+                        .failureForwardUrl("/login/failed")
+                .and()
+                    .logout()
+                        .logoutSuccessUrl("/login/logout")
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
+    }
+
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
