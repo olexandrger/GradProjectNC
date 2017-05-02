@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.grad.project.nc.model.Complain;
 import com.grad.project.nc.model.ProductInstance;
 import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.persistence.mappers.ProductInstanceRowMapper;
@@ -90,6 +91,10 @@ public class ProductInstanceDao extends AbstractDao<ProductInstance>{
     }
 
     public ProductInstance findByProductOrder(ProductOrder productOrder){
+        return null; //TODO find metod
+    }
+
+    public ProductInstance findByComplain(Complain complain){
         return null; //TODO find metod
     }
 }

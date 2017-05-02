@@ -101,7 +101,7 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
             preparedStatement.setLong(1, id);
 
             return preparedStatement;
-        }, new ProductOrderRowMapper());
+        }, mapper);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
                             "close_date " +
                             "FROM product_order";
             return connection.prepareStatement(statement);
-        }, new ProductOrderRowMapper());
+        }, mapper);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
                             "INNER JOIN \"user\" " +
                             "ON \"user\".user_id = product_order.user_id";
             return connection.prepareStatement(statement);
-        }, new ProductOrderRowMapper());
+        }, mapper);
     }
 
     private class ProductOrderProxy extends ProductOrder {

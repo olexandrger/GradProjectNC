@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Complain {
     private Long complainId;
-    private Long userId;
-    private Long productInstanceId;
+    private User user;
+    private ProductInstance productInstance;
     private String complainTitle;
     private String content;
-    private Long statusId;
-    private Long responsibleId;
+    private Category status;
+    private User responsible;
     private String response;
     private LocalDateTime openDate;
     private LocalDateTime closeDate;
-    private Long complainReasonId;
+    private Category complainReason;
 }

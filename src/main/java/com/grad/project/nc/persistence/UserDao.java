@@ -240,6 +240,13 @@ public class UserDao extends AbstractDao<User> {
         return null; //TODO find metod
     }
 
+    public User findUserComplain(Complain complain){
+        return null; //TODO find metod
+    }
+    public User findResponsibleByComplain(Complain complain){
+        return null; //TODO find metod
+    }
+
     /*
         @Transactional
         public void addUserRole(User user, Role role){
