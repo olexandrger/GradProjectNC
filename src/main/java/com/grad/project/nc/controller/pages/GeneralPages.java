@@ -14,5 +14,13 @@ public class GeneralPages {
         return "index";
     }
 
+    @RequestMapping("/about")
+    public String about() {
+        return "about";
+    }
 
+    @RequestMapping("/contacts")
+    public String contacts() {
+        return "contacts";
+    }
 }

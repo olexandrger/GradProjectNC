@@ -16,14 +16,89 @@
 
     <link rel="stylesheet" href="/css/main.css">
     <script src="/js/navbar.js"></script>
+    <script src="/js/products.js"></script>
 
 </head>
 <body>
 
 <div class="container">
 
-<#include "../resources/navbar.ftl"/>
+    <#include "../resources/navbar.ftl"/>
 
+    <div class="row">
 
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div id="new-product-alert-place">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=" col-sm-3 col-sm-offset-1">
+                <div class="list-group" id="products-list"></div>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="New product" id="new-product-type-name">
+                    <span class="input-group-btn">
+                        <button type="button" onclick="addProduct()" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-7 hidden" id="products-editor">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#product-general">Main information</a></li>
+                            <li><a data-toggle="tab" href="#product-characteristics">Characteristics</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div id="product-general" class="tab-pane fade in active">
+                                <div id="product-general-editor">
+
+                                    <div class="form-group">
+                                        <label for="product-type-name">Name</label>
+                                        <input type="text" class="form-control" name="product-type-name" placeholder="Name" id="product-type-name-input">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="product-type-description">Description</label>
+                                        <textarea class="form-control" rows="5" name="product-type-description" placeholder="Description" id="product-type-description-input"></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Regional prices</label>
+                                        <a class="btn btn-default" onclick="addRegionalPrice()">
+                                            <span class="glyphicon glyphicon-plus"></span>Add
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div id="product-characteristics"  class="tab-pane fade">
+                                <h3>Characteristics editor</h3>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12" style="margin-top: 10px;">
+                        <div class="col-xs-12 text-center">
+                            <div class="form-group">
+                                <a class="btn btn-success" onclick="saveSelected()">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span>Save
+                                </a>
+                                <a class="btn btn-danger" onclick="deleteSelected()">
+                                    <span class="glyphicon glyphicon-remove "></span>Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>

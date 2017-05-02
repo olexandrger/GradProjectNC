@@ -1,3 +1,4 @@
+/*
 var productTypeData;
 var dataTypeData;
 
@@ -37,7 +38,7 @@ function removeProductValue(element) {
     element.parentNode.parentNode.removeChild(element.parentNode)
 }
 
-function addProductValue(id, name, measure, dataType) {
+function addProductValue(name, measure, dataType) {
 
     var options = "";
 
@@ -55,11 +56,9 @@ function addProductValue(id, name, measure, dataType) {
     if (name == undefined) name="";
     if (measure == undefined) measure="";
     if (dataType == undefined) dataType="";
-    if (id == undefined) id = -1;
 
     var html=
         '<div class="input-group product-characteristic-input">'+
-            '<input type="hidden" name="characteristic-id" value="' + id + '"/>' +
             '<span class="input-group-addon">Name</span>'+
             '<input type="text" class="form-control" value="' + name + '" placeholder="Name" name="characteristic-name">'+
             '<span class="input-group-addon">Measure</span>'+
@@ -85,7 +84,6 @@ function saveSelected() {
 
     $("#product-type-values").find(".product-characteristic-input").each(function (element) {
        productTypeData[savedId].characteristics.push({
-           id: $(this).find("input[name='characteristic-id']").val(),
            name: $(this).find("input[name='characteristic-name']").val(),
            measure: $(this).find("input[name='characteristic-measure']").val(),
            dataTypeId: $(this).find("select").val()
@@ -210,9 +208,7 @@ function selectItem(x) {
 
         for (var characteristic in productTypeData[selected].characteristics) {
             console.log("adding property " + characteristic + " for " + x);
-            addProductValue(
-                productTypeData[selected].characteristics[characteristic].id,
-                productTypeData[selected].characteristics[characteristic].name,
+            addProductValue(productTypeData[selected].characteristics[characteristic].name,
                 productTypeData[selected].characteristics[characteristic].measure,
                 productTypeData[selected].characteristics[characteristic].dataTypeId);
         }
@@ -262,3 +258,20 @@ function loadProductTypes() {
 $(document).ready(function () {
     loadInfo();
 });
+*/
+
+function addRegionalPrice() {
+
+}
+
+function addProduct() {
+
+}
+
+function saveSelected() {
+
+}
+
+function deleteSelected() {
+
+}

@@ -40,9 +40,10 @@
                     </a>
 
                     <ul class="dropdown-menu">
+                        <!--
                         <li><a href="#">Region 1</a></li>
                         <li><a href="#">Region 2</a></li>
-                        <li><a href="#">Region 3</a></li>
+                        <li><a href="#">Region 3</a></li>-->
                     </ul>
                 </li>
             </ul>

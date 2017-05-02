@@ -52,7 +52,8 @@ public class ProductTypesController {
             type.setName(productType.getProductTypeName());
             type.setDescription(productType.getProductTypeDescription());
             type.setCharacteristics(productCharacteristicDao.findByProductId(type.getId()).stream()
-                    .map(item -> new Characteristic(item.getCharacteristicName(), item.getMeasure(), item.getDataTypeId()))
+                    .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
+                                                        item.getMeasure(), item.getDataTypeId()))
                     .collect(Collectors.toList()));
             return type;
         }).collect(Collectors.toList());
@@ -90,8 +91,7 @@ public class ProductTypesController {
             result.put("status", "success");
 
             for (Characteristic c : type.getCharacteristics()) {
-                log.info(dataTypeDao.toString());
-                log.info(c.toString());
+                //TODO remove deleted characteristics from product
                 DataType dataType = dataTypeDao.find(c.getDataTypeId());
                 if (dataType == null) {
                     result.put("status", "error");
@@ -108,8 +108,12 @@ public class ProductTypesController {
                 characteristic.setDataTypeId(c.getDataTypeId());
                 characteristic.setMeasure(c.getMeasure());
                 characteristic.setProductTypeId(productType.getProductTypeId());
-
-                productCharacteristicDao.add(characteristic);
+                if (c.getId() < 0) {
+                    productCharacteristicDao.add(characteristic);
+                } else {
+                    characteristic.setProductCharacteristicId(c.getId());
+                    productCharacteristicDao.update(characteristic);
+                }
             }
 
         } catch (DataAccessException exception) {
@@ -136,6 +140,7 @@ public class ProductTypesController {
     @AllArgsConstructor
     @NoArgsConstructor
     private static class Characteristic {
+        private Long id;
         private String name;
         private String measure;
         private Long dataTypeId;
