@@ -6,6 +6,7 @@ import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.persistence.mappers.CategoryRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -77,7 +78,7 @@ public class CategoryDao extends AbstractDao<Category> {
     @Override
     public void delete(Category entity) {
         executeUpdate(connection -> {
-            String statement = "DELETE FROM status WHERE status_id = ?";
+            String statement = "DELETE FROM category WHERE category_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
             preparedStatement.setLong(1, entity.getCategoryId());
@@ -100,9 +101,5 @@ public class CategoryDao extends AbstractDao<Category> {
     public Category findComplainReasonByComplain(Complain complain){
         return null; //TODO find method
     }
-    public Category findProductStatusByProduct(Product product){
 
-
-        return null; //TODO find method
-    }
 }

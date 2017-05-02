@@ -43,14 +43,14 @@ public class ProductDao extends AbstractDao<Product> {
         //
 
         KeyHolder keyHolder = executeInsert(connection -> {
-            String statement = "INSERT INTO \"product\" (product_name, product_description, product_type_id, product_status_id)" +
+            String statement = "INSERT INTO \"product\" (product_name, product_description, product_type_id, is_active)" +
                     " VALUES (?, ?, ?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1, product.getName());
             preparedStatement.setString(2, product.getDescription());
             preparedStatement.setLong(3, product.getProductType().getProductTypeId());
-            preparedStatement.setLong(4,product.getStatus().getCategoryId());
+            preparedStatement.setBoolean(4,product.getIsActive());
 
             return preparedStatement;
         });
@@ -68,7 +68,7 @@ public class ProductDao extends AbstractDao<Product> {
     public Product find(long id)  {
 
         return findOne(connection -> {
-            String statement = "SELECT product_id,product_name,product_description FROM product WHERE product_id = ?";
+            String statement = "SELECT product_id,product_name,product_description, is_active FROM product WHERE product_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
             preparedStatement.setLong(1, id);
@@ -88,7 +88,7 @@ public class ProductDao extends AbstractDao<Product> {
                     "product_name = ?" +
                     ", product_description = ?" +
                     ", product_type_id = ? , " +
-                    "product_status_id =? " +
+                    "is_active =? " +
                     "WHERE product_id = ? ";
 
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -96,7 +96,7 @@ public class ProductDao extends AbstractDao<Product> {
             preparedStatement.setString(1, product.getName());
             preparedStatement.setString(2, product.getDescription());
             preparedStatement.setLong(3, product.getProductType().getProductTypeId());
-            preparedStatement.setLong(4, product.getStatus().getCategoryId());
+            preparedStatement.setBoolean(4, product.getIsActive());
             preparedStatement.setLong(5, product.getProductId());
 
 
@@ -131,7 +131,7 @@ public class ProductDao extends AbstractDao<Product> {
             String statement = "SELECT product_id" +
                     ",product_name" +
                     ",product_description" +
-                   // ",product_type_id " +
+                    ",is_active" +
                     "FROM product ";
             return connection.prepareStatement(statement);
         }, mapper);
@@ -192,7 +192,7 @@ public class ProductDao extends AbstractDao<Product> {
             final String QUERY =
                     "SELECT p.product_id" +
                             ",p.product_name" +
-                            ",p.product_description FROM product p INNER JOIN product_region_price prp " +
+                            ",p.product_description,p.is_active FROM product p INNER JOIN product_region_price prp " +
                             "ON p.product_id = prp.product_id " +
                             "WHERE prp.region_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
@@ -206,7 +206,7 @@ public class ProductDao extends AbstractDao<Product> {
     @Transactional
     public Optional<Product> findByName(String name) {
         Product result = findOne(connection -> {
-            String statement = "SELECT product_id,product_name,product_description" +
+            String statement = "SELECT product_id,product_name,product_description,is_active" +
                     //",product_type_id " +
                     "FROM product WHERE product_name = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
@@ -226,7 +226,7 @@ public class ProductDao extends AbstractDao<Product> {
                     "SELECT product_id" +
                             ",product_name" +
                             ",product_description" +
-                         //   ",product_type_id " +
+                            ",is_active " +
                             "FROM product " +
                             "WHERE product_type_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
@@ -244,8 +244,8 @@ public class ProductDao extends AbstractDao<Product> {
                             "pr.product_id, " +
                             "pr.product_name, " +
                             "pr.product_description, " +
-                            "pr.product_type_id " +
-                            "FROM product pr " +
+                            "pr.product_type_id ," +
+                            "pr.is_active FROM product pr " +
                             "WHERE pr.product_id = " +
                             "(SELECT " +
                             "prp.product_id " +
@@ -266,6 +266,7 @@ public class ProductDao extends AbstractDao<Product> {
             product.setProductId(rs.getLong("product_id"));
             product.setName(rs.getString("product_name"));
             product.setDescription(rs.getString("product_description"));
+            product.setIsActive(rs.getBoolean("is_active"));
 
             return product;
         }
@@ -299,15 +300,7 @@ public class ProductDao extends AbstractDao<Product> {
             return super.getProductCharacteristics();
         }
 
-        @Override
-        public Category getStatus() {
 
-            if (super.getStatus() == null) {
-                super.setStatus(categoryDao.findProductStatusByProduct(this));
-            }
-
-            return super.getStatus();
-        }
     }
 
 
