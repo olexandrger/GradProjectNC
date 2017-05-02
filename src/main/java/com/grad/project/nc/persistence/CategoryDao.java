@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Category;
+import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.persistence.mappers.CategoryRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -81,5 +82,12 @@ public class CategoryDao extends AbstractDao<Category> {
 
             return preparedStatement;
         });
+    }
+
+    public Category findAimByProductOrder(ProductOrder productOrder){
+        return null; //TODO find method
+    }
+    public Category findOrderStatusByProductOrder(ProductOrder productOrder){
+        return null; //TODO find method
     }
 }

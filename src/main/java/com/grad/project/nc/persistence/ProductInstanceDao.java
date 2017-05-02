@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.ProductInstance;
+import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.persistence.mappers.ProductInstanceRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -86,5 +87,9 @@ public class ProductInstanceDao extends AbstractDao<ProductInstance>{
 
             return preparedStatement;
         });
+    }
+
+    public ProductInstance findByProductOrder(ProductOrder productOrder){
+        return null; //TODO find metod
     }
 }

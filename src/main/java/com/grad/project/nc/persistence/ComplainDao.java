@@ -1,12 +1,9 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Complain;
-import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.model.User;
-import com.grad.project.nc.persistence.mappers.ProductOrderRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;

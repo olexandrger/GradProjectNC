@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ProductOrder {
     private Long productOrderId;
-    private Long productInstanceId;
-    private Long userId;
-    private Long orderAimId;
-    private Long statusId;
-    private Long responsibleId;
+    private ProductInstance productInstance;
+    private User user;
+    private Category orderAim;
+    private Category status;
+    private User responsible;
     private LocalDateTime openDate;
     private LocalDateTime closeDate;
 }

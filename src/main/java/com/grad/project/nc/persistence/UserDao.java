@@ -232,6 +232,14 @@ public class UserDao extends AbstractDao<User> {
         return Optional.ofNullable(result);
     }
 
+    public User findUserByProductOrder(ProductOrder productOrder){
+        return null; //TODO find metod
+    }
+
+    public User findResponsibleByProductOrder(ProductOrder productOrder){
+        return null; //TODO find metod
+    }
+
     /*
         @Transactional
         public void addUserRole(User user, Role role){
