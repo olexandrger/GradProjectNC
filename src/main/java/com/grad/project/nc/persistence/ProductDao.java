@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.grad.project.nc.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.sql.*;
 import java.util.*;
 
@@ -26,9 +28,20 @@ public class ProductDao extends AbstractDao<Product> {
     private ProductCharacteristicDao productCharacteristicDao;
     @Autowired
     private CategoryDao categoryDao;
+    @Autowired
+    private ProductRegionPriceDao productRegionPriceDao;
 
     private ProductRowMapper mapper = new ProductRowMapper();
 
+
+    public void setProductRegionPriceDao(ProductRegionPriceDao productRegionPriceDao) {
+        this.productRegionPriceDao = productRegionPriceDao;
+    }
+
+    @PostConstruct
+    public void initOtherDao() {
+        productRegionPriceDao.setProductDao(this);
+    }
 
     @Autowired
     public ProductDao(JdbcTemplate jdbcTemplate/*, ProductTypeDao productTypeDao, ProductCharacteristicValueDao productCharacteristicValueDao*/){
@@ -294,6 +307,7 @@ public class ProductDao extends AbstractDao<Product> {
             return super.getProductCharacteristicValues();
         }
 
+        @Override
         public List<ProductCharacteristic> getProductCharacteristics() {
             if (super.getProductCharacteristics() == null){
                 super.setProductCharacteristics(new LinkedList<>(productCharacteristicDao.findByProductId(this.getProductId())));
@@ -302,6 +316,14 @@ public class ProductDao extends AbstractDao<Product> {
             return super.getProductCharacteristics();
         }
 
+        @Override
+        public List<ProductRegionPrice> getPrices() {
+            if (super.getPrices() == null){
+                super.setPrices(new LinkedList<>(productRegionPriceDao.getPricesByProduct(this)));
+            }
+
+            return super.getPrices();
+        }
 
     }
 

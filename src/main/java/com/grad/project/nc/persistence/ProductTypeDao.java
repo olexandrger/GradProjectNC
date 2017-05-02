@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Product;
+import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import java.util.Collection;
 @Repository
 public class ProductTypeDao extends AbstractDao<ProductType> {
 
+    @Autowired
+    private ProductCharacteristicDao productCharacteristicDao;
 
 
     @Autowired
@@ -94,6 +97,12 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
 
     @Override
     public void delete(ProductType entity)  {
+
+        Collection<ProductCharacteristic> characteristics = productCharacteristicDao.findCharacteristicsByProductType(entity);
+
+        characteristics.forEach(item -> {
+            productCharacteristicDao.delete(item);
+        });
 
         executeUpdate(connection -> {
             String statement = "DELETE FROM product_type WHERE product_type_id = ?";

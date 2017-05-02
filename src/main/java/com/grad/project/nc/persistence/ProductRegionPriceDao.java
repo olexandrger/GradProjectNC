@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.controller.api.admin.ProductsController;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.Product;
@@ -14,6 +15,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,21 +32,23 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
 
     ProductRegionPriceRowMapper mapper = new ProductRegionPriceRowMapper();
 
-
     private DiscountDao discountDao;
     private ProductDao productDao;
     private RegionDao regionDao;
 
 
     @Autowired
-    public ProductRegionPriceDao(JdbcTemplate jdbcTemplate, /*  DiscountDao discountDao, */ProductDao productDao, RegionDao regionDao) {
+    public ProductRegionPriceDao(JdbcTemplate jdbcTemplate, /*  DiscountDao discountDao, ProductDao productDao, */RegionDao regionDao) {
         super(jdbcTemplate);
         //this.discountDao = discountDao;
-        this.productDao = productDao;
         this.regionDao = regionDao;
 
     }
 
+
+    public void setProductDao(ProductDao productDao) {
+        this.productDao = productDao;
+    }
     public void setDiscountDao(DiscountDao discountDao) {
         this.discountDao = discountDao;
     }
@@ -205,6 +209,7 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
 
     private class ProductRegionPriceProxy extends ProductRegionPrice {
         @Override
+        @JsonIgnore
         public Product getProduct() {
             if (super.getProduct() == null) {
                 super.setProduct(productDao.getProductByProductRegionPrise(this));

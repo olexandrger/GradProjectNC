@@ -62,10 +62,7 @@ public class ProductTypesController {
     @RequestMapping(value = "productTypes/delete", method = RequestMethod.POST)
     public Map<String, String> deleteType(@RequestBody Map<String, Integer> productTypeId) {
         Map<String, String> result = new HashMap<>();
-        //TODO implement
-        log.info("Deleting product type with id " + productTypeId.get("id"));
-
-        //Change status to "error" and put appropriate message if needed
+        productTypeDao.delete(productTypeDao.find(productTypeId.get("id")));
         result.put("status", "success");
         result.put("message", "Product deleted successfully");
         return result;

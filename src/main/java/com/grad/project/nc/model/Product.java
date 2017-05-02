@@ -17,4 +17,5 @@ public class Product {
     private ProductType productType;
     private List<ProductCharacteristicValue> productCharacteristicValues;
     private List<ProductCharacteristic> productCharacteristics;
+    private List<ProductRegionPrice> prices;
 }

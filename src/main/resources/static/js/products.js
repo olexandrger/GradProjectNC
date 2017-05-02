@@ -7,33 +7,85 @@ var productsData;
 var regionsData;
 var regionsHtml;
 
+function getProductTypeData(id) {
+    var result;
+
+    productTypesData.forEach(function (item) {
+       if (item.id == id) {
+           result = item;
+       }
+    });
+
+    return result;
+}
+
+function getCharacteristicValue(id) {
+    var result;
+    productsData[currentSelected].productCharacteristicValues.forEach(function (item) {
+        if (item.productCharacteristicId == id) {
+            result = item;
+        }
+    });
+
+    return result;
+}
+
+function javaToJsDate(date) {
+    function addNumber(number) {
+        var result = "";
+        if (number < 10)
+            result += '0';
+        result += number;
+        return result;
+    }
+    value = date[0] + '-' + addNumber(date[1]) + '-' + addNumber(date[2]) + 'T' + addNumber(date[3]) + ':' + addNumber(date[4]) + ':' + addNumber(date[5]);
+    return value;
+}
+
 function changeCharacteristics() {
-    var value = $("#product-type-selector").val();
-    console.log("current product type: " + productTypesData[value].name);
+    var data = getProductTypeData($("#product-type-selector").val());
 
     var list = $("#product-characteristics");
-
     list.empty();
+    if (data != undefined) {
+        data.characteristics.forEach(function (item) {
+            var measureHtml = "";
 
-    productTypesData[value].characteristics.forEach(function (item) {
-        var measureHtml = "";
+            if (item.measure != undefined && item.measure != "") {
+                measureHtml = '<span class="input-group-addon characteristic-measure-span text-left">' + item.measure + '</span>';
+            }
 
-        if (item.measure != undefined && item.measure != "") {
-            measureHtml = '<span class="input-group-addon characteristic-measure-span text-left">' + item.measure + '</span>';
-        }
 
-        var html =
-            '<div class="product-characteristic-value-input col-sm-12">' +
+            var inputType = "text";
+            if (item.dataTypeId == 2)
+                inputType = "datetime-local";
+
+            var value = "";
+            var characteristicValue = getCharacteristicValue(item.id);
+            console.log(characteristicValue);
+            if (characteristicValue != undefined) {
+                if (item.dataTypeId == 1) {
+                    value = characteristicValue.numberValue;
+                } else if (item.dataTypeId == 2) {
+                    value = javaToJsDate(characteristicValue.dateValue);
+                } else if (item.dataTypeId) {
+                    value = characteristicValue.stringValue;
+                }
+            }
+
+            var html =
+                '<div class="product-characteristic-value-input col-sm-12">' +
                 '<label>' + item.name + '</label>' +
                 '<div class="input-group col-sm-12">' +
-                    '<input type="hidden" name="characteristic-id" value="' + item.id + '"/>' +
-                    '<input type="text" class="form-control" placeholder="value" name="characteristic-measure">' +
-                        measureHtml +
+                '<input type="hidden" name="characteristic-id" value="' + item.id + '"/>' +
+                '<input type="' + inputType + '" class="form-control" placeholder="value" value="'+ value +  '" name="characteristic-measure">' +
+                measureHtml +
                 '</div>' +
-            '</div>';
+                '</div>';
 
-        list.append($(html));
-    });
+            list.append($(html));
+        });
+    }
 }
 
 function selectProduct(x) {
@@ -57,38 +109,57 @@ function selectProduct(x) {
     list.find("a").removeClass("active");
     list.find("a:nth-child(" + (x+1) + ")").addClass("active");
 
-    //TODO refresh region prices
-    // $(".product-characteristic-input").remove();
+    $("#product-name-input").val("");
+    $("#product-type-selector").val([]);
+    $("#product-characteristics").empty();
+    $(".cities-container").empty();
+    $("#product-description-input").val("");
+    $('input:radio[name=product-status]').filter('[value=true]').prop('checked', true);
+
 
     if (currentSelected != -1) {
         $("#product-name-input").val(productsData[currentSelected].name);
 
-        $("#product-type-selector").val(productsData[currentSelected].productType.productTypeId);
-        changeCharacteristics();
+        if (productsData[currentSelected].productType != undefined) {
+            $("#product-type-selector").val(productsData[currentSelected].productType.productTypeId);
+            changeCharacteristics();
+        }
+        if (productsData[currentSelected].description != undefined) {
+            $("#product-description-input").val(productsData[currentSelected].description);
+        }
 
-        $("#product-description-input").val(productsData[currentSelected].description);
+        if (productsData[currentSelected].prices != undefined) {
+            productsData[currentSelected].prices.forEach(function (item) {
+                // console.error(item.region.)
+                addRegionalPrice(item.region.regionId, item.price);
+            });
+        }
 
         var $radios = $('input:radio[name=product-status]');
         $radios.filter('[value=' + productsData[currentSelected].isActive + ']').prop('checked', true);
-
-        //TODO add region prices
-        // for (var characteristic in productTypeData[selected].characteristics) {
-        //     console.log("adding property " + characteristic + " for " + x);
-        //     addProductValue(productTypeData[selected].characteristics[characteristic].name,
-        //         productTypeData[selected].characteristics[characteristic].measure,
-        //         productTypeData[selected].characteristics[characteristic].dataTypeId);
-        // }
     }
 
 }
 
 function deleteRegionalPrice(element) {
-
     element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
 }
 
-function addRegionalPrice() {
-    //TODO generate regions options
+function saveSelected() {
+    //TODO IMPLEMENT
+}
+
+function addRegionalPrice(regionId, price) {
+
+    // var selectedRegion = "";
+    // console.error(regionId);
+    // if (regionId != undefined)
+    //     selectedRegion=' selected="' + regionId + '" ';
+
+    var selectedPrice = "";
+    if (price != undefined)
+        selectedPrice =' value="' + price + '" ';
+
     var html =
         '<div class="form-inline cities-container">' +
             '<div class="form-group">'+
@@ -97,7 +168,7 @@ function addRegionalPrice() {
                 '</select>'+
             '</div>'+
             '<div class="form-group full-width">'+
-                '<input type="text" class="form-control full-width" placeholder="Price" name="characteristic-measure">'+
+                '<input type="text" class="form-control full-width" placeholder="Price" name="characteristic-measure"' + selectedPrice + '>'+
             '</div>'+
             '<div class="form-group">'+
                 '<a class="btn btn-danger" onclick="deleteRegionalPrice(this)">'+
@@ -107,13 +178,22 @@ function addRegionalPrice() {
         '</div>';
 
 
-    $("#product-general-editor").append($(html));
+    var element = $(html);
+    $("#product-general-editor").append(element);
+
+    if (regionId != undefined) {
+        element.find('select').val(regionId);
+    }
+
 }
 
 function addProduct(name, index) {
     var list = $("#products-list");
     if (name == undefined) {
-        name = $("#new-product-name").val();
+        var nameField = $("#new-product-name");
+
+        name = nameField.val();
+        nameField.val("");
     }
 
     if (name != "") {
@@ -123,14 +203,14 @@ function addProduct(name, index) {
         ref.className = "list-group-item";
         ref.href = "#";
         if (index == undefined)
-            index = productsData.length - 2;
+            index = productsData.length - 1;
 
         ref.onclick = function () {
             selectProduct(index);
         };
 
         list.append(ref);
-        productsData.push({id: id, name: name});
+        productsData.push({id: id, name: name, productCharacteristicValues: []});
 
     } else {
         $("#new-product-alert").remove();
@@ -184,7 +264,7 @@ function loadProductTypes() {
                 // console.log("adding " + item.name);
                 var option = document.createElement("option");
                 option.text = item.name;
-                option.value = i;
+                option.value = item.id;
                 sel.append(option);
             });
 
