@@ -257,11 +257,11 @@ public class ProductDao extends AbstractDao<Product> {
         }, mapper);
     }
 
-    public static final class ProductRowMapper implements RowMapper<Product> {
+    public  final class ProductRowMapper implements RowMapper<Product> {
 
         @Override
         public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Product product = new Product();
+            Product product = new ProductProxy();
 
             product.setProductId(rs.getLong("product_id"));
             product.setName(rs.getString("product_name"));
