@@ -34,12 +34,12 @@
             </div>
         </div>
         <div class="row">
-            <div class=" col-sm-3 col-sm-offset-1">
+            <div class="col-sm-3 col-sm-offset-1">
                 <div class="list-group" id="products-list"></div>
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="New product" id="new-product-name">
                     <span class="input-group-btn">
-                        <button type="button" onclick="addProduct()" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+                        <button type="button" onclick="addProduct(); selectProduct();" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                 </div>
             </div>
@@ -63,20 +63,18 @@
 
                                     <div class="form-group">
                                         <label for="product-type-selector" class="radio">Product type
-                                            <select class="form-control" id="product-type-selector">
-                                                <option>1</option>
-                                                <option>1</option>
+                                            <select class="form-control" id="product-type-selector" onchange="changeCharacteristics()">
                                             </select>
                                         </label>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="product-status">Status</label>
+                                        <label class="radio" for="product-status">Status</label>
                                         <div class="radio">
-                                            <label><input type="radio" name="product-status">Active</label>
+                                            <label><input type="radio" value="true" name="product-status">Active</label>
                                         </div>
                                         <div class="radio">
-                                            <label><input type="radio" name="product-status">Suspended</label>
+                                            <label><input type="radio" value="false" name="product-status">Suspended</label>
                                         </div>
                                     </div>
 
@@ -94,11 +92,8 @@
 
                                 </div>
                             </div>
-
                             <div id="product-characteristics"  class="tab-pane fade">
-                                <h3>Characteristics editor</h3>
                             </div>
-
                         </div>
                     </div>
                 </div>

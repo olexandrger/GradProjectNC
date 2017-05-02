@@ -246,6 +246,7 @@ function loadProductTypes() {
             var ref = document.createElement("a");
             ref.appendChild(document.createTextNode(item.name));
             ref.className = "list-group-item";
+            ref.href = "#";
             ref.onclick = function () {
                 selectItem(i);
             };
