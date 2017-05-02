@@ -46,7 +46,6 @@ public class DataTypeDao extends AbstractDao<DataType> {
 
         dataType.setDataTypeId(getLongValue(keyHolder, "data_type_id"));
         return find(getLongValue(keyHolder, "data_type_id"));
-
     }
 
     @Transactional
