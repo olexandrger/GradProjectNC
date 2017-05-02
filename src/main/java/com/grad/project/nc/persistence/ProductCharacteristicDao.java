@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -126,6 +127,19 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
         return jdbcTemplate.query(SELECT_QUERY,new Object[]{productId},new ProductCharacteristicRowMapper());
 
     }
+
+
+    public List<ProductCharacteristic> findByDataTypeId(Long id){
+
+        final String QUERY = "SELECT product_characteristic_id" +
+                ",product_type_id" +
+                ", characteristic_name , measure , data_type_id " +
+                "FROM product_characteristic WHERE data_type_id = ?" ;
+        return jdbcTemplate.query(QUERY,new Object[]{id}, new ProductCharacteristicRowMapper());
+
+    }
+
+
 
     private static final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
         @Override
