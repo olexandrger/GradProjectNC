@@ -21,6 +21,11 @@ public class LocationImpl implements Location {
     private String googleKey;
 
     private JSONObject location;
+    private JSONReader jsonReader;
+
+    public LocationImpl() {
+        jsonReader = new JSONReader();
+    }
 
     @Override
     public boolean doRequestForJSON(String address) {
@@ -78,7 +83,7 @@ public class LocationImpl implements Location {
         try {
             String url = baseUrl + "language=" + language + "&address=" + URLEncoder.encode(address, "utf-8")
                     + "&key=" + googleKey;
-            JSONObject response = JsonReader.getJSONObject(url);
+            JSONObject response = jsonReader.getJSONObject(url);
             if ("OK".equals(response.getString("status"))) {
                 return response.getJSONArray("results").getJSONObject(0);
             } else {
