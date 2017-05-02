@@ -15,7 +15,7 @@ import java.util.List;
 
 public abstract class AbstractDao<T> implements CrudDao<T>{
 
-    protected final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     protected AbstractDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -52,6 +52,10 @@ public abstract class AbstractDao<T> implements CrudDao<T>{
         jdbcTemplate.update(statementCreator);
     }
 
+    protected int executeUpdate(String sql, Object... params) {
+        return jdbcTemplate.update(sql, params);
+    }
+
     protected <E> E findOne(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
         List<E> result = jdbcTemplate.query(statementCreator, mapper);
 
@@ -80,5 +84,17 @@ public abstract class AbstractDao<T> implements CrudDao<T>{
 
     protected <E> Collection<E> findMultiple(PreparedStatementCreator statementCreator, RowMapper<E> mapper) {
         return jdbcTemplate.query(statementCreator, mapper);
+    }
+
+    protected List<T> query(String sql, RowMapper<T> rowMapper) {
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
+    protected List<T> query(String sql, RowMapper<T> rowMapper, Object... params) {
+        return jdbcTemplate.query(sql, rowMapper, params);
+    }
+
+    protected int[] batchUpdate(String sql, List<Object[]> batchArgs) {
+        return jdbcTemplate.batchUpdate(sql, batchArgs);
     }
 }

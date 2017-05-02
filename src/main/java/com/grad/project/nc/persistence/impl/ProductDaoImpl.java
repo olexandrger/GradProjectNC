@@ -22,10 +22,6 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
     private ProductTypeDao productTypeDao;
     @Autowired
     private ProductCharacteristicValueDao productCharacteristicValueDao;
-    @Autowired
-    private ProductCharacteristicDao productCharacteristicDao;
-    @Autowired
-    private CategoryDao categoryDao;
 
     @Autowired
     public ProductDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -61,7 +57,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
                 "\"product_type_id\"=? " +
                 "WHERE \"product_id\"=?";
 
-        jdbcTemplate.update(updateQuery, product.getName(), product.getDescription(), product.getIsActive(),
+        executeUpdate(updateQuery, product.getName(), product.getDescription(), product.getIsActive(),
                 product.getProductType().getProductTypeId());
 
         return product;
@@ -70,7 +66,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
     @Override
     public void delete(Product product) {
         String deleteQuery = "DELETE FROM \"product\" WHERE \"product_id\" =?";
-        jdbcTemplate.update(deleteQuery, product.getProductId());
+        executeUpdate(deleteQuery, product.getProductId());
     }
 
     @Override
@@ -78,13 +74,13 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
         String findAllQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\"";
 
-        return jdbcTemplate.query(findAllQuery, new ProductRowMapper());
+        return query(findAllQuery, new ProductRowMapper());
     }
 
     @Override
     public void deleteProductCharacteristicValues(Product product) {
         String deleteQuery = "DELETE FROM \"product_characteristic_value\" WHERE \"product_id\"=?";
-        jdbcTemplate.update(deleteQuery, product.getProductId());
+        executeUpdate(deleteQuery, product.getProductId());
     }
 
     @Override
@@ -100,7 +96,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
             batchArgs.add(new Object[]{product.getProductId(), value.getProductCharacteristicId(),
                     value.getNumberValue(), value.getDateValue(), value.getStringValue()});
         }
-        jdbcTemplate.batchUpdate(insertQuery, batchArgs);
+        batchUpdate(insertQuery, batchArgs);
     }
 
     @Override
@@ -111,7 +107,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
                 "ON p.\"product_id\" = prp.\"product_id\" " +
                 "WHERE prp.\"region_id\" =?";
 
-        return jdbcTemplate.query(findProductByRegionQuery, new ProductRowMapper(), region.getRegionId());
+        return query(findProductByRegionQuery, new ProductRowMapper(), region.getRegionId());
     }
 
     @Override
@@ -127,7 +123,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
         String findByProductTypeQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\" WHERE \"product_type_id\"=?";
 
-        return jdbcTemplate.query(findByProductTypeQuery, new ProductRowMapper(), productType.getProductTypeId());
+        return query(findByProductTypeQuery, new ProductRowMapper(), productType.getProductTypeId());
     }
 
     @Override

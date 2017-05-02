@@ -45,7 +45,7 @@ public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDa
     public Category update(Category entity) {
         String updateQuery = "UPDATE \"category\" SET \"category_name\"=?, \"category_type_id\"=? " +
                 "WHERE \"category_id\"=?";
-        jdbcTemplate.update(updateQuery, entity.getCategoryName(), entity.getCategoryType().getCategoryTypeId(),
+        executeUpdate(updateQuery, entity.getCategoryName(), entity.getCategoryType().getCategoryTypeId(),
                 entity.getCategoryId());
 
         return entity;
@@ -61,20 +61,20 @@ public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDa
     @Override
     public Collection<Category> findAll() {
         String findAllQuery = "SELECT \"category_id\", \"category_name\", \"category_type_id\" FROM \"category\"";
-        return jdbcTemplate.query(findAllQuery, new CategoryRowMapper());
+        return query(findAllQuery, new CategoryRowMapper());
     }
 
     @Override
     public Collection<Category> findByCategoryTypeId(Long categoryTypeId) {
         String findAllQuery = "SELECT \"category_id\", \"category_name\", \"category_type_id\" FROM \"category\" " +
                 "WHERE \"category_type_id\"=?";
-        return jdbcTemplate.query(findAllQuery, new CategoryRowMapper(), categoryTypeId);
+        return query(findAllQuery, new CategoryRowMapper(), categoryTypeId);
     }
 
     @Override
     public void delete(Category entity) {
         String deleteQuery = "DELETE FROM \"category\" WHERE category_id = ?";
-        jdbcTemplate.update(deleteQuery, entity.getCategoryId());
+        executeUpdate(deleteQuery, entity.getCategoryId());
     }
 
     @Override

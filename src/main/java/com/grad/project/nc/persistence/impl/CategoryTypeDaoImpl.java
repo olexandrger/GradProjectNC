@@ -37,7 +37,7 @@ public class CategoryTypeDaoImpl extends AbstractDao<CategoryType> implements Ca
     @Override
     public CategoryType update(CategoryType entity) {
         String updateQuery = "UPDATE \"category_type\" SET \"category_type_name\"=? WHERE \"category_type_id\"=?";
-        jdbcTemplate.update(updateQuery,  entity.getCategoryTypeName(), entity.getCategoryTypeId());
+        executeUpdate(updateQuery,  entity.getCategoryTypeName(), entity.getCategoryTypeId());
 
         return entity;
     }
@@ -53,13 +53,13 @@ public class CategoryTypeDaoImpl extends AbstractDao<CategoryType> implements Ca
     @Override
     public Collection<CategoryType> findAll() {
         String findAllQuery = "SELECT \"category_type_id\", \"category_type_name\" FROM \"category_type\"";
-        return jdbcTemplate.query(findAllQuery, new CategoryTypeRowMapper());
+        return query(findAllQuery, new CategoryTypeRowMapper());
     }
 
     @Override
     public void delete(CategoryType entity) {
         String deleteQuery = "DELETE FROM \"category_type\" WHERE category_type_id=?";
-        jdbcTemplate.update(deleteQuery, entity.getCategoryTypeId());
+        executeUpdate(deleteQuery, entity.getCategoryTypeId());
     }
 
     @Override
