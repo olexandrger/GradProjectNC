@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.CategoryType;
+import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.persistence.mappers.CategoryTypeRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -77,5 +78,22 @@ public class CategoryTypeDao extends AbstractDao<CategoryType> {
             preparedStatement.setLong(1, entity.getCategoryTypeId());
             return preparedStatement;
         });
+    }
+
+    public CategoryType getCategoryTypeOfDomain(Domain domain) {
+        return findOne(connection -> {
+            //language=GenericSQL
+            final String SELECT_QUERY = "SELECT " +
+                    "category_type_name, " +
+                    "category_type_id  " +
+                    "FROM category " +
+                    "WHERE category_type_id = (" +
+                    "SELECT d.domain_type_id " +
+                    "FROM domain d " +
+                    "WHERE d.domain_id = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, domain.getDomainId());
+            return preparedStatement;
+        }, new CategoryTypeRowMapper());
     }
 }
