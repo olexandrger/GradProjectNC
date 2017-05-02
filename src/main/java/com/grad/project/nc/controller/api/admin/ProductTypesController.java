@@ -53,7 +53,7 @@ public class ProductTypesController {
             type.setDescription(productType.getProductTypeDescription());
             type.setCharacteristics(productCharacteristicDao.findByProductId(type.getId()).stream()
                     .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
-                                                        item.getMeasure(), item.getDataTypeId()))
+                                                        item.getMeasure(), item.getDataType().getDataTypeId()))
                     .collect(Collectors.toList()));
             return type;
         }).collect(Collectors.toList());
@@ -101,11 +101,7 @@ public class ProductTypesController {
 
                 ProductCharacteristic characteristic = new ProductCharacteristic();
                 characteristic.setCharacteristicName(c.getName());
-                /*
-                * TODO change it to dataType selected previously
-                * (productCharacteristic needs to hold link to productType instead of just id)
-                */
-                characteristic.setDataTypeId(c.getDataTypeId());
+                characteristic.setDataType(dataType);
                 characteristic.setMeasure(c.getMeasure());
                 characteristic.setProductTypeId(productType.getProductTypeId());
                 if (c.getId() < 0) {
@@ -118,7 +114,6 @@ public class ProductTypesController {
 
         } catch (DataAccessException exception) {
             result.put("status", "error");
-            //result.put("message", exception.getMessage());
             result.put("message", "Can not add info to database");
 
             return result;

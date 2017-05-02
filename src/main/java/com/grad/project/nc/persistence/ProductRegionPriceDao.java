@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.grad.project.nc.controller.api.admin.ProductsController;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
@@ -18,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -134,7 +136,7 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
         return findMultiple(connection -> {
             final String SELECT_QUERY =
                     "SELECT " +
-                            "price_id, " +
+                            "prp.price_id, " +
                             "price " +
                             "FROM product_region_price prp " +
                             "INNER JOIN discount_price dp " +
@@ -182,6 +184,22 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
         } else {
             deleteAllDiscounts(productRegionPrice);
         }
+    }
+
+    public Collection<ProductRegionPrice> getPricesByProduct(Product product) {
+        return findMultiple(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "prp.price_id, " +
+                            "prp.product_id, " +
+                            "prp.region_id, " +
+                            "prp.price " +
+                            "FROM product_region_price prp " +
+                            "WHERE prp.product_id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, product.getProductId());
+            return preparedStatement;
+        }, mapper);
     }
 
 

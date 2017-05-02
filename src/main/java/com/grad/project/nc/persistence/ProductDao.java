@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +16,7 @@ import java.util.*;
 
 
 @Repository
+@Slf4j
 public class ProductDao extends AbstractDao<Product> {
     @Autowired
     private ProductTypeDao productTypeDao;
@@ -131,7 +133,7 @@ public class ProductDao extends AbstractDao<Product> {
             String statement = "SELECT product_id" +
                     ",product_name" +
                     ",product_description" +
-                    ",is_active" +
+                    ",is_active " +
                     "FROM product ";
             return connection.prepareStatement(statement);
         }, mapper);
@@ -206,8 +208,9 @@ public class ProductDao extends AbstractDao<Product> {
     @Transactional
     public Optional<Product> findByName(String name) {
         Product result = findOne(connection -> {
-            String statement = "SELECT product_id,product_name,product_description,is_active" +
+            String statement = "SELECT product_id,product_name,product_description,is_active " +
                     //",product_type_id " +
+
                     "FROM product WHERE product_name = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
@@ -258,7 +261,6 @@ public class ProductDao extends AbstractDao<Product> {
     }
 
     public  final class ProductRowMapper implements RowMapper<Product> {
-
         @Override
         public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
             Product product = new ProductProxy();

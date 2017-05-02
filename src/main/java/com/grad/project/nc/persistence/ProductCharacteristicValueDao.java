@@ -3,6 +3,7 @@ package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductCharacteristicValue;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,9 +18,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created by Alex on 4/25/2017.
- */
 @Repository
 public class ProductCharacteristicValueDao   {
 
@@ -97,7 +95,6 @@ public class ProductCharacteristicValueDao   {
     }
 
     public List<ProductCharacteristicValue> findByProductId(Long id){
-
         final String QUERY = "SELECT product_id" +
                 ",product_characteristic_id" +
                 ", number_value , date_value , string_value " +
@@ -116,7 +113,9 @@ public class ProductCharacteristicValueDao   {
 
 
             productCharacteristicValue.setNumberValue(rs.getDouble("number_value"));
-            productCharacteristicValue.setDateValue(rs.getTimestamp("date_value").toLocalDateTime());
+            if (rs.getTimestamp("date_value") != null) {
+                productCharacteristicValue.setDateValue(rs.getTimestamp("date_value").toLocalDateTime());
+            }
             productCharacteristicValue.setStringValue(rs.getString("string_value"));
             return productCharacteristicValue;
         }

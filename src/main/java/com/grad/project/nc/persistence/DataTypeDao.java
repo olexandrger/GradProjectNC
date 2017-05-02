@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,6 +32,11 @@ public class DataTypeDao extends AbstractDao<DataType> {
         super(jdbcTemplate);
     }
 
+
+    @PostConstruct
+    public void init() {
+        productCharacteristicDao.setDataTypeDao(this);
+    }
 
     @Transactional
     @Override
@@ -73,7 +79,7 @@ public class DataTypeDao extends AbstractDao<DataType> {
     public DataType find(long id) {
 
         return findOne(connection -> {
-            String statement = "SELECT data_type_id, data_type, FROM data_type WHERE data_type_id = ?";
+            String statement = "SELECT data_type_id, data_type FROM data_type WHERE data_type_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
             preparedStatement.setLong(1, id);
@@ -89,7 +95,7 @@ public class DataTypeDao extends AbstractDao<DataType> {
         return findMultiple(connection -> {
             String statement = "SELECT data_type_id" +
                     ",data_type" +
-                    "FROM data_type ";
+                    " FROM data_type ";
             return connection.prepareStatement(statement);
         }, mapper);
 
@@ -107,6 +113,18 @@ public class DataTypeDao extends AbstractDao<DataType> {
             return preparedStatement;
         });
 
+    }
+
+    public DataType getDataTypeByProductCharacteristic(ProductCharacteristic productCharacteristic) {
+        return findOne(connection -> {
+            String query = "SELECT dt.data_type_id, dt.data_type FROM data_type dt " +
+                    "INNER JOIN product_characteristic pc ON pc.data_type_id=dt.data_type_id WHERE pc.product_characteristic_id=?";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setLong(1, productCharacteristic.getProductCharacteristicId());
+
+            return statement;
+        }, new DataTypeRowMapper());
     }
 
     private class DataTypeProxy extends DataType{

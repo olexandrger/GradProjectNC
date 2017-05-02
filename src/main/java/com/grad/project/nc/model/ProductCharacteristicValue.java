@@ -17,6 +17,4 @@ public class ProductCharacteristicValue {
     private Double numberValue;
     private LocalDateTime dateValue;
     private String stringValue;
-
-
 }

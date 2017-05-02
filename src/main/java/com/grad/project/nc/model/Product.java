@@ -5,9 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * Created by Alex on 4/24/2017.
- */
+
 @Data
 @NoArgsConstructor
 public class Product {
@@ -19,6 +17,4 @@ public class Product {
     private ProductType productType;
     private List<ProductCharacteristicValue> productCharacteristicValues;
     private List<ProductCharacteristic> productCharacteristics;
-
-
 }

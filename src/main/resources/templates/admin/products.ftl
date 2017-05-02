@@ -37,7 +37,7 @@
             <div class=" col-sm-3 col-sm-offset-1">
                 <div class="list-group" id="products-list"></div>
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="New product" id="new-product-type-name">
+                    <input type="text" class="form-control" placeholder="New product" id="new-product-name">
                     <span class="input-group-btn">
                         <button type="button" onclick="addProduct()" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
@@ -57,13 +57,32 @@
                                 <div id="product-general-editor">
 
                                     <div class="form-group">
-                                        <label for="product-type-name">Name</label>
-                                        <input type="text" class="form-control" name="product-type-name" placeholder="Name" id="product-type-name-input">
+                                        <label for="product-name">Name</label>
+                                        <input type="text" class="form-control" name="product-name" placeholder="Name" id="product-name-input">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="product-type-description">Description</label>
-                                        <textarea class="form-control" rows="5" name="product-type-description" placeholder="Description" id="product-type-description-input"></textarea>
+                                        <label for="product-type-selector" class="radio">Product type
+                                            <select class="form-control" id="product-type-selector">
+                                                <option>1</option>
+                                                <option>1</option>
+                                            </select>
+                                        </label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="product-status">Status</label>
+                                        <div class="radio">
+                                            <label><input type="radio" name="product-status">Active</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="product-status">Suspended</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="product-description">Description</label>
+                                        <textarea class="form-control" rows="5" name="product-description" placeholder="Description" id="product-description-input"></textarea>
                                     </div>
 
                                     <div class="form-group">
@@ -89,9 +108,6 @@
                             <div class="form-group">
                                 <a class="btn btn-success" onclick="saveSelected()">
                                     <span class="glyphicon glyphicon-floppy-disk"></span>Save
-                                </a>
-                                <a class="btn btn-danger" onclick="deleteSelected()">
-                                    <span class="glyphicon glyphicon-remove "></span>Delete
                                 </a>
                             </div>
                         </div>

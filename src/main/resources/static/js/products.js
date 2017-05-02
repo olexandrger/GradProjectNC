@@ -260,12 +260,78 @@ $(document).ready(function () {
 });
 */
 
+var currentSelected = -1;
+var numberOfAdded = 0;
+
+var productTypesData;
+var dataTypesData;
+var productsData;
+
+function selectProduct(x) {
+
+    console.log("Selected " + x);
+
+    if (selected == -1) {
+        $("#products-editor").removeClass("hidden");
+    }
+    if (x == -1) {
+        $("#products-editor").addClass("hidden");
+    }
+
+    selected = x;
+
+    var list = $("#products-list");
+    list.find("a").removeClass("active");
+    list.find("a:nth-child(" + (x+1) + ")").addClass("active");
+
+    //TODO refreshregion prices and characteristics
+    // $(".product-characteristic-input").remove();
+
+    if (selected != -1) {
+        $("#product-name-input").val(productsData[selected].name);
+        $("#product-type-selector").val(productsData[selected].productType);
+        $("#product-description-input").val(productsData[selected].description);
+
+        //TODO add region prices and characteristics
+        // for (var characteristic in productTypeData[selected].characteristics) {
+        //     console.log("adding property " + characteristic + " for " + x);
+        //     addProductValue(productTypeData[selected].characteristics[characteristic].name,
+        //         productTypeData[selected].characteristics[characteristic].measure,
+        //         productTypeData[selected].characteristics[characteristic].dataTypeId);
+        // }
+    }
+
+}
+
 function addRegionalPrice() {
 
 }
 
 function addProduct() {
+    var list = $("#products-list");
+    var name = $("#new-product-name").val();
 
+    if (name != "") {
+        var id = -(++numberOfAdded);
+        var ref = document.createElement("a");
+        ref.appendChild(document.createTextNode(name));
+        ref.className = "list-group-item";
+        var index = productsData.length;
+        ref.onclick = function () {
+            selectItem(index);
+        };
+
+        list.append(ref);
+        productsData.push({id: id, name: name});
+
+        selectProduct(index);
+    } else {
+        $("#new-product-alert").remove();
+
+        $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'Can not add empty name </div>').insertAfter(list);
+    }
 }
 
 function saveSelected() {
@@ -275,3 +341,68 @@ function saveSelected() {
 function deleteSelected() {
 
 }
+
+function loadProducts() {
+    console.log("loading products");
+    $.ajax({
+        url: "/api/admin/dataTypes",
+        success: function (data) {
+            dataTypesData = data;
+            loadProductTypes();
+        },
+        error: function () {
+            console.error("Cannot load dataTypes");
+        }
+    });
+}
+
+function loadDataTypes() {
+    console.log("loading data types");
+    $.ajax({
+        url: "/api/admin/dataTypes",
+        success: function (data) {
+            dataTypesData = data;
+            loadProductTypes();
+        },
+        error: function () {
+            console.error("Cannot load dataTypes");
+        }
+    });
+}
+
+function loadProductTypes() {
+    console.log("loading product types");
+    $.ajax({
+        url: "/api/admin/productTypes/all ",
+        success: function(data) {
+            // var list = $("#product-types-list");
+
+            productTypesData = data;
+
+            loadProducts();
+            // data.forEach(function(item, i) {
+            //     console.log(item.name + " loaded");
+            //
+            //     var ref = document.createElement("a");
+            //     ref.appendChild(document.createTextNode(item.name));
+            //     ref.className = "list-group-item";
+            //     ref.onclick = function () {
+            //         selectItem(i);
+            //     };
+            //
+            //     list.append(ref);
+            // });
+        },
+        error: function () {
+            console.error("Cannot load list product types");
+        }
+    });
+}
+
+function loadData() {
+    loadDataTypes();
+}
+
+$(document).ready(function () {
+    loadData();
+});
