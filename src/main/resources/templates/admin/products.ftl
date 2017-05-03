@@ -15,12 +15,10 @@
 
 
     <link rel="stylesheet" href="/css/main.css">
-    <script src="/js/navbar.js"></script>
     <script src="/js/products.js"></script>
 
 </head>
 <body>
-
 <div class="container">
 
     <#include "../resources/navbar.ftl"/>

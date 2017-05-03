@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
@@ -138,7 +139,7 @@ public class ProductRegionPriceDaoImpl extends AbstractDao<ProductRegionPrice> i
 
     @Override
     public List<ProductRegionPrice> getPricesByProduct(Product product) {
-        String query = "SELECT prp.\"price_id, prp.\"product_id\", prp.\"region_id\", prp.\"price\" " +
+        String query = "SELECT prp.\"price_id\", prp.\"product_id\", prp.\"region_id\", prp.\"price\" " +
                 "FROM \"product_region_price\" prp " +
                 "WHERE prp.\"product_id\"=?";
 
@@ -168,6 +169,7 @@ public class ProductRegionPriceDaoImpl extends AbstractDao<ProductRegionPrice> i
         }
 
         @Override
+        @JsonIgnore
         public Product getProduct() {
             if (super.getProduct() == null) {
                 super.setProduct(productDao.find(getProductId()));

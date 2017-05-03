@@ -109,19 +109,24 @@ function selectProduct(x) {
     list.find("a").removeClass("active");
     list.find("a:nth-child(" + (x+1) + ")").addClass("active");
 
+
+    var typeSelector = $("#product-type-selector");
+
     $("#product-name-input").val("");
-    $("#product-type-selector").val([]);
+    typeSelector.val([]);
     $("#product-characteristics").empty();
     $(".cities-container").empty();
     $("#product-description-input").val("");
     $('input:radio[name=product-status]').filter('[value=true]').prop('checked', true);
+    typeSelector.prop( "disabled", false);
 
 
     if (currentSelected != -1) {
         $("#product-name-input").val(productsData[currentSelected].name);
 
         if (productsData[currentSelected].productType != undefined) {
-            $("#product-type-selector").val(productsData[currentSelected].productType.productTypeId);
+            typeSelector.val(productsData[currentSelected].productType.productTypeId);
+            typeSelector.prop( "disabled", productsData[currentSelected].productId > 0);
             changeCharacteristics();
         }
         if (productsData[currentSelected].description != undefined) {
@@ -130,7 +135,6 @@ function selectProduct(x) {
 
         if (productsData[currentSelected].prices != undefined) {
             productsData[currentSelected].prices.forEach(function (item) {
-                // console.error(item.region.)
                 addRegionalPrice(item.region.regionId, item.price);
             });
         }
@@ -169,7 +173,7 @@ function saveSelected() {
 
     $.ajax({
         type: 'POST',
-        url: '/api/admin/products/update',
+        url: '/api/admin/products/' + (data.id < 0 ? "add" : "update"),
         headers: {
             'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
         },
@@ -188,7 +192,7 @@ function saveSelected() {
 
                 $.ajax({
                     type: 'GET',
-                    url: '/api/admin/products/get/' + data.id,
+                    url: '/api/user/products/get/' + data.id,
                     success: function (data) {
                         console.log("Update after saving successful");
                         console.log("Set name " + data.name);
@@ -260,15 +264,16 @@ function addRegionalPrice(regionId, price) {
 
 function addProduct(name, index) {
     var list = $("#products-list");
+    var id = -(++numberOfAdded);
     if (name == undefined) {
         var nameField = $("#new-product-name");
 
         name = nameField.val();
         nameField.val("");
+        productsData.push({productId: id, name: name, productCharacteristicValues: []});
     }
 
     if (name != "") {
-        var id = -(++numberOfAdded);
         var ref = document.createElement("a");
         ref.appendChild(document.createTextNode(name));
         ref.className = "list-group-item";
@@ -281,7 +286,6 @@ function addProduct(name, index) {
         };
 
         list.append(ref);
-        productsData.push({productId: id, name: name, productCharacteristicValues: []});
 
     } else {
         $("#new-product-alert").remove();
@@ -301,7 +305,7 @@ function addLoadedProducts() {
 function loadProducts() {
     console.log("loadProducts");
     $.ajax({
-        url: "/api/admin/products/all",
+        url: "/api/user/products/all",
         success: function (data) {
 
             data.forEach(function(prod) {
@@ -324,7 +328,7 @@ function loadProducts() {
 function loadProductTypes() {
     console.log("loadProductTypes");
     $.ajax({
-        url: "/api/admin/productTypes/all",
+        url: "/api/user/productTypes/all",
         success: function (data) {
 
             console.log("loaded " + data.length + " product types");

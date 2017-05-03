@@ -21,7 +21,11 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
     @Autowired
     private ProductTypeDao productTypeDao;
     @Autowired
+    private ProductCharacteristicDao productCharacteristicDao;
+    @Autowired
     private ProductCharacteristicValueDao productCharacteristicValueDao;
+    @Autowired
+    private ProductRegionPriceDao productRegionPriceDao;
 
     @Autowired
     public ProductDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -163,6 +167,24 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
             }
 
             return super.getProductCharacteristicValues();
+        }
+
+        @Override
+        public List<ProductCharacteristic> getProductCharacteristics() {
+            if (super.getProductCharacteristics() == null) {
+                super.setProductCharacteristics(productCharacteristicDao.findCharacteristicsByProductType(getProductType()));
+            }
+
+            return super.getProductCharacteristics();
+        }
+
+        @Override
+        public List<ProductRegionPrice> getPrices() {
+            if (super.getPrices() == null) {
+                super.setPrices(productRegionPriceDao.getPricesByProduct(this));
+            }
+
+            return super.getPrices();
         }
     }
 

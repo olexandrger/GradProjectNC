@@ -175,7 +175,13 @@ function selectRegion(region) {
     selectedRegion.text(region.regionName);
     selectedRegion.append($("<span class='caret'></span>"));
     localStorage.setItem("regionId", region.regionId);
+
+    console.log("region changed");
+    $(document).trigger("region-changed");
 }
+
+
+$(document).on("region-changed", function() {console.log("Same file works")});
 
 function loadNavbarRegions() {
     $.ajax({
@@ -215,8 +221,6 @@ function loadNavbarRegions() {
                 console.log("No saved region");
                 selectRegion(data[0]);
             }
-            // console.log("Choosing " + lastChosen);
-            // selectRegion(lastChosen);
         },
         error: function () {
             console.error("Cannot load list of regions");
@@ -224,8 +228,8 @@ function loadNavbarRegions() {
     });
 }
 
+
 $(document).ready(function () {
         getAccountInformation();
         loadNavbarRegions();
-    }
-);
+});

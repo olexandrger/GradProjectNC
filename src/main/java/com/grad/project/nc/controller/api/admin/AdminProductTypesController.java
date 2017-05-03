@@ -53,7 +53,7 @@ public class AdminProductTypesController {
     @RequestMapping(value = "/productTypes/update", method = RequestMethod.POST)
     public Map<String, String> updateType(@RequestBody Type type) {
         Map<String, String> result = new HashMap<>();
-
+        //TODO deal with edited types
         try {
             ProductType productType = new ProductType();
             productType.setProductTypeId(type.getId());
@@ -96,6 +96,7 @@ public class AdminProductTypesController {
             result.put("status", "success");
             result.put("id", productType.getProductTypeId().toString());
         } catch (DataAccessException exception) {
+            log.error(exception.toString());
             result.put("status", "error");
             result.put("message", "Can not add info to database");
 
