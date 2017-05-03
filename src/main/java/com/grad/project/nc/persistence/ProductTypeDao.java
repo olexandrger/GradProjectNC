@@ -3,12 +3,9 @@ package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,7 +147,30 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
 
     }
 
+    private void deleteProductCharacteristic(ProductType productType) {
+        executeUpdate(connection -> {
+            String query =
+                    "DELETE  " +
+                            "FROM product_characteristic " +
+                            "WHERE product_type_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setLong(1, productType.getProductTypeId());
+            return preparedStatement;
+        });
+    }
 
+    @Transactional
+    private void saveProductCharacteristic(ProductType productType) {
+
+        if (productType.getProductCharacteristics() != null && productType.getProductCharacteristics().size() > 0) {
+            deleteProductCharacteristic(productType);
+            for (ProductCharacteristic productCharacteristic : productType.getProductCharacteristics()) {
+                productCharacteristicDao.add(productCharacteristic);
+            }
+        } else {
+            deleteProductCharacteristic(productType);
+        }
+    }
 
     private class ProductTypeProxy extends ProductType{
 
