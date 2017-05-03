@@ -13,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,6 +39,20 @@ public class ProductTypesController {
         Map<Long, String> result = new HashMap<>();
         dataTypeDao.findAll().forEach(value -> result.put(value.getDataTypeId(), value.getDataType()));
         return result;
+    }
+
+    @RequestMapping(value = "/productTypes/get/{id}", method = RequestMethod.GET)
+    public Type getById(@PathVariable("id") Long id) {
+        ProductType pt = productTypeDao.find(id);
+        Type type = new Type();
+        type.setId(pt.getProductTypeId());
+        type.setName(pt.getProductTypeName());
+        type.setDescription(pt.getProductTypeDescription());
+        type.setCharacteristics(productCharacteristicDao.findByProductId(type.getId()).stream()
+                .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
+                        item.getMeasure(), item.getDataType().getDataTypeId()))
+                .collect(Collectors.toList()));
+        return type;
     }
 
     @RequestMapping(value = "/productTypes/all", method = RequestMethod.GET)
@@ -85,10 +96,10 @@ public class ProductTypesController {
                 productType = productTypeDao.add(productType);
                 result.put("message", "Product successfully added");
             }
-            result.put("status", "success");
+
+            productType.setProductCharacteristics(new LinkedList<>());
 
             for (Characteristic c : type.getCharacteristics()) {
-                //TODO remove deleted characteristics from product
                 DataType dataType = dataTypeDao.find(c.getDataTypeId());
                 if (dataType == null) {
                     result.put("status", "error");
@@ -107,8 +118,12 @@ public class ProductTypesController {
                     characteristic.setProductCharacteristicId(c.getId());
                     productCharacteristicDao.update(characteristic);
                 }
+                productType.getProductCharacteristics().add(characteristic);
             }
+            productTypeDao.update(productType);
 
+            result.put("status", "success");
+            result.put("id", productType.getProductTypeId().toString());
         } catch (DataAccessException exception) {
             result.put("status", "error");
             result.put("message", "Can not add info to database");

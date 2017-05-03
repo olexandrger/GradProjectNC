@@ -31,13 +31,10 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
         super(jdbcTemplate);
     }
 
-
-    @Transactional
     @Override
     public ProductType add(ProductType productType)  {
 
-
-        //TODO add lists saving
+        saveProductCharacteristic(productType);
 
         KeyHolder keyHolder = executeInsert(connection -> {
             String statement = "INSERT INTO \"product_type\" (product_type_name, product_type_description)" +
@@ -52,12 +49,10 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
         });
 
         return find(getLongValue(keyHolder, "product_type_id"));
-
     }
 
     @Override
     public ProductType find(long id) {
-
         return findOne(connection -> {
             String statement = "SELECT product_type_id,product_type_name,product_type_description FROM product_type WHERE product_type_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
@@ -68,10 +63,9 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
         }, new ProductTypeRowMapper());
     }
 
-    @Transactional
     @Override
     public ProductType update(ProductType productType)  {
-
+        saveProductCharacteristic(productType);
 
         executeUpdate(connection -> {
             String query = "UPDATE product_type SET product_type_name = ?" +
@@ -92,7 +86,6 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
 
     }
 
-
     @Override
     public void delete(ProductType entity)  {
 
@@ -111,8 +104,6 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
         });
 
     }
-
-
 
     @Override
     public Collection<ProductType> findAll() {

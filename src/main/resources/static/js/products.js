@@ -38,7 +38,7 @@ function javaToJsDate(date) {
         result += number;
         return result;
     }
-    value = date[0] + '-' + addNumber(date[1]) + '-' + addNumber(date[2]) + 'T' + addNumber(date[3]) + ':' + addNumber(date[4]) + ':' + addNumber(date[5]);
+    var value = date[0] + '-' + addNumber(date[1]) + '-' + addNumber(date[2]) + 'T' + addNumber(date[3]) + ':' + addNumber(date[4]) + ':' + addNumber(date[5]);
     return value;
 }
 
@@ -62,7 +62,7 @@ function changeCharacteristics() {
 
             var value = "";
             var characteristicValue = getCharacteristicValue(item.id);
-            console.log(characteristicValue);
+            // console.log(characteristicValue);
             if (characteristicValue != undefined) {
                 if (item.dataTypeId == 1) {
                     value = characteristicValue.numberValue;
@@ -78,7 +78,7 @@ function changeCharacteristics() {
                 '<label>' + item.name + '</label>' +
                 '<div class="input-group col-sm-12">' +
                 '<input type="hidden" name="characteristic-id" value="' + item.id + '"/>' +
-                '<input type="' + inputType + '" class="form-control" placeholder="value" value="'+ value +  '" name="characteristic-measure">' +
+                '<input type="' + inputType + '" class="form-control" placeholder="value" value="'+ value +  '" name="characteristic-value">' +
                 measureHtml +
                 '</div>' +
                 '</div>';
@@ -146,7 +146,78 @@ function deleteRegionalPrice(element) {
 }
 
 function saveSelected() {
-    //TODO IMPLEMENT
+    var data = {};
+
+    data.id = productsData[currentSelected].productId;
+    data.name = $("#product-name-input").val();
+    data.productTypeId = $("#product-type-selector").val();
+    data.description = $("#product-description-input").val();
+    data.isActive = ($('input[name=product-status]:checked').val() == 'true');
+
+    data.prices = {};
+    $(".cities-container").each(function (item) {
+        data.prices[$(this).find('select[name=regionId]').val()] = $(this).find('input[name=region-price]').val();
+    });
+
+    data.characteristicValues = {};
+    $("#product-characteristics").find(".product-characteristic-value-input").each(function(item) {
+        data.characteristicValues[$(this).find('input[name=characteristic-id]').val()] =
+            $(this).find('input[name=characteristic-value]').val();
+    });
+
+    var listSaveId = currentSelected;
+
+    $.ajax({
+        type: 'POST',
+        url: '/api/admin/products/update',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        processData: false,
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function (data) {
+            var alert;
+            $("#new-product-alert").remove();
+            if (data.status == 'success') {
+                console.log("Product update success! " + JSON.stringify(data));
+
+                alert = $('<div class="alert alert-success" role="alert" id="new-product-alert">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                    data.message + "</div>");
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/admin/products/get/' + data.id,
+                    success: function (data) {
+                        console.log("Update after saving successful");
+                        console.log("Set name " + data.name);
+                        $("#products-list").find("a:nth-child(" + (listSaveId+1) + ")").html(data.name);
+                        productsData[listSaveId] = data;
+                    },
+                    error: function (data) {
+                        console.log("Update after saving errored: " + data)
+                    }
+                });
+
+            } else {
+                console.log("Product update error! " + JSON.stringify(data));
+                alert = $('<div class="alert alert-danger" role="alert" id="new-product-alert">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                    data.message + '</div>');
+            }
+
+            alert.insertAfter($("#new-product-alert-place"));
+        },
+        error: function (data) {
+            $("#new-product-alert").remove();
+            console.error("Product update error! " + JSON.stringify(data));
+            $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                "Product changes failed</div>").insertAfter($("#new-product-alert-place"));
+        }
+    });
+
 }
 
 function addRegionalPrice(regionId, price) {
@@ -163,12 +234,12 @@ function addRegionalPrice(regionId, price) {
     var html =
         '<div class="form-inline cities-container">' +
             '<div class="form-group">'+
-                '<select class="form-control" name="characteristic-dataTypeId">'+
+                '<select class="form-control" name="regionId">'+
                     regionsHtml +
                 '</select>'+
             '</div>'+
             '<div class="form-group full-width">'+
-                '<input type="text" class="form-control full-width" placeholder="Price" name="characteristic-measure"' + selectedPrice + '>'+
+                '<input type="text" class="form-control full-width" placeholder="Price" name="region-price"' + selectedPrice + '>'+
             '</div>'+
             '<div class="form-group">'+
                 '<a class="btn btn-danger" onclick="deleteRegionalPrice(this)">'+
@@ -210,7 +281,7 @@ function addProduct(name, index) {
         };
 
         list.append(ref);
-        productsData.push({id: id, name: name, productCharacteristicValues: []});
+        productsData.push({productId: id, name: name, productCharacteristicValues: []});
 
     } else {
         $("#new-product-alert").remove();
