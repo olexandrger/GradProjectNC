@@ -2,7 +2,6 @@ var catalogProducts;
 var catalogSelectedItem = -1;
 
 var catalogSelectedCategory = decodeURIComponent(window.location.search.substr(1));
-console.log(catalogSelectedCategory);
 var catalogCharacteristics = {};
 
 function getCharacteristicStringValue(characteristic, dataType) {

@@ -10,7 +10,7 @@
 <script>
     function loadCategories() {
         $.ajax({
-            url: "/api/user/productTypes/all ",
+            url: "/api/user/productTypes/all",
             success: function (data) {
                 console.log("Product types loaded");
                 var list = $("#catalog-product-types-list");
@@ -18,7 +18,11 @@
                 data.forEach(function (item, i) {
 
                     var li = document.createElement("li");
-                    li.setAttribute("id", "catalog-link-" + item.name.replace(" ", "-"));
+                    li.setAttribute("id", "catalog-link-" + item.id);
+
+                    if (item.name == decodeURIComponent(window.location.search.substr(1))) {
+                        li.className += "active";
+                    }
 
                     var ref = document.createElement("a");
                     ref.appendChild(document.createTextNode(item.name));
@@ -28,8 +32,7 @@
 
                     list.append(li);
                 });
-                console.log("ADD TO: " + "#catalog-link-"+decodeURIComponent(window.location.search.substr(1)));
-                $("#catalog-link-"+decodeURIComponent(window.location.search.substr(1)).replace(" ", "-")).addClass("active");
+
             },
             error: function () {
                 console.error("Cannot load product types");
