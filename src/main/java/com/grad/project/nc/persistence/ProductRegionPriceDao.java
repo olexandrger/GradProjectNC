@@ -1,7 +1,6 @@
 package com.grad.project.nc.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.grad.project.nc.controller.api.admin.ProductsController;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
@@ -60,9 +59,9 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
             final String INSERT_QUERY =
                     "INSERT " +
                             "INTO product_region_price (" +
-                            "product_region_price.price, " +
-                            "product_region_price.product_id, " +
-                            "product_region_price.region_id) " +
+                            "price, " +
+                            "product_id, " +
+                            "region_id) " +
                             "VALUES(?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_QUERY);
             preparedStatement.setDouble(1, productRegionPrice.getPrice());
