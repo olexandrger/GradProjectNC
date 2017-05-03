@@ -42,7 +42,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
     }
 
     @Override
-    public Product find(long id) {
+    public Product find(Long id) {
         String query = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\" WHERE \"product_id\"=?";
         return findOne(query, new ProductRowMapper(), id);
@@ -70,7 +70,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
     }
 
     @Override
-    public Collection<Product> findAll() {
+    public List<Product> findAll() {
         String findAllQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\"";
 
@@ -100,7 +100,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
     }
 
     @Override
-    public Collection<Product> findProductsByRegion(Region region) {
+    public List<Product> findProductsByRegion(Region region) {
         String findProductByRegionQuery = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
                 "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
                 "JOIN \"product_region_price\" prp " +
@@ -119,7 +119,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
     }
 
     @Override
-    public Collection<Product> findProductsByType(ProductType productType) {
+    public List<Product> findProductsByType(ProductType productType) {
         String findByProductTypeQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\" WHERE \"product_type_id\"=?";
 

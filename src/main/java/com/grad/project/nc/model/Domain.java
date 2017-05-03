@@ -13,6 +13,6 @@ public class Domain {
     private Long domainId;
     private String domainName;
     private Address address;
-    private CategoryType domainType;
+    private Category domainType;
     private Collection<User> users;
 }

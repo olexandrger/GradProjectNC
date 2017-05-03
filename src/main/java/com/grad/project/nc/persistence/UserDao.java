@@ -3,7 +3,6 @@ package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -94,7 +93,7 @@ public class UserDao extends AbstractDao<User> {
     }
 
     @Override
-    public User find(long id) {
+    public User find(Long id) {
         return findOne(connection -> {
             String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\" WHERE user_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
@@ -107,11 +106,11 @@ public class UserDao extends AbstractDao<User> {
 
     @Override
     @Transactional
-    public Collection<User> findAll() {
-        return findMultiple(connection -> {
-            String statement = "SELECT user_id, email, password, first_name, last_name, phone_number FROM \"user\"";
-            return connection.prepareStatement(statement);
-        }, mapper);
+    public List<User> findAll() {
+        String findAllQuery = "SELECT \"user_id\", \"email\", \"password\", \"first_name\", " +
+                "\"last_name\", \"phone_number\" FROM \"user\"";
+
+        return query(findAllQuery, new UserRowMapper());
     }
 
     public Collection<User> findByDomain(Domain domain) {

@@ -3,11 +3,10 @@ package com.grad.project.nc.persistence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.ProductRegionPrice;
+import com.grad.project.nc.persistence.impl.ProductRegionPriceDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by Roman Savuliak on 25.04.2017.
@@ -27,12 +25,12 @@ import java.util.Map;
 @Repository
 public class DiscountDao extends AbstractDao<Discount> {
 
-    private ProductRegionPriceDao productRegionPriceDao;
+    private ProductRegionPriceDaoImpl productRegionPriceDao;
 
     private DiscountRowMapper mapper = new DiscountRowMapper();
 
     @Autowired
-    public DiscountDao(JdbcTemplate jdbcTemplate, ProductRegionPriceDao productRegionPriceDao) {
+    public DiscountDao(JdbcTemplate jdbcTemplate, ProductRegionPriceDaoImpl productRegionPriceDao) {
         super(jdbcTemplate);
         this.productRegionPriceDao = productRegionPriceDao;
     }
@@ -90,7 +88,7 @@ public class DiscountDao extends AbstractDao<Discount> {
     }
 
     @Override
-    public Discount find(long id) {
+    public Discount find(Long id) {
         return findOne(connection -> {
             final String SELECT_QUERY =
                     "SELECT " +
@@ -108,19 +106,11 @@ public class DiscountDao extends AbstractDao<Discount> {
     }
 
     @Override
-    public Collection<Discount> findAll() {
-        return findMultiple(connection -> {
-            final String SELECT_QUERY =
-                    "SELECT " +
-                            "discount_id, " +
-                            "discount_title, " +
-                            "discount, " +
-                            "start_date, " +
-                            "end_date " +
-                            "FROM discount ";
-            return connection.prepareStatement(SELECT_QUERY);
+    public List<Discount> findAll() {
+        String findAllQuery = "SELECT \"discount_id\", \"discount_title\", \"discount\", " +
+                "\"start_date\", \"end_date\" FROM \"discount\"";
 
-        }, mapper);
+        return query(findAllQuery, new DiscountRowMapper());
     }
 
     @Override

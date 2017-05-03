@@ -6,19 +6,19 @@ import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.model.Region;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
+import java.util.List;
 
-public interface ProductDao {
+public interface ProductDao extends CrudDao<Product> {
     void deleteProductCharacteristicValues(Product product);
 
     @Transactional
     void saveProductCharacteristicValues(Product product);
 
-    Collection<Product> findProductsByRegion(Region region);
+    List<Product> findProductsByRegion(Region region);
 
     Product findByName(String productName);
 
-    Collection<Product> findProductsByType(ProductType productType);
+    List<Product> findProductsByType(ProductType productType);
 
     Product getProductByProductRegionPrice(ProductRegionPrice productRegionPrice);
 }

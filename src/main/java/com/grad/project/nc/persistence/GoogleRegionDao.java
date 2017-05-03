@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by DeniG on 30.04.2017.
@@ -86,7 +86,7 @@ public class GoogleRegionDao extends AbstractDao<GoogleRegion> {
     }
 
     @Override
-    public GoogleRegion find(long id) {
+    public GoogleRegion find(Long id) {
         return findOne(connection -> {
             final String SELECT_QUERY =
                     "SELECT " +
@@ -101,15 +101,11 @@ public class GoogleRegionDao extends AbstractDao<GoogleRegion> {
     }
 
     @Override
-    public Collection<GoogleRegion> findAll() {
-        return findMultiple(connection -> {
-            final String SELECT_QUERY =
-                    "SELECT " +
-                            "gr.google_region_id, " +
-                            "gr.google_region_name " +
-                            "FROM google_region gr ";
-            return connection.prepareStatement(SELECT_QUERY);
-        }, mapper);
+    public List<GoogleRegion> findAll() {
+        String findAllQuery = "SELECT \"google_region_id\", \"google_region_name\", \"region_id\" " +
+                "FROM \"google_region\"";
+
+        return query(findAllQuery, new GoogleRegionRowMapper());
     }
 
     @Override

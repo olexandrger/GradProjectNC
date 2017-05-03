@@ -4,7 +4,6 @@ import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.AbstractDao;
 import com.grad.project.nc.persistence.CategoryDao;
 import com.grad.project.nc.persistence.CategoryTypeDao;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Pavlo Rospopa
@@ -52,14 +52,14 @@ public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDa
     }
 
     @Override
-    public Category find(long id) {
+    public Category find(Long id) {
         String query = "SELECT \"category_id\", \"category_name\", \"category_type_id\" FROM \"category\" " +
                 "WHERE \"category_id\"=?";
         return findOne(query, new CategoryRowMapper(), id);
     }
 
     @Override
-    public Collection<Category> findAll() {
+    public List<Category> findAll() {
         String findAllQuery = "SELECT \"category_id\", \"category_name\", \"category_type_id\" FROM \"category\"";
         return query(findAllQuery, new CategoryRowMapper());
     }

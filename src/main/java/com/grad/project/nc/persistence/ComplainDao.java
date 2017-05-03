@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public class ComplainDao extends AbstractDao<Complain> {
@@ -104,7 +105,7 @@ public class ComplainDao extends AbstractDao<Complain> {
     }
 
     @Override
-    public Complain find(long id) {
+    public Complain find(Long id) {
 
         return findOne(connection -> {
             String statement =
@@ -126,21 +127,12 @@ public class ComplainDao extends AbstractDao<Complain> {
     }
 
     @Override
-    public Collection<Complain> findAll() {
+    public List<Complain> findAll() {
+        String findAllQuery = "SELECT \"complain_id\", \"user_id\", \"product_instance_id\", " +
+                "\"complain_title\", \"content\", \"status_id\", \"responsible_id\", \"response\", " +
+                "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\"";
 
-        return findMultiple(connection -> {
-            String statement =
-                    "SELECT " +
-                            "complain_id, " +
-                            "complain_title, " +
-                            "content, " +
-                            "response, " +
-                            "open_date, " +
-                            "close_date, " +
-                            "FROM complain";
-
-            return connection.prepareStatement(statement);
-        }, mapper);
+        return query(findAllQuery, new ComplainRowMapper());
     }
 
     @Override

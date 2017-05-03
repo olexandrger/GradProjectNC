@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by DeniG on 30.04.2017.
@@ -83,7 +83,7 @@ public class LocationDao extends AbstractDao<Location> {
     }
 
     @Override
-    public Location find(long id) {
+    public Location find(Long id) {
         return findOne(connection -> {
             final String FIND_QUERY = "SELECT " +
                     "l.location_id, " +
@@ -98,15 +98,10 @@ public class LocationDao extends AbstractDao<Location> {
     }
 
     @Override
-    public Collection<Location> findAll() {
-        return findMultiple(connection -> {
-            final String FIND_QUERY =
-                    "SELECT " +
-                            "l.location_id, " +
-                            "l.google_place_id, " +
-                            "FROM location l ";
-            return connection.prepareStatement(FIND_QUERY);
-        }, mapper);
+    public List<Location> findAll() {
+        String findAllQuery = "SELECT \"location_id\", \"google_place_id\", \"google_region_id\" FROM \"location\"";
+
+        return query(findAllQuery, new LocationRowMapper());
     }
 
     @Override

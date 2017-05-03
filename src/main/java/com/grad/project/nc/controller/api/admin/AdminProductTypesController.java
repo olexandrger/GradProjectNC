@@ -42,7 +42,7 @@ public class AdminProductTypesController {
     }
 
     @RequestMapping(value = "productTypes/delete", method = RequestMethod.POST)
-    public Map<String, String> deleteType(@RequestBody Map<String, Integer> productTypeId) {
+    public Map<String, String> deleteType(@RequestBody Map<String, Long> productTypeId) {
         Map<String, String> result = new HashMap<>();
         productTypeDao.delete(productTypeDao.find(productTypeId.get("id")));
         result.put("status", "success");

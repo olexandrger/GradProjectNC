@@ -14,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,7 +75,7 @@ public class DataTypeDao extends AbstractDao<DataType> {
 
     @Transactional
     @Override
-    public DataType find(long id) {
+    public DataType find(Long id) {
 
         return findOne(connection -> {
             String statement = "SELECT data_type_id, data_type FROM data_type WHERE data_type_id = ?";
@@ -91,13 +90,10 @@ public class DataTypeDao extends AbstractDao<DataType> {
 
     @Transactional
     @Override
-    public Collection<DataType> findAll() {
-        return findMultiple(connection -> {
-            String statement = "SELECT data_type_id" +
-                    ",data_type" +
-                    " FROM data_type ";
-            return connection.prepareStatement(statement);
-        }, mapper);
+    public List<DataType> findAll() {
+        String findAllQuery = "SELECT \"data_type_id\", \"data_type\", FROM \"data_type\"";
+
+        return query(findAllQuery, new DataTypeRowMapper());
 
     }
 

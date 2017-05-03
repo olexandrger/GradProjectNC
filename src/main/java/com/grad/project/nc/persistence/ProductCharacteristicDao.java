@@ -58,7 +58,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
 
     @Transactional
     @Override
-    public ProductCharacteristic find(long id) {
+    public ProductCharacteristic find(Long id) {
         final String SELECT_QUERY = "SELECT product_characteristic_id" +
                 ",product_type_id" +
                 ",characteristic_name" +
@@ -109,7 +109,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
 
 
     @Override
-    public Collection<ProductCharacteristic> findAll() {
+    public List<ProductCharacteristic> findAll() {
 
         final String SELECT_QUERY = "SELECT product_characteristic_id" +
                 ",product_type_id" +
@@ -151,6 +151,10 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
                 ", characteristic_name , measure , data_type_id " +
                 "FROM product_characteristic WHERE product_type_id = ?" ;
         return jdbcTemplate.query(QUERY,new Object[]{entity.getProductTypeId()}, new ProductCharacteristicRowMapper());
+    }
+
+    public List<ProductCharacteristic> findByProductId(Long id) {
+        return null;
     }
 
 

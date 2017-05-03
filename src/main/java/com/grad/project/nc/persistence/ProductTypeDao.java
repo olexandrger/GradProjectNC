@@ -52,7 +52,7 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
     }
 
     @Override
-    public ProductType find(long id) {
+    public ProductType find(Long id) {
         return findOne(connection -> {
             String statement = "SELECT product_type_id,product_type_name,product_type_description FROM product_type WHERE product_type_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
@@ -106,16 +106,11 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
     }
 
     @Override
-    public Collection<ProductType> findAll() {
+    public List<ProductType> findAll() {
+        String findAllQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\" " +
+                "FROM \"product_type\"";
 
-        return findMultiple(connection -> {
-            final String QUERY = "SELECT product_type_id,product_type_name,product_type_description FROM product_type";
-
-            PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
-
-            return preparedStatement;
-
-        }, new ProductTypeRowMapper());
+        return query(findAllQuery, new ProductTypeRowMapper());
     }
 
     public ProductType getProductTypeByProduct(Product product){
@@ -175,8 +170,6 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
         }
     }
 
-
-
     private static final class ProductTypeRowMapper implements RowMapper<ProductType> {
         @Override
         public ProductType mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -189,6 +182,4 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
             return productType;
         }
     }
-
-
 }

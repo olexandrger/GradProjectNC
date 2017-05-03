@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public class ProductOrderDao extends AbstractDao<ProductOrder> {
@@ -87,7 +88,7 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
     }
 
     @Override
-    public ProductOrder find(long id) {
+    public ProductOrder find(Long id) {
         return findOne(connection -> {
             String statement =
                     "SELECT " +
@@ -105,16 +106,12 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
     }
 
     @Override
-    public Collection<ProductOrder> findAll() {
-        return findMultiple(connection -> {
-            String statement =
-                    "SELECT " +
-                            "product_order_id, " +
-                            "open_date, " +
-                            "close_date " +
-                            "FROM product_order";
-            return connection.prepareStatement(statement);
-        }, mapper);
+    public List<ProductOrder> findAll() {
+        String findAllQuery = "SELECT \"product_order_id\", \"product_instance_id\", \"user_id\", " +
+                "\"order_aim_id\", \"status_id\", \"responsible_id\", \"open_date\", \"close_date\" " +
+                "FROM \"product_order\"";
+
+        return query(findAllQuery, new ProductOrderRowMapper());
     }
 
     @Override

@@ -3,12 +3,9 @@ package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.GoogleRegion;
 import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.Region;
-import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by Roman Savuliak on 25.04.2017.
@@ -66,7 +61,7 @@ public class RegionDao extends AbstractDao<Region> {
     }
 
     @Override
-    public Region find(long id) {
+    public Region find(Long id) {
         return findOne(connection -> {
             final String SELECT_QUERY =
                     "SELECT " +
@@ -81,11 +76,10 @@ public class RegionDao extends AbstractDao<Region> {
     }
 
     @Override
-    public Collection<Region> findAll() {
-        return findMultiple(connection -> {
-            final String SELECT_QUERY = "SELECT region_id, region_name FROM region";
-            return connection.prepareStatement(SELECT_QUERY);
-        }, regionRowMapper);
+    public List<Region> findAll() {
+        String findAllQuery = "SELECT \"region_id\", \"region_name\" FROM \"region\"";
+
+        return query(findAllQuery, new RegionRowMapper());
     }
 
     @Override

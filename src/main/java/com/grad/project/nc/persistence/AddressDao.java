@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by DeniG on 25.04.2017.
@@ -48,7 +48,7 @@ public class AddressDao extends AbstractDao<Address> {
     }
 
     @Override
-    public Address find(long id) {
+    public Address find(Long id) {
         return findOne(connection -> {
             final String SELECT_QUERY = "SELECT address_id, apartment_number" +
                     " FROM address WHERE address_id = ?";
@@ -60,14 +60,11 @@ public class AddressDao extends AbstractDao<Address> {
     }
 
     @Override
-    public Collection<Address> findAll() {
-        return findMultiple(connection -> {
-            final String SELECT_ALL_QUERY = "SELECT address_id, apartment_number " +
-                    " FROM address";
-            return connection.prepareStatement(SELECT_ALL_QUERY);
+    public List<Address> findAll() {
+        String findAllQuery = "SELECT \"address_id\", \"apartment_number\", \"location_id\" " +
+                " FROM \"address\"";
 
-        }, mapper);
-
+        return query(findAllQuery, new AddressMapper());
     }
 
     @Override

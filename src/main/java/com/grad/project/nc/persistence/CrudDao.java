@@ -2,7 +2,7 @@ package com.grad.project.nc.persistence;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface CrudDao<T> {
 
@@ -14,10 +14,10 @@ public interface CrudDao<T> {
     //add optional here?
 
     @Transactional
-    T find(long id);
+    T find(Long id);
 
     @Transactional
-    Collection<T> findAll();
+    List<T> findAll();
 
     @Transactional
     void delete(T entity);

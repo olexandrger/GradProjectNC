@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Pavlo Rospopa
@@ -43,7 +43,7 @@ public class CategoryTypeDaoImpl extends AbstractDao<CategoryType> implements Ca
     }
 
     @Override
-    public CategoryType find(long id) {
+    public CategoryType find(Long id) {
         String query = "SELECT \"category_type_id\", \"category_type_name\" " +
                 "FROM \"category_type\" " +
                 "WHERE \"category_type_id\"=?";
@@ -51,7 +51,7 @@ public class CategoryTypeDaoImpl extends AbstractDao<CategoryType> implements Ca
     }
 
     @Override
-    public Collection<CategoryType> findAll() {
+    public List<CategoryType> findAll() {
         String findAllQuery = "SELECT \"category_type_id\", \"category_type_name\" FROM \"category_type\"";
         return query(findAllQuery, new CategoryTypeRowMapper());
     }

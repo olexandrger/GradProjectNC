@@ -1,9 +1,6 @@
 package com.grad.project.nc.persistence;
 
-import com.grad.project.nc.model.Address;
-import com.grad.project.nc.model.CategoryType;
-import com.grad.project.nc.model.Domain;
-import com.grad.project.nc.model.User;
+import com.grad.project.nc.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,19 +12,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public class DomainDao extends AbstractDao<Domain> {
 
     AddressDao addressDao;
-    CategoryTypeDao categoryTypeDao;
+    CategoryDao categoryDao;
     UserDao userDao;
 
     @Autowired
-    public DomainDao(JdbcTemplate jdbcTemplate, CategoryTypeDao categoryTypeDao, AddressDao addressDao) {
+    public DomainDao(JdbcTemplate jdbcTemplate, CategoryDao categoryTypeDao, AddressDao addressDao) {
         super(jdbcTemplate);
         this.addressDao = addressDao;
-        this.categoryTypeDao = categoryTypeDao;
+        this.categoryDao = categoryTypeDao;
         //this.userDao = userDao;
     }
 
@@ -43,7 +41,7 @@ public class DomainDao extends AbstractDao<Domain> {
             PreparedStatement preparedStatement = connection.prepareStatement(stretment, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, domain.getDomainName());
             preparedStatement.setLong(2, domain.getAddress().getAddressId());
-            preparedStatement.setLong(3, domain.getDomainType().getCategoryTypeId());
+            preparedStatement.setLong(3, domain.getDomainType().getCategoryId());
             return preparedStatement;
 
         });
@@ -66,7 +64,7 @@ public class DomainDao extends AbstractDao<Domain> {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY);
             preparedStatement.setString(1, entity.getDomainName());
             preparedStatement.setLong(2, entity.getAddress().getAddressId());
-            preparedStatement.setLong(3, entity.getDomainType().getCategoryTypeId());
+            preparedStatement.setLong(3, entity.getDomainType().getCategoryId());
             preparedStatement.setLong(4, entity.getDomainId());
 
             return preparedStatement;
@@ -78,7 +76,7 @@ public class DomainDao extends AbstractDao<Domain> {
     }
 
     @Override
-    public Domain find(long id) {
+    public Domain find(Long id) {
 
         return findOne(connection -> {
             final String SELECT_QUERY = "SELECT " +
@@ -96,18 +94,10 @@ public class DomainDao extends AbstractDao<Domain> {
     }
 
     @Override
-    public Collection<Domain> findAll() {
-        return findMultiple(connection -> {
-            final String SELECT_QUERY =
-                    "SELECT " +
-                            "domain_id, " +
-                            "domain_name, " +
-                            "address_id, " +
-                            "domain_type_id " +
-                            "FROM \"domain\" ";
-            return connection.prepareStatement(SELECT_QUERY);
-        }, new DomainRowMapper());
-
+    public List<Domain> findAll() {
+        String findAllQuery = "SELECT \"domain_id\", \"domain_name\", \"address_id\", \"domain_type_id\" " +
+                "FROM \"domain\"";
+        return query(findAllQuery, new DomainRowMapper());
     }
 
     @Override
@@ -189,9 +179,9 @@ public class DomainDao extends AbstractDao<Domain> {
         }
 
         @Override
-        public CategoryType getDomainType() {
+        public Category getDomainType() {
             if (super.getDomainType() == null) {
-                super.setDomainType(categoryTypeDao.getCategoryTypeOfDomain(this));
+                super.setDomainType(categoryDao.findDomainType(this.getDomainId()));
             }
             return super.getDomainType();
         }

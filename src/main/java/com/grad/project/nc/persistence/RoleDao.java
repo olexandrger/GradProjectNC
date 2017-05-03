@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Roman Savuliak on 26.04.2017.
@@ -59,7 +60,7 @@ public class RoleDao extends AbstractDao<Role> {
     }
 
     @Override
-    public Role find(long id) {
+    public Role find(Long id) {
 
         return findOne(connection -> {
             final String SELECT_QUERY = "SELECT role_id, role_name FROM role WHERE role_id = ?";
@@ -71,12 +72,10 @@ public class RoleDao extends AbstractDao<Role> {
     }
 
     @Override
-    public Collection<Role> findAll() {
-        return findMultiple(connection -> {
-            final String SELECT_QUERY = "SELECT role_id, role_name FROM role";
-            return connection.prepareStatement(SELECT_QUERY);
-        }, new RoleRowMapper());
+    public List<Role> findAll() {
+        String findAllQuery = "SELECT \"role_id\", \"role_name\" FROM \"role\"";
 
+        return query(findAllQuery, new RoleRowMapper());
     }
 
 
