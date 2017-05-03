@@ -11,6 +11,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -141,6 +143,125 @@ public class ProductOrderDao extends AbstractDao<ProductOrder> {
                             "ON \"user\".user_id = product_order.user_id";
             return connection.prepareStatement(statement);
         }, mapper);
+    }
+
+    public Collection<ProductOrder> findByProductName(String productName){
+        return findMultiple(connection -> {
+            String statement =
+                    "SELECT " +
+                            "po.product_order_id, " +
+                            "po.open_date, " +
+                            "po.close_date " +
+                            "FROM product_order po " +
+                            "INNER JOIN product_instance pi " +
+                            "ON po.product_instance_id = pi.instance_id " +
+                            "INNER JOIN product_region_price prp " +
+                            "ON pi.price_id = prp.price_id " +
+                            "INNER JOIN product p " +
+                            "ON prp.product_id = p.product_id " +
+                            "WHERE p.product_name = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+            preparedStatement.setString(1, productName);
+            return preparedStatement;
+        }, mapper);
+    }
+
+    public Collection<ProductOrder> findByClientLastName(String clientLastName){
+        return findMultiple(connection -> {
+            String statement =
+                    "SELECT " +
+                            "po.product_order_id, " +
+                            "po.open_date, " +
+                            "po.close_date " +
+                            "FROM product_order po " +
+                            "INNER JOIN \"user\" u " +
+                            "ON po.user_id = u.user_id " +
+                            "WHERE u.last_name = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+            preparedStatement.setString(1, clientLastName);
+            return preparedStatement;
+        }, mapper);
+
+    }
+
+    public Collection<ProductOrder> findByClientPhone (String phone){
+        return findMultiple(connection -> {
+            String statement =
+                    "SELECT " +
+                            "po.product_order_id, " +
+                            "po.open_date, " +
+                            "po.close_date " +
+                            "FROM product_order po " +
+                            "INNER JOIN \"user\" u " +
+                            "ON po.user_id = u.user_id " +
+                            "WHERE u.phone_number = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+            preparedStatement.setString(1, phone);
+            return preparedStatement;
+        }, mapper);
+    }
+
+    /**
+     * The method selects orders that are open or closed in a certain time interval. Null-values are ignored
+     * @param openBefore -open before then (exclusive)
+     * @param openAfter - open after then (inclusive)
+     * @param closedBefore -closed before then (exclusive)
+     * @param closedAfter - closed after then (inclusive)
+     * @return
+     */
+
+    public Collection<ProductOrder> findByTimePeriod (LocalDateTime openBefore, LocalDateTime openAfter, LocalDateTime closedBefore, LocalDateTime closedAfter){
+
+        return findMultiple(connection -> {
+            boolean isNotFirst = false;
+            List<LocalDateTime> args = new ArrayList<>();
+            String statement =
+                    "SELECT " +
+                            "po.product_order_id, " +
+                            "po.open_date, " +
+                            "po.close_date " +
+                            "FROM product_order po ";
+            if(openBefore!=null || openAfter!=null || closedBefore !=null || closedAfter !=null){
+                statement+="WHERE ";
+                if (openBefore!=null){
+                    statement+="po.open_date < ? ";
+                    isNotFirst = true;
+                    args.add(openBefore);
+                }
+                if (openAfter!=null){
+                    if(isNotFirst){
+                        statement+="AND ";
+                    }
+                    statement+="po.open_date => ? ";
+                    isNotFirst = true;
+                    args.add(openAfter);
+                }
+                if(closedBefore !=null){
+                    if(isNotFirst){
+                        statement+="AND ";
+                    }
+                    statement+= "close_date < ? ";
+                    isNotFirst = true;
+                    args.add(closedBefore);
+                }
+                if (closedAfter!=null){
+                    if(isNotFirst){
+                        statement+="AND ";
+                    }
+                    statement+= "close_date => ? ";
+                    args.add(closedAfter);
+                }
+
+            }
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+            int i = 0;
+            for(LocalDateTime arg:args){
+                preparedStatement.setTimestamp(++i, Timestamp.valueOf(arg));
+            }
+            return preparedStatement;
+
+        }, mapper);
+
     }
 
     private class ProductOrderProxy extends ProductOrder {

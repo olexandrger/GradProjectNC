@@ -21,16 +21,19 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService{
 
+    @Autowired
     private UserDao userDao;
+    @Autowired
     private RoleDao roleDao;
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    public UserServiceImpl(UserDao userDao, RoleDao roleDao, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userDao = userDao;
-        this.roleDao = roleDao;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
+   // @Autowired
+    //public UserServiceImpl(/*UserDao userDao, RoleDao roleDao,*/ BCryptPasswordEncoder bCryptPasswordEncoder) {
+        //this.userDao = userDao;
+        //this.roleDao = roleDao;
+      //  this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+   // }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
