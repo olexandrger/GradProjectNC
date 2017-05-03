@@ -18,7 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
-
+import java.util.LinkedList;
+import java.util.List;
 
 
 @Repository
@@ -147,6 +148,20 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
         }, new ProductTypeRowMapper());
 
 
+    }
+
+
+
+    private class ProductTypeProxy extends ProductType{
+
+        @Override
+        public List<ProductCharacteristic> getProductCharacteristics() {
+            if (super.getProductCharacteristics() == null){
+                super.setProductCharacteristics(new LinkedList<>(productCharacteristicDao.findCharacteristicsByProductType(this)));
+            }
+
+            return super.getProductCharacteristics();
+        }
     }
 
 
