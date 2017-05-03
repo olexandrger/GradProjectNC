@@ -1,5 +1,7 @@
 package com.grad.project.nc.persistence;
+import com.grad.project.nc.model.DataType;
 import com.grad.project.nc.model.ProductCharacteristic;
+import com.grad.project.nc.model.ProductType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -22,16 +24,21 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
 
     private JdbcTemplate jdbcTemplate;
 
+//    @Autowired
+    private DataTypeDao dataTypeDao;
+
     @Autowired
     public ProductCharacteristicDao(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    public void setDataTypeDao(DataTypeDao dataTypeDao) {
+        this.dataTypeDao = dataTypeDao;
+    }
 
     @Transactional
     @Override
     public ProductCharacteristic add(ProductCharacteristic productCharacteristic) {
-        log.info("ADDING PRODUCT CHARACTERISTIC");
         SimpleJdbcInsert insertProductQuery = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("product_characteristic")
                 .usingGeneratedKeyColumns("product_characteristic_id");
@@ -40,7 +47,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
         parameters.put("product_type_id", productCharacteristic.getProductTypeId());
         parameters.put("characteristic_name", productCharacteristic.getCharacteristicName());
         parameters.put("measure", productCharacteristic.getMeasure());
-        parameters.put("data_type_id", productCharacteristic.getDataTypeId());
+        parameters.put("data_type_id", productCharacteristic.getDataType().getDataTypeId());
 
         Number newId = insertProductQuery.executeAndReturnKey(parameters);
         productCharacteristic.setProductCharacteristicId(newId.longValue());
@@ -84,7 +91,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
         jdbcTemplate.update(UPDATE_QUERY, productCharacteristic.getProductTypeId()
                 ,productCharacteristic.getCharacteristicName()
                 ,productCharacteristic.getMeasure()
-                ,productCharacteristic.getDataTypeId()
+                ,productCharacteristic.getDataType().getDataTypeId()
                 ,productCharacteristic.getProductCharacteristicId());
         return productCharacteristic;
 
@@ -138,23 +145,38 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
 
     }
 
+    public Collection<ProductCharacteristic> findCharacteristicsByProductType(ProductType entity) {
+        final String QUERY = "SELECT product_characteristic_id" +
+                ",product_type_id" +
+                ", characteristic_name , measure , data_type_id " +
+                "FROM product_characteristic WHERE product_type_id = ?" ;
+        return jdbcTemplate.query(QUERY,new Object[]{entity.getProductTypeId()}, new ProductCharacteristicRowMapper());
+    }
 
 
-    private static final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
+    private final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
         @Override
         public ProductCharacteristic mapRow(ResultSet rs, int rowNum) throws SQLException {
-            ProductCharacteristic productCharacteristic = new ProductCharacteristic();
+            ProductCharacteristic productCharacteristic = new ProductCharacteristicProxy();
 
             productCharacteristic.setProductCharacteristicId(rs.getLong("product_characteristic_id"));
             productCharacteristic.setProductTypeId(rs.getLong("product_type_id"));
             productCharacteristic.setCharacteristicName(rs.getString("characteristic_name"));
             productCharacteristic.setMeasure(rs.getString("measure"));
-            productCharacteristic.setDataTypeId(rs.getLong("data_type_id"));
+//            productCharacteristic.setDataTypeId(rs.getLong("data_type_id"));
 
 
             return productCharacteristic;
         }
     }
 
-
+    private class ProductCharacteristicProxy extends ProductCharacteristic {
+        @Override
+        public DataType getDataType() {
+            if (super.getDataType() == null) {
+                super.setDataType(dataTypeDao.getDataTypeByProductCharacteristic(this));
+            }
+            return super.getDataType();
+        }
+    }
 }

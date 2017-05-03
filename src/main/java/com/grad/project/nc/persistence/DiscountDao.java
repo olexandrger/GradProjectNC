@@ -1,5 +1,6 @@
 package com.grad.project.nc.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.ProductRegionPrice;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,7 +181,7 @@ public class DiscountDao extends AbstractDao<Discount> {
             final String SELECT_QUERY =
                     "SELECT " +
                             "d.discount_id, " +
-                            "d.discount_title " +
+                            "d.discount_title, " +
                             "d.discount, " +
                             "d.start_date, " +
                             "d.end_date " +
@@ -196,6 +197,7 @@ public class DiscountDao extends AbstractDao<Discount> {
 
     private class DiscountProxy extends Discount{
         @Override
+        @JsonIgnore
         public Collection<ProductRegionPrice> getProductRegionPrices() {
             if(super.getProductRegionPrices() == null){
               setProductRegionPrices(productRegionPriceDao.getProductRegionPricesByDiscount(this));

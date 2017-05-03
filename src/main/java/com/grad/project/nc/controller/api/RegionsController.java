@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class RegionsController {
     }
 
     @RequestMapping("/all")
-    public List<String> test() {
-        return regionsDao.findAll().stream().map(Region::getRegionName).collect(Collectors.toList());
+    public Collection<Region> test() {
+        return regionsDao.findAll();
     }
 }

@@ -1,277 +1,380 @@
-/*
-var productTypeData;
-var dataTypeData;
-
+var currentSelected = -1;
 var numberOfAdded = 0;
-var selected = -1;
 
-function addProductType() {
-    var list = $("#product-types-list");
-    var name = $("#new-product-type-name").val();
+var productTypesData;
+var productsData;
+
+var regionsData;
+var regionsHtml;
+
+function getProductTypeData(id) {
+    var result;
+
+    productTypesData.forEach(function (item) {
+       if (item.id == id) {
+           result = item;
+       }
+    });
+
+    return result;
+}
+
+function getCharacteristicValue(id) {
+    var result;
+    productsData[currentSelected].productCharacteristicValues.forEach(function (item) {
+        if (item.productCharacteristicId == id) {
+            result = item;
+        }
+    });
+
+    return result;
+}
+
+function javaToJsDate(date) {
+    function addNumber(number) {
+        var result = "";
+        if (number < 10)
+            result += '0';
+        result += number;
+        return result;
+    }
+    var value = date[0] + '-' + addNumber(date[1]) + '-' + addNumber(date[2]) + 'T' + addNumber(date[3]) + ':' + addNumber(date[4]) + ':' + addNumber(date[5]);
+    return value;
+}
+
+function changeCharacteristics() {
+    var data = getProductTypeData($("#product-type-selector").val());
+
+    var list = $("#product-characteristics");
+    list.empty();
+    if (data != undefined) {
+        data.characteristics.forEach(function (item) {
+            var measureHtml = "";
+
+            if (item.measure != undefined && item.measure != "") {
+                measureHtml = '<span class="input-group-addon characteristic-measure-span text-left">' + item.measure + '</span>';
+            }
+
+
+            var inputType = "text";
+            if (item.dataTypeId == 2)
+                inputType = "datetime-local";
+
+            var value = "";
+            var characteristicValue = getCharacteristicValue(item.id);
+            // console.log(characteristicValue);
+            if (characteristicValue != undefined) {
+                if (item.dataTypeId == 1) {
+                    value = characteristicValue.numberValue;
+                } else if (item.dataTypeId == 2) {
+                    value = javaToJsDate(characteristicValue.dateValue);
+                } else if (item.dataTypeId) {
+                    value = characteristicValue.stringValue;
+                }
+            }
+
+            var html =
+                '<div class="product-characteristic-value-input col-sm-12">' +
+                '<label>' + item.name + '</label>' +
+                '<div class="input-group col-sm-12">' +
+                '<input type="hidden" name="characteristic-id" value="' + item.id + '"/>' +
+                '<input type="' + inputType + '" class="form-control" placeholder="value" value="'+ value +  '" name="characteristic-value">' +
+                measureHtml +
+                '</div>' +
+                '</div>';
+
+            list.append($(html));
+        });
+    }
+}
+
+function selectProduct(x) {
+
+    if (x == undefined) {
+        x = productsData.length - 1;
+    }
+
+    console.log("Selected " + x);
+
+    if (currentSelected == -1) {
+        $("#products-editor").removeClass("hidden");
+    }
+    if (x == -1) {
+        $("#products-editor").addClass("hidden");
+    }
+
+    currentSelected = x;
+
+    var list = $("#products-list");
+    list.find("a").removeClass("active");
+    list.find("a:nth-child(" + (x+1) + ")").addClass("active");
+
+    $("#product-name-input").val("");
+    $("#product-type-selector").val([]);
+    $("#product-characteristics").empty();
+    $(".cities-container").empty();
+    $("#product-description-input").val("");
+    $('input:radio[name=product-status]').filter('[value=true]').prop('checked', true);
+
+
+    if (currentSelected != -1) {
+        $("#product-name-input").val(productsData[currentSelected].name);
+
+        if (productsData[currentSelected].productType != undefined) {
+            $("#product-type-selector").val(productsData[currentSelected].productType.productTypeId);
+            changeCharacteristics();
+        }
+        if (productsData[currentSelected].description != undefined) {
+            $("#product-description-input").val(productsData[currentSelected].description);
+        }
+
+        if (productsData[currentSelected].prices != undefined) {
+            productsData[currentSelected].prices.forEach(function (item) {
+                // console.error(item.region.)
+                addRegionalPrice(item.region.regionId, item.price);
+            });
+        }
+
+        var $radios = $('input:radio[name=product-status]');
+        $radios.filter('[value=' + productsData[currentSelected].isActive + ']').prop('checked', true);
+    }
+
+}
+
+function deleteRegionalPrice(element) {
+    element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
+}
+
+function saveSelected() {
+    var data = {};
+
+    data.id = productsData[currentSelected].productId;
+    data.name = $("#product-name-input").val();
+    data.productTypeId = $("#product-type-selector").val();
+    data.description = $("#product-description-input").val();
+    data.isActive = ($('input[name=product-status]:checked').val() == 'true');
+
+    data.prices = {};
+    $(".cities-container").each(function (item) {
+        data.prices[$(this).find('select[name=regionId]').val()] = $(this).find('input[name=region-price]').val();
+    });
+
+    data.characteristicValues = {};
+    $("#product-characteristics").find(".product-characteristic-value-input").each(function(item) {
+        data.characteristicValues[$(this).find('input[name=characteristic-id]').val()] =
+            $(this).find('input[name=characteristic-value]').val();
+    });
+
+    var listSaveId = currentSelected;
+
+    $.ajax({
+        type: 'POST',
+        url: '/api/admin/products/update',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        processData: false,
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function (data) {
+            var alert;
+            $("#new-product-alert").remove();
+            if (data.status == 'success') {
+                console.log("Product update success! " + JSON.stringify(data));
+
+                alert = $('<div class="alert alert-success" role="alert" id="new-product-alert">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                    data.message + "</div>");
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/admin/products/get/' + data.id,
+                    success: function (data) {
+                        console.log("Update after saving successful");
+                        console.log("Set name " + data.name);
+                        $("#products-list").find("a:nth-child(" + (listSaveId+1) + ")").html(data.name);
+                        productsData[listSaveId] = data;
+                    },
+                    error: function (data) {
+                        console.log("Update after saving errored: " + data)
+                    }
+                });
+
+            } else {
+                console.log("Product update error! " + JSON.stringify(data));
+                alert = $('<div class="alert alert-danger" role="alert" id="new-product-alert">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                    data.message + '</div>');
+            }
+
+            alert.insertAfter($("#new-product-alert-place"));
+        },
+        error: function (data) {
+            $("#new-product-alert").remove();
+            console.error("Product update error! " + JSON.stringify(data));
+            $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                "Product changes failed</div>").insertAfter($("#new-product-alert-place"));
+        }
+    });
+
+}
+
+function addRegionalPrice(regionId, price) {
+
+    // var selectedRegion = "";
+    // console.error(regionId);
+    // if (regionId != undefined)
+    //     selectedRegion=' selected="' + regionId + '" ';
+
+    var selectedPrice = "";
+    if (price != undefined)
+        selectedPrice =' value="' + price + '" ';
+
+    var html =
+        '<div class="form-inline cities-container">' +
+            '<div class="form-group">'+
+                '<select class="form-control" name="regionId">'+
+                    regionsHtml +
+                '</select>'+
+            '</div>'+
+            '<div class="form-group full-width">'+
+                '<input type="text" class="form-control full-width" placeholder="Price" name="region-price"' + selectedPrice + '>'+
+            '</div>'+
+            '<div class="form-group">'+
+                '<a class="btn btn-danger" onclick="deleteRegionalPrice(this)">'+
+                    '<span class="glyphicon glyphicon-remove "></span>'+
+                '</a>'+
+            '</div>'+
+        '</div>';
+
+
+    var element = $(html);
+    $("#product-general-editor").append(element);
+
+    if (regionId != undefined) {
+        element.find('select').val(regionId);
+    }
+
+}
+
+function addProduct(name, index) {
+    var list = $("#products-list");
+    if (name == undefined) {
+        var nameField = $("#new-product-name");
+
+        name = nameField.val();
+        nameField.val("");
+    }
 
     if (name != "") {
         var id = -(++numberOfAdded);
         var ref = document.createElement("a");
         ref.appendChild(document.createTextNode(name));
         ref.className = "list-group-item";
-        var index = productTypeData.length;
+        ref.href = "#";
+        if (index == undefined)
+            index = productsData.length - 1;
+
         ref.onclick = function () {
-            selectItem(index);
+            selectProduct(index);
         };
 
         list.append(ref);
-        productTypeData.push({id: id, name: name, description: "", characteristics: []});
+        productsData.push({productId: id, name: name, productCharacteristicValues: []});
 
-        selectItem(index);
     } else {
-            $("#new-product-type-alert").remove();
+        $("#new-product-alert").remove();
 
-            $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
-                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-            'Can not add empty name </div>').insertAfter( list);
+        $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'Can not add empty name </div>').insertAfter(list);
     }
-
 }
 
-function removeProductValue(element) {
-    console.log(element);
-    element.parentNode.parentNode.removeChild(element.parentNode)
-}
-
-function addProductValue(name, measure, dataType) {
-
-    var options = "";
-
-    for (var dataTypeId in dataTypeData) {
-        if (dataTypeData.hasOwnProperty(dataTypeId)) {
-            options += '<option value="' + dataTypeId + '"';
-
-            if (dataTypeId == dataType) {
-                options += " selected ";
-            }
-            options += '>' + dataTypeData[dataTypeId] + '</option>';
-        }
-    }
-
-    if (name == undefined) name="";
-    if (measure == undefined) measure="";
-    if (dataType == undefined) dataType="";
-
-    var html=
-        '<div class="input-group product-characteristic-input">'+
-            '<span class="input-group-addon">Name</span>'+
-            '<input type="text" class="form-control" value="' + name + '" placeholder="Name" name="characteristic-name">'+
-            '<span class="input-group-addon">Measure</span>'+
-            '<input type="text" class="form-control" value="' + measure + '" placeholder="Measure" name="characteristic-measure">'+
-            '<span class="input-group-addon">Data type</span>'+
-            '<select class="form-control" name="characteristic-dataTypeId">'+
-                options +
-            '</select>'+
-            '<span class="input-group-addon" style="background-color: #d9534f; cursor: pointer" onclick="removeProductValue(this)">'+
-                '<span class="glyphicon glyphicon-remove bg-danger" style="color: white; background-color: #d9534f; cursor: pointer"></span>'+
-            '</span>'+
-        '</div>';
-
-    $("#product-type-values").append($(html));
-}
-
-function saveSelected() {
-    var savedId = selected;
-
-    productTypeData[savedId].name = $("#product-type-name-input").val();
-    productTypeData[savedId].description = $("#product-type-description-input").val();
-    productTypeData[savedId].characteristics = [];
-
-    $("#product-type-values").find(".product-characteristic-input").each(function (element) {
-       productTypeData[savedId].characteristics.push({
-           name: $(this).find("input[name='characteristic-name']").val(),
-           measure: $(this).find("input[name='characteristic-measure']").val(),
-           dataTypeId: $(this).find("select").val()
-       });
-    });
-
-    console.log("Sending\n" + JSON.stringify(productTypeData[savedId]));
-
-    $.ajax({
-        type: 'POST',
-        url: '/api/admin/productTypes/update',
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-        },
-        processData: false,
-        contentType: 'application/json',
-        data: JSON.stringify(productTypeData[selected]),
-        success: function (data) {
-            var alert;
-            if (data.status == 'success') {
-                console.log("Saving success! " + JSON.stringify(data));
-
-                $("#product-types-list").find("a:nth-child(" + (savedId+1) + ")").html(productTypeData[savedId].name);
-
-                alert = $('<div id="new-product-type-alert" class="alert alert-success" role="alert">' +
-                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                     data.message + '</div>');
-            } else {
-                console.log("Saving error! " + JSON.stringify(data));
-                alert = $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
-                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                    data.message + '</div>');
-            }
-
-            $("#new-product-type-alert").remove();
-
-            alert.insertAfter($("#new-product-type-alert-place"));
-
-        },
-        error: function (data) {
-            console.error("Saving error! " + JSON.stringify(data));
-
-            $("#new-product-type-alert").remove();
-
-            $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
-                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                'Product changes failed </div>').insertAfter($("#new-product-type-alert-place"));
-        }
+function addLoadedProducts() {
+    productsData.forEach(function (product, i) {
+        addProduct(product.name, i);
     });
 }
 
-function deleteSelected() {
-    if (productTypeData[selected].id < 0) {
-        $("#product-types-list").find("a:nth-child(" + (selected+1) + ")").addClass("hidden");
-        selectItem(-1);
-    } else {
-        $.ajax({
-            type: 'POST',
-            url: '/api/admin/productTypes/delete',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-            },
-            processData: false,
-            contentType: 'application/json',
-            data: JSON.stringify({id: productTypeData[selected].id}),
-            success: function (data) {
-                var alert;
-                if (data.status == 'success') {
-                    console.log("Deleting success! " + JSON.stringify(data));
-
-                    $("#product-types-list").find("a:nth-child(" + (selected+1) + ")").addClass("hidden");
-                    selectItem(-1);
-                    alert = $('<div id="new-product-type-alert" class="alert alert-success" role="alert">' +
-                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                        data.message + '</div>');
-                } else {
-                    console.log("Deleting error! " + JSON.stringify(data));
-                    alert = $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
-                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                        data.message + '</div>');
-                }
-
-                $("#new-product-type-alert").remove();
-
-                alert.insertAfter($("#new-product-type-alert-place"));
-
-            },
-            error: function (data) {
-                console.error("Deleting error! " + JSON.stringify(data));
-
-                $("#new-product-type-alert").remove();
-
-                $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
-                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                    'Product changes failed </div>').insertAfter($("#new-product-type-alert-place"));
-            }
-        });
-    }
-}
-
-function selectItem(x) {
-    console.log("Selected " + x);
-
-    if (selected == -1) {
-        $("#product-type-editor").removeClass("hidden");
-    }
-    if (x == -1) {
-        $("#product-type-editor").addClass("hidden");
-    }
-
-    selected = x;
-
-    var list = $("#product-types-list");
-    list.find("a").removeClass("active");
-    list.find("a:nth-child(" + (x+1) + ")").addClass("active");
-
-    $(".product-characteristic-input").remove();
-
-    if (selected != -1) {
-        $("#product-type-name-input").val(productTypeData[selected].name);
-        $("#product-type-description-input").val(productTypeData[selected].description);
-
-        for (var characteristic in productTypeData[selected].characteristics) {
-            console.log("adding property " + characteristic + " for " + x);
-            addProductValue(productTypeData[selected].characteristics[characteristic].name,
-                productTypeData[selected].characteristics[characteristic].measure,
-                productTypeData[selected].characteristics[characteristic].dataTypeId);
-        }
-    }
-}
-
-function loadInfo() {
+function loadProducts() {
+    console.log("loadProducts");
     $.ajax({
-        url: "/api/admin/dataTypes",
+        url: "/api/admin/products/all",
         success: function (data) {
-            dataTypeData = data;
-            loadProductTypes();
+
+            data.forEach(function(prod) {
+                prod.characteristics = {};
+                prod.productCharacteristics.forEach(function (char) {
+                    prod.characteristics[char.productCharacteristicId] = char;
+                });
+            });
+
+            productsData = data;
+
+            addLoadedProducts();
         },
         error: function () {
-            console.error("Cannot load dataTypes");
+            console.error("Cannot load products");
         }
     });
 }
 
 function loadProductTypes() {
+    console.log("loadProductTypes");
     $.ajax({
-        url: "/api/admin/productTypes/all ",
+        url: "/api/admin/productTypes/all",
+        success: function (data) {
+
+            console.log("loaded " + data.length + " product types");
+
+            var sel = $("#product-type-selector");
+
+            data.forEach(function(item, i) {
+                // console.log("adding " + item.name);
+                var option = document.createElement("option");
+                option.text = item.name;
+                option.value = item.id;
+                sel.append(option);
+            });
+
+            productTypesData = data;
+
+            loadProducts();
+        },
+        error: function () {
+            console.error("Cannot load product types");
+        }
+    });
+}
+
+function loadRegions() {
+    console.log('loadRegions');
+    $.ajax({
+        url: "/api/user/regions/all",
         success: function(data) {
-        var list = $("#product-types-list");
 
-        productTypeData = data;
+            regionsData = data;
 
-        data.forEach(function(item, i) {
-            console.log(item.name + " loaded");
+            regionsHtml = "";
+            data.forEach(function(item) {
+                regionsHtml += '<option value="' + item.regionId + '">' + item.regionName + '</option>'
+            });
 
-            var ref = document.createElement("a");
-            ref.appendChild(document.createTextNode(item.name));
-            ref.className = "list-group-item";
-            ref.onclick = function () {
-                selectItem(i);
-            };
+            loadProductTypes();
+        },
+        error: function () {
+            console.error("Cannot load list of regions");
+        }
+    });
+}
 
-            list.append(ref);
-        });
-    },
-    error: function () {
-        console.error("Cannot load list product types");
-    }
-});
+function loadData() {
+    console.log("loadData");
+    loadRegions();
 }
 
 $(document).ready(function () {
-    loadInfo();
+    loadData();
 });
-*/
-
-function addRegionalPrice() {
-
-}
-
-function addProduct() {
-
-}
-
-function saveSelected() {
-
-}
-
-function deleteSelected() {
-
-}

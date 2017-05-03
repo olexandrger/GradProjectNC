@@ -1,20 +1,27 @@
 package com.grad.project.nc.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.Region;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * reated by DeniG on 5/01/2017.
@@ -24,21 +31,23 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
 
     ProductRegionPriceRowMapper mapper = new ProductRegionPriceRowMapper();
 
-
     private DiscountDao discountDao;
     private ProductDao productDao;
     private RegionDao regionDao;
 
 
     @Autowired
-    public ProductRegionPriceDao(JdbcTemplate jdbcTemplate, /*  DiscountDao discountDao, */ProductDao productDao, RegionDao regionDao) {
+    public ProductRegionPriceDao(JdbcTemplate jdbcTemplate, /*  DiscountDao discountDao, ProductDao productDao, */RegionDao regionDao) {
         super(jdbcTemplate);
         //this.discountDao = discountDao;
-        this.productDao = productDao;
         this.regionDao = regionDao;
 
     }
 
+
+    public void setProductDao(ProductDao productDao) {
+        this.productDao = productDao;
+    }
     public void setDiscountDao(DiscountDao discountDao) {
         this.discountDao = discountDao;
     }
@@ -50,9 +59,9 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
             final String INSERT_QUERY =
                     "INSERT " +
                             "INTO product_region_price (" +
-                            "product_region_price.price, " +
-                            "product_region_price.product_id, " +
-                            "product_region_price.region_id) " +
+                            "price, " +
+                            "product_id, " +
+                            "region_id) " +
                             "VALUES(?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_QUERY);
             preparedStatement.setDouble(1, productRegionPrice.getPrice());
@@ -130,7 +139,7 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
         return findMultiple(connection -> {
             final String SELECT_QUERY =
                     "SELECT " +
-                            "price_id, " +
+                            "prp.price_id, " +
                             "price " +
                             "FROM product_region_price prp " +
                             "INNER JOIN discount_price dp " +
@@ -180,12 +189,29 @@ public class ProductRegionPriceDao extends AbstractDao<ProductRegionPrice> {
         }
     }
 
+    public Collection<ProductRegionPrice> getPricesByProduct(Product product) {
+        return findMultiple(connection -> {
+            final String SELECT_QUERY =
+                    "SELECT " +
+                            "prp.price_id, " +
+                            "prp.product_id, " +
+                            "prp.region_id, " +
+                            "prp.price " +
+                            "FROM product_region_price prp " +
+                            "WHERE prp.product_id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_QUERY);
+            preparedStatement.setLong(1, product.getProductId());
+            return preparedStatement;
+        }, mapper);
+    }
+
 
     private class ProductRegionPriceProxy extends ProductRegionPrice {
         @Override
+        @JsonIgnore
         public Product getProduct() {
             if (super.getProduct() == null) {
-                super.setProduct(productDao.getProductByProductRegionPrice(this));
+                super.setProduct(productDao.getProductByProductRegionPrise(this));
             }
             return super.getProduct();
         }

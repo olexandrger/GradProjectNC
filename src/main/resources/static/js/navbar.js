@@ -170,14 +170,14 @@ function register() {
     });
 }
 
-function selectRegion(regionName) {
+function selectRegion(region) {
     var selectedRegion = $('#region-selected');
-    selectedRegion.text(regionName);
+    selectedRegion.text(region.regionName);
     selectedRegion.append($("<span class='caret'></span>"));
-    localStorage.setItem("region", regionName);
+    localStorage.setItem("regionId", region.regionId);
 }
 
-function loadRegions() {
+function loadNavbarRegions() {
     $.ajax({
         url: "/api/user/regions/all",
         success: function(data) {
@@ -185,10 +185,10 @@ function loadRegions() {
             var list = $("#region-select").find("ul");
 
             data.forEach(function(item) {
-                console.log(item + " loaded");
+                // console.log(item + " loaded");
 
                 var ref = document.createElement("a");
-                ref.appendChild(document.createTextNode(item));
+                ref.appendChild(document.createTextNode(item.regionName));
                 ref.onclick = function () {
                     selectRegion(item);
                 };
@@ -198,13 +198,25 @@ function loadRegions() {
                 list.append(li);
             });
 
-            var lastChosen = localStorage.getItem("region");
-            if (data.indexOf(lastChosen) < 0) {
+            var lastChosenId = localStorage.getItem("regionId");
+
+            var contains = false;
+
+            // console.log(lastChosenId);
+            data.forEach(function(item) {
+                // console.log(item.regionId);
+               if (item.regionId == lastChosenId) {
+                   contains = true;
+                   selectRegion(item);
+               }
+            });
+
+            if (!contains) {
                 console.log("No saved region");
-                lastChosen = data[0];
+                selectRegion(data[0]);
             }
-            console.log("Choosing " + lastChosen);
-            selectRegion(lastChosen);
+            // console.log("Choosing " + lastChosen);
+            // selectRegion(lastChosen);
         },
         error: function () {
             console.error("Cannot load list of regions");
@@ -214,6 +226,6 @@ function loadRegions() {
 
 $(document).ready(function () {
         getAccountInformation();
-        loadRegions();
+        loadNavbarRegions();
     }
 );

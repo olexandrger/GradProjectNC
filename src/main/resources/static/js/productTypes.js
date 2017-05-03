@@ -108,11 +108,25 @@ function saveSelected() {
             if (data.status == 'success') {
                 console.log("Saving success! " + JSON.stringify(data));
 
-                $("#product-types-list").find("a:nth-child(" + (savedId+1) + ")").html(productTypeData[savedId].name);
 
                 alert = $('<div id="new-product-type-alert" class="alert alert-success" role="alert">' +
                     '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
                      data.message + '</div>');
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/admin/productTypes/get/' + data.id,
+                    success: function (data) {
+                        console.log("Update after saving successful");
+                        console.log("Set name " + data.name);
+                        $("#product-types-list").find("a:nth-child(" + (savedId+1) + ")").html(data.name);
+                        productTypeData[savedId] = data;
+                    },
+                    error: function (data) {
+                        console.log("Update after saving errored: " + data)
+                    }
+                });
+
             } else {
                 console.log("Saving error! " + JSON.stringify(data));
                 alert = $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
@@ -132,7 +146,7 @@ function saveSelected() {
 
             $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                'Product changes failed </div>').insertAfter($("#new-product-type-alert-place"));
+                'Product type changes failed </div>').insertAfter($("#new-product-type-alert-place"));
         }
     });
 }
@@ -246,6 +260,7 @@ function loadProductTypes() {
             var ref = document.createElement("a");
             ref.appendChild(document.createTextNode(item.name));
             ref.className = "list-group-item";
+            ref.href = "#";
             ref.onclick = function () {
                 selectItem(i);
             };

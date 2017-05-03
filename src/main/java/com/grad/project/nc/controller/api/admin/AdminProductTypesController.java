@@ -10,12 +10,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,14 +21,14 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
 @Slf4j
-public class ProductTypesController {
+public class AdminProductTypesController {
 
     private ProductTypeDao productTypeDao;
     private DataTypeDao dataTypeDao;
     private ProductCharacteristicDao productCharacteristicDao;
 
     @Autowired
-    public ProductTypesController(ProductTypeDao productTypeDao, DataTypeDao dataTypeDao, ProductCharacteristicDao productCharacteristicDao) {
+    public AdminProductTypesController(ProductTypeDao productTypeDao, DataTypeDao dataTypeDao, ProductCharacteristicDao productCharacteristicDao) {
         this.productTypeDao = productTypeDao;
         this.dataTypeDao = dataTypeDao;
         this.productCharacteristicDao = productCharacteristicDao;
@@ -43,28 +41,10 @@ public class ProductTypesController {
         return result;
     }
 
-    @RequestMapping(value = "/productTypes/all", method = RequestMethod.GET)
-    public List<Type> getAll() {
-        return productTypeDao.findAll().stream().map(productType -> {
-            Type type = new Type();
-            type.setId(productType.getProductTypeId());
-            type.setName(productType.getProductTypeName());
-            type.setDescription(productType.getProductTypeDescription());
-            type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
-                    .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
-                                                        item.getMeasure(), item.getDataTypeId()))
-                    .collect(Collectors.toList()));
-            return type;
-        }).collect(Collectors.toList());
-    }
-
     @RequestMapping(value = "productTypes/delete", method = RequestMethod.POST)
     public Map<String, String> deleteType(@RequestBody Map<String, Integer> productTypeId) {
         Map<String, String> result = new HashMap<>();
-        //TODO implement
-        log.info("Deleting product type with id " + productTypeId.get("id"));
-
-        //Change status to "error" and put appropriate message if needed
+        productTypeDao.delete(productTypeDao.find(productTypeId.get("id")));
         result.put("status", "success");
         result.put("message", "Product deleted successfully");
         return result;
@@ -87,10 +67,10 @@ public class ProductTypesController {
                 productType = productTypeDao.add(productType);
                 result.put("message", "Product successfully added");
             }
-            result.put("status", "success");
+
+            productType.setProductCharacteristics(new LinkedList<>());
 
             for (Characteristic c : type.getCharacteristics()) {
-                //TODO remove deleted characteristics from product
                 DataType dataType = dataTypeDao.find(c.getDataTypeId());
                 if (dataType == null) {
                     result.put("status", "error");
@@ -100,11 +80,7 @@ public class ProductTypesController {
 
                 ProductCharacteristic characteristic = new ProductCharacteristic();
                 characteristic.setCharacteristicName(c.getName());
-                /*
-                * TODO change it to dataType selected previously
-                * (productCharacteristic needs to hold link to productType instead of just id)
-                */
-                characteristic.setDataTypeId(c.getDataTypeId());
+                characteristic.setDataType(dataType);
                 characteristic.setMeasure(c.getMeasure());
                 characteristic.setProductTypeId(productType.getProductTypeId());
                 if (c.getId() < 0) {
@@ -113,11 +89,14 @@ public class ProductTypesController {
                     characteristic.setProductCharacteristicId(c.getId());
                     productCharacteristicDao.update(characteristic);
                 }
+                productType.getProductCharacteristics().add(characteristic);
             }
+            productTypeDao.update(productType);
 
+            result.put("status", "success");
+            result.put("id", productType.getProductTypeId().toString());
         } catch (DataAccessException exception) {
             result.put("status", "error");
-            //result.put("message", exception.getMessage());
             result.put("message", "Can not add info to database");
 
             return result;
