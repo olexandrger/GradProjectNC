@@ -73,7 +73,7 @@ public class CategoryTypeDao extends AbstractDao<CategoryType> {
     @Override
     public void delete(CategoryType entity) {
         executeUpdate(connection -> {
-            final String statement = "DELETE FROM status WHERE status_id = ?";
+            final String statement = "DELETE FROM category WHERE category_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
             preparedStatement.setLong(1, entity.getCategoryTypeId());
             return preparedStatement;

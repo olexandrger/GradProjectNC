@@ -114,7 +114,7 @@ public class ComplainDao extends AbstractDao<Complain> {
                             "content, " +
                             "response, " +
                             "open_date, " +
-                            "close_date, " +
+                            "close_date " +
                             "FROM complain " +
                             "WHERE complain_id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
@@ -136,7 +136,7 @@ public class ComplainDao extends AbstractDao<Complain> {
                             "content, " +
                             "response, " +
                             "open_date, " +
-                            "close_date, " +
+                            "close_date " +
                             "FROM complain";
 
             return connection.prepareStatement(statement);
@@ -167,7 +167,7 @@ public class ComplainDao extends AbstractDao<Complain> {
                             "content, " +
                             "response, " +
                             "open_date, " +
-                            "close_date, " +
+                            "close_date " +
                             "FROM complain " +
                             "INNER JOIN \"user\" " +
                             "ON complain.user_id=\"user\".user_id " +

@@ -87,7 +87,7 @@ public class LocationDao extends AbstractDao<Location> {
         return findOne(connection -> {
             final String FIND_QUERY = "SELECT " +
                     "l.location_id, " +
-                    "l.google_place_id, " +
+                    "l.google_place_id " +
                     "FROM location l " +
                     "WHERE l.location_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_QUERY);
@@ -103,7 +103,7 @@ public class LocationDao extends AbstractDao<Location> {
             final String FIND_QUERY =
                     "SELECT " +
                             "l.location_id, " +
-                            "l.google_place_id, " +
+                            "l.google_place_id " +
                             "FROM location l ";
             return connection.prepareStatement(FIND_QUERY);
         }, mapper);

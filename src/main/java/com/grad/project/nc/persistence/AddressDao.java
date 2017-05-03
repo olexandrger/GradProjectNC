@@ -36,7 +36,7 @@ public class AddressDao extends AbstractDao<Address> {
     @Transactional
     public Address add(Address address) {
         KeyHolder keyHolder = executeInsert(connection -> {
-            String query = "INSERT INTO address(address.apartment_number, address.location_id) VALUE (?, ?)";
+            String query = "INSERT INTO address(address.apartment_number, address.location_id) VALUES (?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, address.getApartmentNumber());
             preparedStatement.setLong(2, address.getLocation().getLocationId());
