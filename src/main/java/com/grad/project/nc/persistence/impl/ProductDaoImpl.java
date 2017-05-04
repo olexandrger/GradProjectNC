@@ -1,7 +1,9 @@
 package com.grad.project.nc.persistence.impl;
 
 import com.grad.project.nc.model.*;
+import com.grad.project.nc.model.proxy.ProductProxy;
 import com.grad.project.nc.persistence.*;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,14 +20,12 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
 
     private static final String PK_COLUMN_NAME = "product_id";
 
-    @Autowired
-    private ProductTypeDao productTypeDao;
-    @Autowired
-    private ProductCharacteristicValueDao productCharacteristicValueDao;
+    private final ObjectFactory<ProductProxy> proxyFactory;
 
     @Autowired
-    public ProductDaoImpl(JdbcTemplate jdbcTemplate) {
+    public ProductDaoImpl(JdbcTemplate jdbcTemplate, ObjectFactory<ProductProxy> proxyFactory) {
         super(jdbcTemplate);
+        this.proxyFactory = proxyFactory;
     }
 
     @Override
@@ -78,28 +78,6 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
     }
 
     @Override
-    public void deleteProductCharacteristicValues(Product product) {
-        String deleteQuery = "DELETE FROM \"product_characteristic_value\" WHERE \"product_id\"=?";
-        executeUpdate(deleteQuery, product.getProductId());
-    }
-
-    @Override
-    public void saveProductCharacteristicValues(Product product) {
-        deleteProductCharacteristicValues(product);
-
-        String insertQuery = "INSERT INTO \"product_characteristic_value\" (\"product_id\", " +
-                "\"product_characteristic_id\", \"number_value\", \"date_value\", \"string_value\") " +
-                "VALUES (?, ?, ?, ?, ?)";
-
-        List<Object[]> batchArgs = new ArrayList<>();
-        for (ProductCharacteristicValue value : product.getProductCharacteristicValues()) {
-            batchArgs.add(new Object[]{product.getProductId(), value.getProductCharacteristicId(),
-                    value.getNumberValue(), value.getDateValue(), value.getStringValue()});
-        }
-        batchUpdate(insertQuery, batchArgs);
-    }
-
-    @Override
     public List<Product> findProductsByRegion(Region region) {
         String findProductByRegionQuery = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
                 "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
@@ -137,40 +115,11 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
         return findOne(query, new ProductRowMapper(), productRegionPrice.getPriceId());
     }
 
-    private class ProductProxy extends Product {
-        private Long productTypeId;
-
-        public Long getProductTypeId() {
-            return productTypeId;
-        }
-
-        public void setProductTypeId(Long productTypeId) {
-            this.productTypeId = productTypeId;
-        }
-
-        @Override
-        public ProductType getProductType() {
-            if (super.getProductType() == null) {
-                super.setProductType(productTypeDao.find(productTypeId));
-            }
-            return super.getProductType();
-        }
-
-        @Override
-        public List<ProductCharacteristicValue> getProductCharacteristicValues() {
-            if (super.getProductCharacteristicValues() == null) {
-                super.setProductCharacteristicValues(productCharacteristicValueDao.findByProductId(getProductId()));
-            }
-
-            return super.getProductCharacteristicValues();
-        }
-    }
-
     private class ProductRowMapper implements RowMapper<Product> {
 
         @Override
         public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
-            ProductProxy product = new ProductProxy();
+            ProductProxy product = proxyFactory.getObject();
 
             product.setProductId(rs.getLong("product_id"));
             product.setName(rs.getString("product_name"));

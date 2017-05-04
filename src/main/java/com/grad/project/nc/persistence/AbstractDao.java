@@ -70,8 +70,8 @@ public abstract class AbstractDao<T> implements CrudDao<T>{
         return result.get(0);
     }
 
-    protected T findOne(String query, RowMapper<T> mapper, Object... params) {
-        List<T> result = jdbcTemplate.query(query, mapper, params);
+    protected <K> K findOne(String query, RowMapper<K> mapper, Object... params) {
+        List<K> result = jdbcTemplate.query(query, mapper, params);
 
         if (result.size() > 1) {
             throw new NonUniqueResultException();
@@ -86,11 +86,11 @@ public abstract class AbstractDao<T> implements CrudDao<T>{
         return jdbcTemplate.query(statementCreator, mapper);
     }
 
-    protected List<T> query(String sql, RowMapper<T> rowMapper) {
+    protected <E> List<E> query(String sql, RowMapper<E> rowMapper) {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    protected List<T> query(String sql, RowMapper<T> rowMapper, Object... params) {
+    protected <E> List<E> query(String sql, RowMapper<E> rowMapper, Object... params) {
         return jdbcTemplate.query(sql, rowMapper, params);
     }
 

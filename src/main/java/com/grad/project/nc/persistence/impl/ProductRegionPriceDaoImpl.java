@@ -3,8 +3,10 @@ package com.grad.project.nc.persistence.impl;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
-import com.grad.project.nc.model.Region;
-import com.grad.project.nc.persistence.*;
+import com.grad.project.nc.model.proxy.ProductRegionPriceProxy;
+import com.grad.project.nc.persistence.AbstractDao;
+import com.grad.project.nc.persistence.ProductRegionPriceDao;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,34 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
- * created by DeniG on 5/01/2017.
+ * created by DeniG on 5/01/2017. edited by Pavlo Rospopa
  */
 @Repository
 public class ProductRegionPriceDaoImpl extends AbstractDao<ProductRegionPrice> implements ProductRegionPriceDao {
 
     private static final String PK_COLUMN_NAME = "price_id";
 
-    private DiscountDao discountDao;
-    private ProductDao productDao;
-    private RegionDao regionDao;
+    private final ObjectFactory<ProductRegionPriceProxy> proxyFactory;
 
     @Autowired
-    public ProductRegionPriceDaoImpl(JdbcTemplate jdbcTemplate, /*  DiscountDao discountDao, ProductDao productDao, */RegionDao regionDao) {
+    public ProductRegionPriceDaoImpl(JdbcTemplate jdbcTemplate, ObjectFactory<ProductRegionPriceProxy> proxyFactory) {
         super(jdbcTemplate);
-        //this.discountDao = discountDao;
-        this.regionDao = regionDao;
-
-    }
-
-    public void setProductDao(ProductDao productDao) {
-        this.productDao = productDao;
-    }
-    public void setDiscountDao(DiscountDao discountDao) {
-        this.discountDao = discountDao;
+        this.proxyFactory = proxyFactory;
     }
 
     @Override
@@ -145,58 +135,10 @@ public class ProductRegionPriceDaoImpl extends AbstractDao<ProductRegionPrice> i
         return query(query, new ProductRegionPriceRowMapper(), product.getProductId());
     }
 
-
-    private class ProductRegionPriceProxy extends ProductRegionPrice {
-
-        private Long productId;
-        private Long regionId;
-
-        public Long getProductId() {
-            return productId;
-        }
-
-        public void setProductId(Long productId) {
-            this.productId = productId;
-        }
-
-        public Long getRegionId() {
-            return regionId;
-        }
-
-        public void setRegionId(Long regionId) {
-            this.regionId = regionId;
-        }
-
-        @Override
-        public Product getProduct() {
-            if (super.getProduct() == null) {
-                super.setProduct(productDao.find(getProductId()));
-            }
-            return super.getProduct();
-        }
-
-        @Override
-        public Region getRegion() {
-            if (super.getRegion() == null) {
-                super.setRegion(regionDao.find(getRegionId()));
-            }
-            return super.getRegion();
-        }
-
-        @Override
-        public Collection<Discount> getDiscounts() {
-            if (super.getDiscounts() == null) {
-                super.setDiscounts(discountDao.findByProductRegionPrise(this));
-            }
-            return super.getDiscounts();
-        }
-    }
-
-
     private final class ProductRegionPriceRowMapper implements RowMapper<ProductRegionPrice> {
         @Override
         public ProductRegionPrice mapRow(ResultSet rs, int rowNum) throws SQLException {
-            ProductRegionPriceProxy productRegionPrice = new ProductRegionPriceProxy();
+            ProductRegionPriceProxy productRegionPrice = proxyFactory.getObject();
 
             productRegionPrice.setPriceId(rs.getLong("price_id"));
             productRegionPrice.setProductId(rs.getLong("product_id"));

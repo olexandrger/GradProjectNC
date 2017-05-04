@@ -1,9 +1,10 @@
 package com.grad.project.nc.persistence.impl;
 
-import com.grad.project.nc.model.*;
+import com.grad.project.nc.model.Category;
+import com.grad.project.nc.model.proxy.CategoryProxy;
 import com.grad.project.nc.persistence.AbstractDao;
 import com.grad.project.nc.persistence.CategoryDao;
-import com.grad.project.nc.persistence.CategoryTypeDao;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -22,12 +23,12 @@ public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDa
 
     private static final String PK_COLUMN_NAME = "category_id";
 
-    @Autowired
-    private CategoryTypeDao categoryTypeDao;
+    private final ObjectFactory<CategoryProxy> proxyFactory;
 
     @Autowired
-    public CategoryDaoImpl(JdbcTemplate jdbcTemplate) {
+    public CategoryDaoImpl(JdbcTemplate jdbcTemplate, ObjectFactory<CategoryProxy> proxyFactory) {
         super(jdbcTemplate);
+        this.proxyFactory = proxyFactory;
     }
 
     @Override
@@ -137,30 +138,10 @@ public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDa
         return findOne(query, new CategoryRowMapper(), domainId);
     }
 
-    private class CategoryProxy extends Category {
-        private Long categoryTypeId;
-
-        public Long getCategoryTypeId() {
-            return categoryTypeId;
-        }
-
-        public void setCategoryTypeId(Long categoryTypeId) {
-            this.categoryTypeId = categoryTypeId;
-        }
-
-        @Override
-        public CategoryType getCategoryType() {
-            if (super.getCategoryType() == null) {
-                super.setCategoryType(categoryTypeDao.find(categoryTypeId));
-            }
-            return super.getCategoryType();
-        }
-    }
-
     private class CategoryRowMapper implements RowMapper<Category> {
         @Override
         public Category mapRow(ResultSet resultSet, int i) throws SQLException {
-            CategoryProxy category = new CategoryProxy();
+            CategoryProxy category = proxyFactory.getObject();
             category.setCategoryId(resultSet.getLong("category_id"));
             category.setCategoryName(resultSet.getString("category_name"));
             category.setCategoryTypeId(resultSet.getLong("category_type_id"));

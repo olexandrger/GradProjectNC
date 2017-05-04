@@ -9,11 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface ProductDao extends CrudDao<Product> {
-    void deleteProductCharacteristicValues(Product product);
-
-    @Transactional
-    void saveProductCharacteristicValues(Product product);
-
     List<Product> findProductsByRegion(Region region);
 
     Product findByName(String productName);

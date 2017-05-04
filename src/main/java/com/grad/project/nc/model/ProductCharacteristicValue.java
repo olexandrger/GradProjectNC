@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class ProductCharacteristicValue {
-    private Long productId;
-    private Long productCharacteristicId;
+    private Product product;
+    private ProductCharacteristic productCharacteristic;
     private Number numberValue;
     private LocalDateTime dateValue;
     private String stringValue;
