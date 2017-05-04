@@ -1,5 +1,6 @@
 package com.grad.project.nc.model.proxy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
@@ -48,6 +49,7 @@ public class ProductRegionPriceProxy extends ProductRegionPrice {
     }
 
     @Override
+    @JsonIgnore
     public Product getProduct() {
         if (super.getProduct() == null) {
             super.setProduct(productDao.find(getProductId()));

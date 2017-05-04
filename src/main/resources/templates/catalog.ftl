@@ -27,35 +27,66 @@
 <#include "resources/navbar.ftl"/>
 <#include "resources/catalogBar.ftl"/>
 
-<div class="row" style="margin-top: 10px;">
+    <div class="row" style="margin-top: 10px;">
 
-    <div class="col-sm-4">
-        <div class="list-group" id="catalog-products-list">
+        <div class="col-sm-4">
+            <div class="list-group" id="catalog-products-list">
+            </div>
         </div>
+
+        <div class="col-sm-8 hidden" id="catalog-main-info">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h2 id="catalog-product-name">Product name here</h2>
+                    <p id="catalog-product-description">Product description here</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-bordered" id="catalog-table-details">
+                        <tr><th colspan="2">Details</th></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <a class="btn btn-primary active hidden" onclick="catalogCreateOrder()"  id="catalog-new-order-button">Order</a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="col-sm-8 hidden" id="catalog-main-info">
-        <div class="row">
-            <div class="col-sm-12">
-                <h2 id="catalog-product-name">Product name here</h2>
-                <p id="catalog-product-description">Product description here</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <table class="table table-bordered" id="catalog-table-details">
-                    <tr><th colspan="2">Details</th></tr>
-                </table>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <a class="btn btn-primary active">Order</a>
+    <div class="modal fade" id="new-product-order-modal" tabindex="-1" role="dialog" aria-labelledby="Order modal" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" align="center">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                    <h1>Create order</h1>
+                    <div id="catalog-order-alert"></div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="catalog-domain-selector" class="radio">Select domain
+                            <select class="form-control" id="catalog-domain-selector" onchange="catalogChangeDomain(this.options[this.selectedIndex].value)">
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label for="catalog-price-field" class="radio">Price</label>
+                            <input type="text" class="form-control" name="price" id="catalog-price-field" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="new-product-order-modal-submit" class="btn btn-primary btn-lg btn-block" onclick="catalogSubmitOrder()">Create</button>
+                </div>
             </div>
         </div>
     </div>
-
-</div>
 
 </div>
 </body>

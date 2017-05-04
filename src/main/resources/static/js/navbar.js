@@ -34,6 +34,7 @@ function displayAuthenticatedNavigationBar(data) {
     var ref = document.createElement("a");
     ref.appendChild(document.createTextNode("Logout"));
     ref.onclick = logout;
+    ref.href = "#";
     var li = document.createElement("li");
     li.appendChild(ref);
     list.append(li);
@@ -41,6 +42,9 @@ function displayAuthenticatedNavigationBar(data) {
     account.removeClass("hidden");
     $("#navbar-login-button").addClass("hidden");
     $("#navbar-registration-button").addClass("hidden");
+
+
+    $(document).trigger("account-loaded");
 }
 
 function getAccountInformation() {
@@ -127,7 +131,7 @@ function register() {
     var lastName = form.find('input[name="lastName"]').val();
     var email = form.find('input[name="email"]').val();
     var password = form.find('input[name="password"]').val();
-    var repeatPassword = form.find('input[name="repeatPassword"]').val();
+    // var repeatPassword = form.find('input[name="repeatPassword"]').val();
     var phone = form.find('input[name="phone"]').val();
 
     var _csrf = $('meta[name=_csrf]').attr("content");
@@ -176,12 +180,12 @@ function selectRegion(region) {
     selectedRegion.append($("<span class='caret'></span>"));
     localStorage.setItem("regionId", region.regionId);
 
-    console.log("region changed");
+    // console.log("region changed");
     $(document).trigger("region-changed");
 }
 
 
-$(document).on("region-changed", function() {console.log("Same file works")});
+// $(document).on("region-changed", function() {console.log("Same file works")});
 
 function loadNavbarRegions() {
     $.ajax({

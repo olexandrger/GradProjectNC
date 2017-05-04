@@ -15,5 +15,5 @@ public interface ProductRegionPriceDao extends CrudDao<ProductRegionPrice> {
 
     void addBatch(List<ProductRegionPrice> prices);
 
-    List<ProductRegionPrice> getPricesByProduct(Product product);
+    List<ProductRegionPrice> getPricesByProductId(Long productId);
 }

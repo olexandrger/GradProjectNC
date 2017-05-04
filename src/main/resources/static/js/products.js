@@ -126,7 +126,7 @@ function selectProduct(x) {
 
         if (productsData[currentSelected].productType != undefined) {
             typeSelector.val(productsData[currentSelected].productType.productTypeId);
-            typeSelector.prop( "disabled", productsData[currentSelected].productId > 0);
+            typeSelector.prop("disabled", productsData[currentSelected].productId > 0);
             changeCharacteristics();
         }
         if (productsData[currentSelected].description != undefined) {

@@ -89,7 +89,7 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
     @Override
     public void delete(ProductType entity)  {
 
-        Collection<ProductCharacteristic> characteristics = productCharacteristicDao.findCharacteristicsByProductType(entity);
+        Collection<ProductCharacteristic> characteristics = productCharacteristicDao.findCharacteristicsByProductTypeId(entity.getProductTypeId());
 
         characteristics.forEach(item -> {
             productCharacteristicDao.delete(item);
@@ -163,7 +163,7 @@ public class ProductTypeDao extends AbstractDao<ProductType> {
         @Override
         public List<ProductCharacteristic> getProductCharacteristics() {
             if (super.getProductCharacteristics() == null){
-                super.setProductCharacteristics(new LinkedList<>(productCharacteristicDao.findCharacteristicsByProductType(this)));
+                super.setProductCharacteristics(new LinkedList<>(productCharacteristicDao.findCharacteristicsByProductTypeId(getProductTypeId())));
             }
 
             return super.getProductCharacteristics();

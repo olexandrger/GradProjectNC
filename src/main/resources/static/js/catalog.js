@@ -4,12 +4,9 @@ var catalogSelectedItem = -1;
 var catalogSelectedCategory = decodeURIComponent(window.location.search.substr(1));
 var catalogCharacteristics = {};
 
-function getCharacteristicStringValue(characteristic, dataType) {
-    // console.log(characteristic);
-    // console.log(dataType);
-    //
-    // return "FUCK THIS SHIT";
+var catalogDomains;
 
+function getCharacteristicStringValue(characteristic, dataType) {
     if (dataType == "NUMBER") {
         return characteristic.numberValue;
     }
@@ -18,7 +15,6 @@ function getCharacteristicStringValue(characteristic, dataType) {
         return characteristic.stringValue;
 
     if (dataType == "DATE") {
-        // return new Date(characteristic[0], characteristic[1], characteristic[2], characteristic[3], characteristic[4], characteristic[5], 0);
         var date = characteristic.dateValue;
         function addNumber(number) {
             var result = "";
@@ -31,13 +27,13 @@ function getCharacteristicStringValue(characteristic, dataType) {
     }
 }
 
-function getRegionalPrice() {
-    var price = "Error while searching for price";
+function getRegionalPrice(regionId) {
+    var price = "";
 
-    var selectedRegion = localStorage.getItem("regionId");
+    // var selectedRegion = localStorage.getItem("regionId");
 
     catalogProducts[catalogSelectedItem].prices.forEach(function(item) {
-        if (item.region.regionId == selectedRegion)
+        if (item.region.regionId == regionId)
             price = item.price;
     });
 
@@ -77,7 +73,7 @@ function selectCatalogProduct(index) {
     });
 
     var html = '<tr class="table-row"><td>Price</td><td>' +
-        getRegionalPrice() +
+        getRegionalPrice(localStorage.getItem("regionId")) +
         '</td></tr>';
     table.append($(html));
 }
@@ -103,7 +99,7 @@ function updateCatalog() {
 }
 
 function loadCatalogData() {
-    console.log("trigger works");
+    // console.log("trigger works");
     $.ajax({
         url: "/api/user/products/byRegion/" + localStorage.getItem("regionId"),
         success: function(data) {
@@ -116,4 +112,64 @@ function loadCatalogData() {
     });
 }
 
+function loadDomainsData() {
+    $.ajax({
+        url: "/api/client/domains/get/all",
+        success: function(data) {
+            var select = $("#catalog-domain-selector");
+            select.empty();
+
+            catalogDomains = {};
+            data.forEach(function (domain) {
+                catalogDomains[domain.domainId] = domain;
+
+                var option = document.createElement("option");
+                option.text = domain.domainName;
+                option.value = domain.domainId;
+                select.append(option);
+            });
+
+            //TODO maybe add message
+            if (data.length > 0) {
+                $("#catalog-new-order-button").removeClass("hidden");
+            }
+        },
+        error: function () {
+            console.error("Cannot load list of domains");
+        }
+    });
+}
+
+function catalogChangeDomain(domainId) {
+    // console.log(catalogDomains[domainId]);
+    // $('#new-product-order-modal-submit').removeClass("disabled");
+    //TODO display address
+
+    var price = getRegionalPrice(catalogDomains[domainId].regionId);
+    if (price == "") {
+        price = "Product unavailable in this region";
+        $('#new-product-order-modal-submit').addClass("disabled");
+    } else {
+        $('#new-product-order-modal-submit').removeClass("disabled");
+    }
+
+    // $('#new-product-order-modal-submit').addClass("disabled");
+    $('#catalog-price-field').val(price);
+}
+
+function catalogSubmitOrder() {
+    console.log("Creating order for product " +
+        catalogProducts[catalogSelectedItem].name +
+        " at domain " +
+        catalogDomains[$("#catalog-domain-selector").val()[0]].domainName);
+}
+
+function catalogCreateOrder() {
+    $('#new-product-order-modal').modal('toggle');
+    $('#new-product-order-modal-submit').addClass("disabled");
+    $("#catalog-domain-selector").val([]);
+    $('#catalog-price-field').val("")
+}
+
+$(document).on("account-loaded", loadDomainsData);
 $(document).on("region-changed", loadCatalogData);

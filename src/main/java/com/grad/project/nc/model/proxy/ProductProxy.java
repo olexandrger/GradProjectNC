@@ -1,9 +1,9 @@
 package com.grad.project.nc.model.proxy;
 
-import com.grad.project.nc.model.Product;
-import com.grad.project.nc.model.ProductCharacteristicValue;
-import com.grad.project.nc.model.ProductType;
+import com.grad.project.nc.model.*;
+import com.grad.project.nc.persistence.ProductCharacteristicDao;
 import com.grad.project.nc.persistence.ProductCharacteristicValueDao;
+import com.grad.project.nc.persistence.ProductRegionPriceDao;
 import com.grad.project.nc.persistence.ProductTypeDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -17,13 +17,18 @@ public class ProductProxy extends Product {
 
     private final ProductTypeDao productTypeDao;
     private final ProductCharacteristicValueDao productCharacteristicValueDao;
+    private final ProductCharacteristicDao productCharacteristicDao;
+    private final ProductRegionPriceDao productRegionPriceDao;
 
     private Long productTypeId;
 
     @Autowired
-    public ProductProxy(ProductCharacteristicValueDao productCharacteristicValueDao, ProductTypeDao productTypeDao) {
+    public ProductProxy(ProductCharacteristicValueDao productCharacteristicValueDao, ProductTypeDao productTypeDao,
+                        ProductCharacteristicDao productCharacteristicDao, ProductRegionPriceDao productRegionPriceDao) {
         this.productCharacteristicValueDao = productCharacteristicValueDao;
         this.productTypeDao = productTypeDao;
+        this.productCharacteristicDao = productCharacteristicDao;
+        this.productRegionPriceDao = productRegionPriceDao;
     }
 
     public Long getProductTypeId() {
@@ -49,5 +54,23 @@ public class ProductProxy extends Product {
         }
 
         return super.getProductCharacteristicValues();
+    }
+
+    @Override
+    public List<ProductCharacteristic> getProductCharacteristics() {
+        if (super.getProductCharacteristics() == null) {
+            super.setProductCharacteristics(productCharacteristicDao.findByProductTypeId(getProductTypeId()));
+        }
+
+        return super.getProductCharacteristics();
+    }
+
+    @Override
+    public List<ProductRegionPrice> getPrices() {
+        if (super.getPrices() == null) {
+            super.setPrices(productRegionPriceDao.getPricesByProductId(getProductId()));
+        }
+
+        return super.getPrices();
     }
 }

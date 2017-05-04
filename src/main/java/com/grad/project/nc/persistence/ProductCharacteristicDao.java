@@ -144,18 +144,22 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
 
     }
 
-    public List<ProductCharacteristic> findCharacteristicsByProductType(ProductType entity) {
+    public List<ProductCharacteristic> findCharacteristicsByProductTypeId(Long id) {
         final String QUERY = "SELECT product_characteristic_id" +
                 ",product_type_id" +
                 ", characteristic_name , measure , data_type_id " +
                 "FROM product_characteristic WHERE product_type_id = ?" ;
-        return jdbcTemplate.query(QUERY,new Object[]{entity.getProductTypeId()}, new ProductCharacteristicRowMapper());
+        return jdbcTemplate.query(QUERY,new Object[]{id}, new ProductCharacteristicRowMapper());
     }
-
+/*
     public List<ProductCharacteristic> findByProductId(Long id) {
-        return null;
+        final String QUERY = "SELECT product_characteristic_id" +
+            ",product_type_id" +
+            ", characteristic_name , measure , data_type_id " +
+            "FROM product_characteristic WHERE product_type_id = ?" ;
+        return jdbcTemplate.query(QUERY,new Object[]{id}, new ProductCharacteristicRowMapper());
     }
-
+*/
 
     private final class ProductCharacteristicRowMapper implements RowMapper<ProductCharacteristic> {
         @Override

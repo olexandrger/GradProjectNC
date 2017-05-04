@@ -6,7 +6,9 @@ var selected = -1;
 
 function addProductType() {
     var list = $("#product-types-list");
-    var name = $("#new-product-type-name").val();
+    var nameInput = $("#new-product-type-name");
+    var name = nameInput.val();
+    nameInput.val("");
 
     if (name != "") {
         var id = -(++numberOfAdded);

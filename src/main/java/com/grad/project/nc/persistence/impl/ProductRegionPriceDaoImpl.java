@@ -127,12 +127,12 @@ public class ProductRegionPriceDaoImpl extends AbstractDao<ProductRegionPrice> i
     }
 
     @Override
-    public List<ProductRegionPrice> getPricesByProduct(Product product) {
-        String query = "SELECT prp.\"price_id, prp.\"product_id\", prp.\"region_id\", prp.\"price\" " +
+    public List<ProductRegionPrice> getPricesByProductId(Long productId) {
+        String query = "SELECT prp.\"price_id\", prp.\"product_id\", prp.\"region_id\", prp.\"price\" " +
                 "FROM \"product_region_price\" prp " +
                 "WHERE prp.\"product_id\"=?";
 
-        return query(query, new ProductRegionPriceRowMapper(), product.getProductId());
+        return query(query, new ProductRegionPriceRowMapper(), productId);
     }
 
     private final class ProductRegionPriceRowMapper implements RowMapper<ProductRegionPrice> {

@@ -108,10 +108,10 @@
                         <label for="password">Password</label>
                         <input type="password" class="form-control" name="password" placeholder="Password">
                     </div>
-                    <div class="form-group">
-                        <label for="repeatPassword">Repeat password</label>
-                        <input type="password" class="form-control" name="repeatPassword" placeholder="Repeat password">
-                    </div>
+                    <#--<div class="form-group">-->
+                        <#--<label for="repeatPassword">Repeat password</label>-->
+                        <#--<input type="password" class="form-control" name="repeatPassword" placeholder="Repeat password">-->
+                    <#--</div>-->
                     <div class="form-group">
                         <label for="phone">Phone</label>
                         <input type="text" class="form-control" name="phone" placeholder="Phone">
