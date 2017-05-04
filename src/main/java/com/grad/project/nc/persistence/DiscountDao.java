@@ -24,7 +24,7 @@ import java.util.List;
 @Repository
 public class DiscountDao extends AbstractDao<Discount> {
 
-    private ProductRegionPriceDaoImpl productRegionPriceDao;
+    private ProductRegionPriceDao productRegionPriceDao;
 
     private DiscountRowMapper mapper = new DiscountRowMapper();
 
