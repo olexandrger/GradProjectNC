@@ -115,7 +115,7 @@ function saveSelected() {
 
                 $.ajax({
                     type: 'GET',
-                    url: '/api/admin/productTypes/get/' + data.id,
+                    url: '/api/user/productTypes/get/' + data.id,
                     success: function (data) {
                         console.log("Update after saving successful");
                         console.log("Set name " + data.name);
@@ -235,7 +235,7 @@ function selectItem(x) {
 
 function loadInfo() {
     $.ajax({
-        url: "/api/admin/dataTypes",
+        url: "/api/user/dataTypes",
         success: function (data) {
             dataTypeData = data;
             loadProductTypes();
@@ -248,7 +248,7 @@ function loadInfo() {
 
 function loadProductTypes() {
     $.ajax({
-        url: "/api/admin/productTypes/all ",
+        url: "/api/user/productTypes/all ",
         success: function(data) {
         var list = $("#product-types-list");
 

@@ -91,7 +91,7 @@ public class DataTypeDao extends AbstractDao<DataType> {
     @Transactional
     @Override
     public List<DataType> findAll() {
-        String findAllQuery = "SELECT \"data_type_id\", \"data_type\", FROM \"data_type\"";
+        String findAllQuery = "SELECT \"data_type_id\", \"data_type\" FROM \"data_type\"";
 
         return query(findAllQuery, new DataTypeRowMapper());
 

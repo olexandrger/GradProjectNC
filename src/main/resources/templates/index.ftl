@@ -15,7 +15,6 @@
 
 
     <link rel="stylesheet" href="/css/main.css">
-    <script src="/js/navbar.js"></script>
     <script src="/js/mainPage.js"></script>
 </head>
 <body>
@@ -23,6 +22,7 @@
 <div class="container">
 
     <#include "resources/navbar.ftl"/>
+    <#include "resources/catalogBar.ftl"/>
 
     <div class="row">
         <div class="col-md-4 col-md-offset-4">

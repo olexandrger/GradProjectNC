@@ -15,7 +15,6 @@
 
 
     <link rel="stylesheet" href="/css/main.css">
-    <script src="/js/navbar.js"></script>
     <script src="/js/contactsPage.js"></script>
 </head>
 <body>

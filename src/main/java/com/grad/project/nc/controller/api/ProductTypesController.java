@@ -1,7 +1,5 @@
 package com.grad.project.nc.controller.api;
 
-import com.grad.project.nc.model.DataType;
-import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.persistence.DataTypeDao;
 import com.grad.project.nc.persistence.ProductCharacteristicDao;
@@ -11,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -47,7 +44,7 @@ public class ProductTypesController {
         type.setId(pt.getProductTypeId());
         type.setName(pt.getProductTypeName());
         type.setDescription(pt.getProductTypeDescription());
-        type.setCharacteristics(productCharacteristicDao.findByProductId(type.getId()).stream()
+        type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
                 .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
                         item.getMeasure(), item.getDataType().getDataTypeId()))
                 .collect(Collectors.toList()));
@@ -61,7 +58,7 @@ public class ProductTypesController {
             type.setId(productType.getProductTypeId());
             type.setName(productType.getProductTypeName());
             type.setDescription(productType.getProductTypeDescription());
-            type.setCharacteristics(productCharacteristicDao.findByProductId(type.getId()).stream()
+            type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
                     .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
                                                         item.getMeasure(), item.getDataType().getDataTypeId()))
                     .collect(Collectors.toList()));

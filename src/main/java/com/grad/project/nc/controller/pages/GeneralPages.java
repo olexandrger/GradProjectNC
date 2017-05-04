@@ -23,4 +23,9 @@ public class GeneralPages {
     public String contacts() {
         return "contacts";
     }
+
+    @RequestMapping("/catalog")
+    public String catalog() {
+        return "catalog";
+    }
 }

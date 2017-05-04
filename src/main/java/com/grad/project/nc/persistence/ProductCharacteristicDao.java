@@ -122,7 +122,6 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
     }
 
     public List<ProductCharacteristic> findByProductTypeId(Long productTypeId){
-
         final String SELECT_QUERY = "SELECT pch.product_characteristic_id" +
                 ",pch.product_type_id" +
                 ",pch.characteristic_name" +
@@ -145,7 +144,7 @@ public class ProductCharacteristicDao implements CrudDao<ProductCharacteristic> 
 
     }
 
-    public Collection<ProductCharacteristic> findCharacteristicsByProductType(ProductType entity) {
+    public List<ProductCharacteristic> findCharacteristicsByProductType(ProductType entity) {
         final String QUERY = "SELECT product_characteristic_id" +
                 ",product_type_id" +
                 ", characteristic_name , measure , data_type_id " +
