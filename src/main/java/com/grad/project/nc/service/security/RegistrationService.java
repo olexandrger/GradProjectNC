@@ -1,7 +1,6 @@
 package com.grad.project.nc.service.security;
 
 import com.grad.project.nc.model.User;
-import com.grad.project.nc.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -12,6 +11,11 @@ import java.util.Collections;
 public class RegistrationService {
     private final String INVALID_EMAIL = "Invalid email address";
     private final String EMAIL_ALREADY_EXISTS = "Email already exists";
+    private final String FIRST_NAME_IS_EMPTY = "First name is empty";
+    private final String LAST_NAME_IS_EMPTY = "Last name is empty";
+    private final String EMAIL_IS_EMPTY = "Email name is empty";
+    private final String PASSWORD_IS_EMPTY = "Password name is empty";
+    private final String PHONE_IS_EMPTY = "Phone name is empty";
 
     private final String SUCCESS = "success";
     private final String ERROR = "error";
@@ -23,6 +27,31 @@ public class RegistrationService {
     private UserService userService;
 
     public boolean register(User user) {
+        if (user.getFirstName().isEmpty()) {
+            status = ERROR;
+            messageError = FIRST_NAME_IS_EMPTY;
+            return false;
+        }
+        if (user.getLastName().isEmpty()) {
+            status = ERROR;
+            messageError = LAST_NAME_IS_EMPTY;
+            return false;
+        }
+        if (user.getEmail().isEmpty()) {
+            status = ERROR;
+            messageError = EMAIL_IS_EMPTY;
+            return false;
+        }
+        if (user.getPassword().isEmpty()) {
+            status = ERROR;
+            messageError = PASSWORD_IS_EMPTY;
+            return false;
+        }
+        if (user.getPhoneNumber().isEmpty()) {
+            status = ERROR;
+            messageError = PHONE_IS_EMPTY;
+            return false;
+        }
         if (!isEmailValid(user.getEmail())) {
             status = ERROR;
             messageError = INVALID_EMAIL;
