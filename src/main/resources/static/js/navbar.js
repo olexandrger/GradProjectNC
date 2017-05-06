@@ -149,7 +149,7 @@ function register() {
             lastName: lastName,
             email: email,
             password: password,
-            phone: phone
+            phoneNumber: phone
         }),
         success: function (data) {
             var alert;

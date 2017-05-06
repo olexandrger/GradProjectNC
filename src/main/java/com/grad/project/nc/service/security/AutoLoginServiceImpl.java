@@ -22,10 +22,6 @@ public class AutoLoginServiceImpl implements AutoLoginService {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
 
-        authenticationManager.authenticate(authenticationToken);
-
-        if (authenticationToken.isAuthenticated()) {
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        }
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 }

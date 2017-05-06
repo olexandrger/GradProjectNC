@@ -13,9 +13,9 @@ public class RegistrationService {
     private final String EMAIL_ALREADY_EXISTS = "Email already exists";
     private final String FIRST_NAME_IS_EMPTY = "First name is empty";
     private final String LAST_NAME_IS_EMPTY = "Last name is empty";
-    private final String EMAIL_IS_EMPTY = "Email name is empty";
-    private final String PASSWORD_IS_EMPTY = "Password name is empty";
-    private final String PHONE_IS_EMPTY = "Phone name is empty";
+    private final String EMAIL_IS_EMPTY = "Email is empty";
+    private final String PASSWORD_IS_EMPTY = "Password is empty";
+    private final String PHONE_IS_EMPTY = "Phone is empty";
 
     private final String SUCCESS = "success";
     private final String ERROR = "error";
