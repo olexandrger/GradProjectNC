@@ -24,34 +24,34 @@
     <#include "resources/navbar.ftl"/>
     <#include "resources/catalogBar.ftl"/>
 
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
+    <#--<div class="row">-->
+        <#--<div class="col-md-4 col-md-offset-4">-->
 
-            <div id="mainCarousel" class="carousel slide" data-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="item active">
-                        <h2>This is first box</h2>
-                        <p>Product description here</p>
-                    </div>
-                    <div class="item">
-                        <h2>This is second box</h2>
-                        <p>Product description here</p>
-                    </div>
-                    <div class="item">
-                        <h2>This is third box</h2>
-                        <p>Product description here</p>
-                    </div>
-                </div>
+            <#--<div id="mainCarousel" class="carousel slide" data-ride="carousel">-->
+                <#--<div class="carousel-inner">-->
+                    <#--<div class="item active">-->
+                        <#--<h2>This is first box</h2>-->
+                        <#--<p>Product description here</p>-->
+                    <#--</div>-->
+                    <#--<div class="item">-->
+                        <#--<h2>This is second box</h2>-->
+                        <#--<p>Product description here</p>-->
+                    <#--</div>-->
+                    <#--<div class="item">-->
+                        <#--<h2>This is third box</h2>-->
+                        <#--<p>Product description here</p>-->
+                    <#--</div>-->
+                <#--</div>-->
 
-                <ol class="carousel-indicators">
-                    <li data-target="#mainCarousel" data-slide-to="0" class="active"></li>
-                    <li data-target="#mainCarousel" data-slide-to="1"></li>
-                    <li data-target="#mainCarousel" data-slide-to="2"></li>
-                </ol>
-            </div>
-        </div>
-        <div class="col-md-4"></div>
-    </div>
+                <#--<ol class="carousel-indicators">-->
+                    <#--<li data-target="#mainCarousel" data-slide-to="0" class="active"></li>-->
+                    <#--<li data-target="#mainCarousel" data-slide-to="1"></li>-->
+                    <#--<li data-target="#mainCarousel" data-slide-to="2"></li>-->
+                <#--</ol>-->
+            <#--</div>-->
+        <#--</div>-->
+        <#--<div class="col-md-4"></div>-->
+    <#--</div>-->
 </div>
 
 </body>

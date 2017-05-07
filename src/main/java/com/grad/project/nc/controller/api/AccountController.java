@@ -48,6 +48,10 @@ public class AccountController {
                 profileLinks.add(new Link("Edit products", "/admin/products"));
             }
 
+            if (user.getRoles().add(roleDao.getRoleByName("ROLE_CSR"))) {
+                profileLinks.add(new Link("Orders", "/csr/orders"));
+            }
+
             result.put("profileLinks", profileLinks);
         } else {
             result.put("authenticated", "false");

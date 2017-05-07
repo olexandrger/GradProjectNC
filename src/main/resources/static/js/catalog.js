@@ -158,10 +158,38 @@ function catalogChangeDomain(domainId) {
 }
 
 function catalogSubmitOrder() {
+
+    var selectedDomainIndex = $("#catalog-domain-selector").val()[0];
+
     console.log("Creating order for product " +
         catalogProducts[catalogSelectedItem].name +
         " at domain " +
-        catalogDomains[$("#catalog-domain-selector").val()[0]].domainName);
+        catalogDomains[selectedDomainIndex].domainName);
+
+    $.ajax({
+        url: "/api/client/orders/new/create",
+        method: "POST",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        contentType: 'application/json',
+        data: JSON.stringify({
+            productId: catalogProducts[catalogSelectedItem].productId,
+            domainId: catalogDomains[selectedDomainIndex].domainId
+        }),
+        success: function(data) {
+            if (data.status == "success") {
+                console.log(data.message);
+            } else {
+                console.error("Cannot create order: " + data.message);
+                // console.error(data);
+            }
+        },
+        error: function (data) {
+            console.error("Cannot create order: ");
+            console.error(data);
+        }
+    });
 }
 
 function catalogCreateOrder() {
