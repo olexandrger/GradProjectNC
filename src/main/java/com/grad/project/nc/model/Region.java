@@ -11,4 +11,8 @@ import lombok.NoArgsConstructor;
 public class Region {
     private Long regionId;
     private String regionName;
+
+    public Region(Long regionId) {
+        this.regionId = regionId;
+    }
 }

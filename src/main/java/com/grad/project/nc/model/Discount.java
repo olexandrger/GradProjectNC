@@ -3,8 +3,8 @@ package com.grad.project.nc.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 
 /**
@@ -16,8 +16,9 @@ import java.util.Collection;
 public class Discount {
     private Long discountId;
     private String discountTitle;
-    private Double discount;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private Collection<ProductRegionPrice> productRegionPrices;
+    private double discount;
+    private OffsetDateTime startDate;
+    private OffsetDateTime endDate;
+
+    private List<ProductRegionPrice> productRegionPrices;
 }
