@@ -146,6 +146,12 @@ public class UserDao extends AbstractDao<User> {
         });
     }
 
+    public void createUser(User user) {
+        add(user);
+        user.setUserId(findByEmail(user.getEmail()).get().getUserId());
+        saveUserRoles(user);
+    }
+
     private void deleteUserRoles(User user) {
         executeUpdate(connection -> {
             String query = "DELETE FROM user_role WHERE user_id=?";
