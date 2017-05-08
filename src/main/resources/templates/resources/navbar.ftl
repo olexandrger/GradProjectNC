@@ -93,12 +93,12 @@
             <div class="modal-body">
                 <form id="registration-form">
                     <div class="form-group">
-                        <label for="firstName">First productName</label>
-                        <input type="text" class="form-control" name="firstName" placeholder="First productName">
+                        <label for="firstName">First Name</label>
+                        <input type="text" class="form-control" name="firstName" placeholder="First Name">
                     </div>
                     <div class="form-group">
-                        <label for="lastName">Last productName</label>
-                        <input type="text" class="form-control" name="lastName" placeholder="Last productName">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" class="form-control" name="lastName" placeholder="Last Name">
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>

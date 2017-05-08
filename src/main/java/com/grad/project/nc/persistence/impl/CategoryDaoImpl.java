@@ -73,7 +73,7 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
 
     @Override
     public List<Category> findByCategoryTypeName(String categoryTypeName) {
-        String query = "SELECT \"category_id\", \"category_name\", \"category_type_id\" FROM \"category\" c " +
+        String query = "SELECT \"category_id\", \"category_name\", c.\"category_type_id\" FROM \"category\" c " +
                 "JOIN \"category_type\" ct " +
                 "ON c.\"category_type_id\" = ct.\"category_type_id\" " +
                 "WHERE ct.\"category_type_name\"=?";
