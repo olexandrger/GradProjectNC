@@ -16,30 +16,31 @@ import java.util.List;
  * @author Pavlo Rospopa
  */
 @Repository
-public class CategoryTypeDaoImpl extends AbstractDao<CategoryType> implements CategoryTypeDao {
+public class CategoryTypeDaoImpl extends AbstractDao implements CategoryTypeDao {
+
     private static final String PK_COLUMN_NAME = "category_type_id";
 
     @Autowired
-    CategoryTypeDaoImpl(JdbcTemplate jdbcTemplate) {
+    public CategoryTypeDaoImpl(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
     @Override
-    public CategoryType add(CategoryType entity) {
+    public CategoryType add(CategoryType categoryType) {
         String insertQuery = "INSERT INTO \"category_type\" (\"category_type_name\") VALUES (?)";
-        Long categoryTypeId = executeInsertWithId(insertQuery, PK_COLUMN_NAME, entity.getCategoryTypeName());
+        Long categoryTypeId = executeInsertWithId(insertQuery, PK_COLUMN_NAME, categoryType.getCategoryTypeName());
 
-        entity.setCategoryTypeId(categoryTypeId);
+        categoryType.setCategoryTypeId(categoryTypeId);
 
-        return entity;
+        return categoryType;
     }
 
     @Override
-    public CategoryType update(CategoryType entity) {
+    public CategoryType update(CategoryType categoryType) {
         String updateQuery = "UPDATE \"category_type\" SET \"category_type_name\"=? WHERE \"category_type_id\"=?";
-        executeUpdate(updateQuery,  entity.getCategoryTypeName(), entity.getCategoryTypeId());
+        executeUpdate(updateQuery, categoryType.getCategoryTypeName(), categoryType.getCategoryTypeId());
 
-        return entity;
+        return categoryType;
     }
 
     @Override
@@ -53,13 +54,13 @@ public class CategoryTypeDaoImpl extends AbstractDao<CategoryType> implements Ca
     @Override
     public List<CategoryType> findAll() {
         String findAllQuery = "SELECT \"category_type_id\", \"category_type_name\" FROM \"category_type\"";
-        return query(findAllQuery, new CategoryTypeRowMapper());
+        return findMultiple(findAllQuery, new CategoryTypeRowMapper());
     }
 
     @Override
-    public void delete(CategoryType entity) {
+    public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"category_type\" WHERE category_type_id=?";
-        executeUpdate(deleteQuery, entity.getCategoryTypeId());
+        executeUpdate(deleteQuery, id);
     }
 
     @Override

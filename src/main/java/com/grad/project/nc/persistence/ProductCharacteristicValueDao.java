@@ -7,12 +7,20 @@ import java.util.List;
 
 public interface ProductCharacteristicValueDao {
 
+    ProductCharacteristicValue add(ProductCharacteristicValue value);
+
+    ProductCharacteristicValue update(ProductCharacteristicValue value);
+
     ProductCharacteristicValue find(Long productId, Long productCharacteristicId);
 
-    List<ProductCharacteristicValue> findByProductId(Long id);
+    List<ProductCharacteristicValue> findAll();
 
-    void deleteProductCharacteristicValuesByProductId(Long productId);
+    void delete(Long productId, Long productCharacteristicId);
+
+    List<ProductCharacteristicValue> findByProductId(Long productId);
+
+    void deleteByProductId(Long productId);
 
     @Transactional
-    void addBatch(List<ProductCharacteristicValue> values);
+    void persistBatch(Long productId, List<ProductCharacteristicValue> values);
 }
