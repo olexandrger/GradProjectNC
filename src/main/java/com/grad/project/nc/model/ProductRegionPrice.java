@@ -14,6 +14,7 @@ public class ProductRegionPrice {
     private double price;
 
     private List<Discount> discounts;
+    private List<ProductInstance> productInstances;
 
     public ProductRegionPrice(Region region, double price) {
         this.region = region;

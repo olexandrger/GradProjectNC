@@ -14,4 +14,5 @@ public class Domain {
     private Category domainType;
 
     private List<User> users;
+    private List<ProductInstance> productInstances;
 }

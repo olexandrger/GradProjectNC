@@ -20,7 +20,7 @@ public class User implements UserDetails {
 
     private List<Role> roles;
     private List<Domain> domains;
-    private List<ProductOrder> orders;
+    private List<ProductOrder> productOrders;
     private List<Complain> complains;
 
     @Override
