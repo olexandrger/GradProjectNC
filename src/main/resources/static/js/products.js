@@ -77,8 +77,8 @@ function changeCharacteristics() {
                 '<div class="product-characteristic-value-input col-sm-12">' +
                 '<label>' + item.name + '</label>' +
                 '<div class="input-group col-sm-12">' +
-                '<input type="hidden" name="characteristic-id" value="' + item.id + '"/>' +
-                '<input type="' + inputType + '" class="form-control" placeholder="value" value="'+ value +  '" name="characteristic-value">' +
+                '<input type="hidden" productName="characteristic-id" value="' + item.id + '"/>' +
+                '<input type="' + inputType + '" class="form-control" placeholder="value" value="'+ value +  '" productName="characteristic-value">' +
                 measureHtml +
                 '</div>' +
                 '</div>';
@@ -112,17 +112,17 @@ function selectProduct(x) {
 
     var typeSelector = $("#product-type-selector");
 
-    $("#product-name-input").val("");
+    $("#product-productName-input").val("");
     typeSelector.val([]);
     $("#product-characteristics").empty();
     $(".cities-container").empty();
-    $("#product-description-input").val("");
-    $('input:radio[name=product-status]').filter('[value=true]').prop('checked', true);
+    $("#product-productDescription-input").val("");
+    $('input:radio[productName=product-status]').filter('[value=true]').prop('checked', true);
     typeSelector.prop( "disabled", false);
 
 
     if (currentSelected != -1) {
-        $("#product-name-input").val(productsData[currentSelected].name);
+        $("#product-productName-input").val(productsData[currentSelected].name);
 
         if (productsData[currentSelected].productType != undefined) {
             typeSelector.val(productsData[currentSelected].productType.productTypeId);
@@ -130,7 +130,7 @@ function selectProduct(x) {
             changeCharacteristics();
         }
         if (productsData[currentSelected].description != undefined) {
-            $("#product-description-input").val(productsData[currentSelected].description);
+            $("#product-productDescription-input").val(productsData[currentSelected].description);
         }
 
         if (productsData[currentSelected].prices != undefined) {
@@ -139,7 +139,7 @@ function selectProduct(x) {
             });
         }
 
-        var $radios = $('input:radio[name=product-status]');
+        var $radios = $('input:radio[productName=product-status]');
         $radios.filter('[value=' + productsData[currentSelected].isActive + ']').prop('checked', true);
     }
 
@@ -153,20 +153,20 @@ function saveSelected() {
     var data = {};
 
     data.id = productsData[currentSelected].productId;
-    data.name = $("#product-name-input").val();
+    data.name = $("#product-productName-input").val();
     data.productTypeId = $("#product-type-selector").val();
-    data.description = $("#product-description-input").val();
-    data.isActive = ($('input[name=product-status]:checked').val() == 'true');
+    data.description = $("#product-productDescription-input").val();
+    data.isActive = ($('input[productName=product-status]:checked').val() == 'true');
 
     data.prices = {};
     $(".cities-container").each(function (item) {
-        data.prices[$(this).find('select[name=regionId]').val()] = $(this).find('input[name=region-price]').val();
+        data.prices[$(this).find('select[productName=regionId]').val()] = $(this).find('input[productName=region-price]').val();
     });
 
     data.characteristicValues = {};
     $("#product-characteristics").find(".product-characteristic-value-input").each(function(item) {
-        data.characteristicValues[$(this).find('input[name=characteristic-id]').val()] =
-            $(this).find('input[name=characteristic-value]').val();
+        data.characteristicValues[$(this).find('input[productName=characteristic-id]').val()] =
+            $(this).find('input[productName=characteristic-value]').val();
     });
 
     var listSaveId = currentSelected;
@@ -175,7 +175,7 @@ function saveSelected() {
         type: 'POST',
         url: '/api/admin/products/' + (data.id < 0 ? "add" : "update"),
         headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+            'X-CSRF-TOKEN': $('meta[productName=_csrf]').attr("content")
         },
         processData: false,
         contentType: 'application/json',
@@ -195,7 +195,7 @@ function saveSelected() {
                     url: '/api/user/products/get/' + data.id,
                     success: function (data) {
                         console.log("Update after saving successful");
-                        console.log("Set name " + data.name);
+                        console.log("Set productName " + data.name);
                         $("#products-list").find("a:nth-child(" + (listSaveId+1) + ")").html(data.name);
                         productsData[listSaveId] = data;
                     },
@@ -238,12 +238,12 @@ function addRegionalPrice(regionId, price) {
     var html =
         '<div class="form-inline cities-container">' +
             '<div class="form-group">'+
-                '<select class="form-control" name="regionId">'+
+                '<select class="form-control" productName="regionId">'+
                     regionsHtml +
                 '</select>'+
             '</div>'+
             '<div class="form-group full-width">'+
-                '<input type="text" class="form-control full-width" placeholder="Price" name="region-price"' + selectedPrice + '>'+
+                '<input type="text" class="form-control full-width" placeholder="Price" productName="region-price"' + selectedPrice + '>'+
             '</div>'+
             '<div class="form-group">'+
                 '<a class="btn btn-danger" onclick="deleteRegionalPrice(this)">'+
@@ -266,7 +266,7 @@ function addProduct(name, index) {
     var list = $("#products-list");
     var id = -(++numberOfAdded);
     if (name == undefined) {
-        var nameField = $("#new-product-name");
+        var nameField = $("#new-product-productName");
 
         name = nameField.val();
         nameField.val("");
@@ -292,7 +292,7 @@ function addProduct(name, index) {
 
         $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
             '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-            'Can not add empty name </div>').insertAfter(list);
+            'Can not add empty productName </div>').insertAfter(list);
     }
 }
 
@@ -336,7 +336,7 @@ function loadProductTypes() {
             var sel = $("#product-type-selector");
 
             data.forEach(function(item, i) {
-                // console.log("adding " + item.name);
+                // console.log("adding " + item.productName);
                 var option = document.createElement("option");
                 option.text = item.name;
                 option.value = item.id;

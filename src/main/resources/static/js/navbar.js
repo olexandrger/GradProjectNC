@@ -48,7 +48,7 @@ function displayAuthenticatedNavigationBar(data) {
 }
 
 function getAccountInformation() {
-    var _csrf = $('meta[name=_csrf]').attr("content");
+    var _csrf = $('meta[productName=_csrf]').attr("content");
 
     $.ajax({
         type: 'GET',
@@ -74,7 +74,7 @@ function logout() {
     //TODO if user is not on allowed page, redirect him to main page
 
     console.log("Logout");
-    var _csrf = $('meta[name=_csrf]').attr("content");
+    var _csrf = $('meta[productName=_csrf]').attr("content");
     $.ajax({
         type: 'POST',
         url: '/logout',
@@ -93,10 +93,10 @@ function logout() {
 
 function login() {
     var form = $("#login-form");
-    var email = form.find('input[name="email"]').val();
-    var password = form.find('input[name="password"]').val();
+    var email = form.find('input[productName="email"]').val();
+    var password = form.find('input[productName="password"]').val();
 
-    var _csrf = $('meta[name=_csrf]').attr("content");
+    var _csrf = $('meta[productName=_csrf]').attr("content");
 
     $.ajax({
         type: 'POST',
@@ -127,14 +127,14 @@ function login() {
 
 function register() {
     var form = $("#registration-form");
-    var firstName = form.find('input[name="firstName"]').val();
-    var lastName = form.find('input[name="lastName"]').val();
-    var email = form.find('input[name="email"]').val();
-    var password = form.find('input[name="password"]').val();
-    // var repeatPassword = form.find('input[name="repeatPassword"]').val();
-    var phone = form.find('input[name="phone"]').val();
+    var firstName = form.find('input[productName="firstName"]').val();
+    var lastName = form.find('input[productName="lastName"]').val();
+    var email = form.find('input[productName="email"]').val();
+    var password = form.find('input[productName="password"]').val();
+    // var repeatPassword = form.find('input[productName="repeatPassword"]').val();
+    var phone = form.find('input[productName="phone"]').val();
 
-    var _csrf = $('meta[name=_csrf]').attr("content");
+    var _csrf = $('meta[productName=_csrf]').attr("content");
 
     $.ajax({
         type: 'POST',

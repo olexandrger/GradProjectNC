@@ -1,7 +1,7 @@
 package com.grad.project.nc.controller.api;
 
 import com.grad.project.nc.model.ProductType;
-import com.grad.project.nc.persistence.DataTypeDao;
+import com.grad.project.nc.persistence.CategoryDao;
 import com.grad.project.nc.persistence.ProductCharacteristicDao;
 import com.grad.project.nc.persistence.ProductTypeDao;
 import lombok.AllArgsConstructor;
@@ -9,9 +9,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -20,20 +26,22 @@ import java.util.stream.Collectors;
 public class ProductTypesController {
 
     private ProductTypeDao productTypeDao;
-    private DataTypeDao dataTypeDao;
     private ProductCharacteristicDao productCharacteristicDao;
+    private final CategoryDao categoryDao;
 
     @Autowired
-    public ProductTypesController(ProductTypeDao productTypeDao, DataTypeDao dataTypeDao, ProductCharacteristicDao productCharacteristicDao) {
+    public ProductTypesController(ProductTypeDao productTypeDao, ProductCharacteristicDao productCharacteristicDao,
+                                  CategoryDao categoryDao) {
         this.productTypeDao = productTypeDao;
-        this.dataTypeDao = dataTypeDao;
         this.productCharacteristicDao = productCharacteristicDao;
+        this.categoryDao = categoryDao;
     }
 
     @RequestMapping(value = "/dataTypes", method = RequestMethod.GET)
     public Map<Long, String> dataTypes() {
         Map<Long, String> result = new HashMap<>();
-        dataTypeDao.findAll().forEach(value -> result.put(value.getDataTypeId(), value.getDataType()));
+        categoryDao.findByCategoryTypeName("DATA_TYPE")
+                .forEach(value -> result.put(value.getCategoryId(), value.getCategoryName()));
         return result;
     }
 
@@ -46,7 +54,7 @@ public class ProductTypesController {
         type.setDescription(pt.getProductTypeDescription());
         type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
                 .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
-                        item.getMeasure(), item.getDataType().getDataTypeId()))
+                        item.getMeasure(), item.getDataType().getCategoryId()))
                 .collect(Collectors.toList()));
         return type;
     }
@@ -60,7 +68,7 @@ public class ProductTypesController {
             type.setDescription(productType.getProductTypeDescription());
             type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
                     .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
-                                                        item.getMeasure(), item.getDataType().getDataTypeId()))
+                                                        item.getMeasure(), item.getDataType().getCategoryId()))
                     .collect(Collectors.toList()));
             return type;
         }).collect(Collectors.toList());

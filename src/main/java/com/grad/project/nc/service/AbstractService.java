@@ -22,12 +22,7 @@ public abstract class AbstractService<T> implements CrudService<T> {
 
     @Override
     public List<T> findAll() {
-        return (List<T>)getBackingDao().findAll();
-    }
-
-    @Override
-    public void delete(T entity) {
-        getBackingDao().delete(entity);
+        return getBackingDao().findAll();
     }
 
     public abstract CrudDao<T> getBackingDao();

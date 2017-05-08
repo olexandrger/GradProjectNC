@@ -1,7 +1,6 @@
 package com.grad.project.nc.service.security;
 
 import com.grad.project.nc.model.User;
-import com.grad.project.nc.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;

@@ -3,9 +3,8 @@ package com.grad.project.nc.service.security;
 import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.User;
 
-import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.RoleDao;
-import com.grad.project.nc.persistence.UserDao;
+import com.grad.project.nc.persistence.impl.UserDaoImpl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService{
 
     @Autowired
-    private UserDao userDao;
+    private UserDaoImpl userDao;
     @Autowired
     private RoleDao roleDao;
     @Autowired
@@ -53,7 +52,7 @@ public class UserServiceImpl implements UserService{
         user.setRoles(new LinkedList<>());
 
         roles.forEach(roleName -> {
-            Role role = roleDao.getRoleByName(roleName);
+            Role role = roleDao.findByName(roleName);
             if (role != null) {
                 user.getRoles().add(role);
             } else {

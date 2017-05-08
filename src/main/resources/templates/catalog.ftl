@@ -37,8 +37,8 @@
         <div class="col-sm-8 hidden" id="catalog-main-info">
             <div class="row">
                 <div class="col-sm-12">
-                    <h2 id="catalog-product-name">Product name here</h2>
-                    <p id="catalog-product-description">Product description here</p>
+                    <h2 id="catalog-product-name">Product productName here</h2>
+                    <p id="catalog-product-description">Product productDescription here</p>
                 </div>
             </div>
             <div class="row">

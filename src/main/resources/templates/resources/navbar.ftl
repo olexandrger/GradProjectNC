@@ -93,12 +93,12 @@
             <div class="modal-body">
                 <form id="registration-form">
                     <div class="form-group">
-                        <label for="firstName">First name</label>
-                        <input type="text" class="form-control" name="firstName" placeholder="First name">
+                        <label for="firstName">First productName</label>
+                        <input type="text" class="form-control" name="firstName" placeholder="First productName">
                     </div>
                     <div class="form-group">
-                        <label for="lastName">Last name</label>
-                        <input type="text" class="form-control" name="lastName" placeholder="Last name">
+                        <label for="lastName">Last productName</label>
+                        <input type="text" class="form-control" name="lastName" placeholder="Last productName">
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
@@ -110,7 +110,7 @@
                     </div>
                     <#--<div class="form-group">-->
                         <#--<label for="repeatPassword">Repeat password</label>-->
-                        <#--<input type="password" class="form-control" name="repeatPassword" placeholder="Repeat password">-->
+                        <#--<input type="password" class="form-control" productName="repeatPassword" placeholder="Repeat password">-->
                     <#--</div>-->
                     <div class="form-group">
                         <label for="phone">Phone</label>

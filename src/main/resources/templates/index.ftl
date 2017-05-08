@@ -31,15 +31,15 @@
                 <div class="carousel-inner">
                     <div class="item active">
                         <h2>This is first box</h2>
-                        <p>Product description here</p>
+                        <p>Product productDescription here</p>
                     </div>
                     <div class="item">
                         <h2>This is second box</h2>
-                        <p>Product description here</p>
+                        <p>Product productDescription here</p>
                     </div>
                     <div class="item">
                         <h2>This is third box</h2>
-                        <p>Product description here</p>
+                        <p>Product productDescription here</p>
                     </div>
                 </div>
 

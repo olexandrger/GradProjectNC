@@ -6,7 +6,7 @@ var selected = -1;
 
 function addProductType() {
     var list = $("#product-types-list");
-    var nameInput = $("#new-product-type-name");
+    var nameInput = $("#new-product-type-productName");
     var name = nameInput.val();
     nameInput.val("");
 
@@ -29,7 +29,7 @@ function addProductType() {
 
             $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-            'Can not add empty name </div>').insertAfter( list);
+            'Can not add empty productName </div>').insertAfter( list);
     }
 
 }
@@ -61,13 +61,13 @@ function addProductValue(id, name, measure, dataType) {
 
     var html=
         '<div class="input-group product-characteristic-input">'+
-            '<input type="hidden" name="characteristic-id" value="' + id + '"/>' +
+            '<input type="hidden" productName="characteristic-id" value="' + id + '"/>' +
             '<span class="input-group-addon">Name</span>'+
-            '<input type="text" class="form-control" value="' + name + '" placeholder="Name" name="characteristic-name">'+
+            '<input type="text" class="form-control" value="' + name + '" placeholder="Name" productName="characteristic-productName">'+
             '<span class="input-group-addon">Measure</span>'+
-            '<input type="text" class="form-control" value="' + measure + '" placeholder="Measure" name="characteristic-measure">'+
+            '<input type="text" class="form-control" value="' + measure + '" placeholder="Measure" productName="characteristic-measure">'+
             '<span class="input-group-addon">Data type</span>'+
-            '<select class="form-control" name="characteristic-dataTypeId">'+
+            '<select class="form-control" productName="characteristic-dataTypeId">'+
                 options +
             '</select>'+
             '<span class="input-group-addon" style="background-color: #d9534f; cursor: pointer" onclick="removeProductValue(this)">'+
@@ -81,15 +81,15 @@ function addProductValue(id, name, measure, dataType) {
 function saveSelected() {
     var savedId = selected;
 
-    productTypeData[savedId].name = $("#product-type-name-input").val();
-    productTypeData[savedId].description = $("#product-type-description-input").val();
+    productTypeData[savedId].name = $("#product-type-productName-input").val();
+    productTypeData[savedId].description = $("#product-type-productDescription-input").val();
     productTypeData[savedId].characteristics = [];
 
     $("#product-type-values").find(".product-characteristic-input").each(function (element) {
        productTypeData[savedId].characteristics.push({
-           id: $(this).find("input[name='characteristic-id']").val(),
-           name: $(this).find("input[name='characteristic-name']").val(),
-           measure: $(this).find("input[name='characteristic-measure']").val(),
+           id: $(this).find("input[productName='characteristic-id']").val(),
+           name: $(this).find("input[productName='characteristic-productName']").val(),
+           measure: $(this).find("input[productName='characteristic-measure']").val(),
            dataTypeId: $(this).find("select").val()
        });
     });
@@ -100,7 +100,7 @@ function saveSelected() {
         type: 'POST',
         url: '/api/admin/productTypes/update',
         headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+            'X-CSRF-TOKEN': $('meta[productName=_csrf]').attr("content")
         },
         processData: false,
         contentType: 'application/json',
@@ -120,7 +120,7 @@ function saveSelected() {
                     url: '/api/user/productTypes/get/' + data.id,
                     success: function (data) {
                         console.log("Update after saving successful");
-                        console.log("Set name " + data.name);
+                        console.log("Set productName " + data.name);
                         $("#product-types-list").find("a:nth-child(" + (savedId+1) + ")").html(data.name);
                         productTypeData[savedId] = data;
                     },
@@ -162,7 +162,7 @@ function deleteSelected() {
             type: 'POST',
             url: '/api/admin/productTypes/delete',
             headers: {
-                'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+                'X-CSRF-TOKEN': $('meta[productName=_csrf]').attr("content")
             },
             processData: false,
             contentType: 'application/json',
@@ -221,8 +221,8 @@ function selectItem(x) {
     $(".product-characteristic-input").remove();
 
     if (selected != -1) {
-        $("#product-type-name-input").val(productTypeData[selected].name);
-        $("#product-type-description-input").val(productTypeData[selected].description);
+        $("#product-type-productName-input").val(productTypeData[selected].name);
+        $("#product-type-productDescription-input").val(productTypeData[selected].description);
 
         for (var characteristic in productTypeData[selected].characteristics) {
             console.log("adding property " + characteristic + " for " + x);
