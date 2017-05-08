@@ -6,6 +6,8 @@ import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.persistence.CategoryDao;
 import com.grad.project.nc.persistence.ProductTypeDao;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -13,8 +15,13 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("prototype")
 public class ProductCharacteristicProxy extends ProductCharacteristic {
+    @Getter @Setter
     private Long productTypeId;
+    @Getter @Setter
     private Long dataTypeId;
+
+    private boolean productTypeLoaded;
+    private boolean dataTypeLoaded;
 
     private final ProductTypeDao productTypeDao;
     private final CategoryDao categoryDao;
@@ -25,38 +32,34 @@ public class ProductCharacteristicProxy extends ProductCharacteristic {
         this.categoryDao = categoryDao;
     }
 
-    public Long getProductTypeId() {
-        return productTypeId;
-    }
-
-    public void setProductTypeId(Long productTypeId) {
-        this.productTypeId = productTypeId;
-    }
-
-    public Long getDataTypeId() {
-        return dataTypeId;
-    }
-
-    public void setDataTypeId(Long dataTypeId) {
-        this.dataTypeId = dataTypeId;
-    }
-
     @Override
     @JsonIgnore
     public ProductType getProductType() {
-        if (super.getProductType() == null) {
-            super.setProductType(productTypeDao.find(getProductTypeId()));
+        if (!productTypeLoaded) {
+            this.setProductType(productTypeDao.find(getProductTypeId()));
         }
 
         return super.getProductType();
     }
 
     @Override
+    public void setProductType(ProductType productType) {
+        productTypeLoaded = true;
+        super.setProductType(productType);
+    }
+
+    @Override
     public Category getDataType() {
-        if (super.getDataType() == null) {
-            super.setDataType(categoryDao.find(getDataTypeId()));
+        if (!dataTypeLoaded) {
+            this.setDataType(categoryDao.find(getDataTypeId()));
         }
 
         return super.getDataType();
+    }
+
+    @Override
+    public void setDataType(Category dataType) {
+        dataTypeLoaded = true;
+        super.setDataType(dataType);
     }
 }

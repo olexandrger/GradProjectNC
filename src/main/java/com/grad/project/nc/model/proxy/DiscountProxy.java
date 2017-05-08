@@ -15,6 +15,8 @@ public class DiscountProxy extends Discount {
 
     private final ProductRegionPriceDao productRegionPriceDao;
 
+    private boolean productRegionPricesLoaded;
+
     @Autowired
     public DiscountProxy(ProductRegionPriceDao productRegionPriceDao) {
         this.productRegionPriceDao = productRegionPriceDao;
@@ -22,10 +24,16 @@ public class DiscountProxy extends Discount {
 
     @Override
     public List<ProductRegionPrice> getProductRegionPrices() {
-        if(super.getProductRegionPrices() == null){
-            super.setProductRegionPrices(productRegionPriceDao.findByDiscountId(getDiscountId()));
+        if(!productRegionPricesLoaded){
+            this.setProductRegionPrices(productRegionPriceDao.findByDiscountId(getDiscountId()));
         }
 
         return super.getProductRegionPrices();
+    }
+
+    @Override
+    public void setProductRegionPrices(List<ProductRegionPrice> productRegionPrices) {
+        productRegionPricesLoaded = true;
+        super.setProductRegionPrices(productRegionPrices);
     }
 }

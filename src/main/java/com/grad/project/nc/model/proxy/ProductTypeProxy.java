@@ -13,6 +13,8 @@ import java.util.List;
 @Scope("prototype")
 public class ProductTypeProxy extends ProductType {
 
+    private boolean productCharacteristicsLoaded;
+
     private final ProductCharacteristicDao productCharacteristicDao;
 
     @Autowired
@@ -22,10 +24,16 @@ public class ProductTypeProxy extends ProductType {
 
     @Override
     public List<ProductCharacteristic> getProductCharacteristics() {
-        if (super.getProductCharacteristics() == null) {
-            super.setProductCharacteristics(productCharacteristicDao.findByProductTypeId(getProductTypeId()));
+        if (!productCharacteristicsLoaded) {
+            this.setProductCharacteristics(productCharacteristicDao.findByProductTypeId(getProductTypeId()));
         }
 
         return super.getProductCharacteristics();
+    }
+
+    @Override
+    public void setProductCharacteristics(List<ProductCharacteristic> productCharacteristics) {
+        productCharacteristicsLoaded = true;
+        super.setProductCharacteristics(productCharacteristics);
     }
 }

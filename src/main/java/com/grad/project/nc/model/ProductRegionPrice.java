@@ -1,11 +1,15 @@
 package com.grad.project.nc.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class ProductRegionPrice {
     private Long priceId;
@@ -15,9 +19,4 @@ public class ProductRegionPrice {
 
     private List<Discount> discounts;
     private List<ProductInstance> productInstances;
-
-    public ProductRegionPrice(Region region, double price) {
-        this.region = region;
-        this.price = price;
-    }
 }

@@ -15,6 +15,11 @@ import java.util.List;
 @Scope("prototype")
 public class UserProxy extends User {
 
+    private boolean rolesLoaded;
+    private boolean domainsLoaded;
+    private boolean productOrdersLoaded;
+    private boolean complainsLoaded;
+
     private final RoleDao roleDao;
     private final DomainDao domainDao;
     private final ProductOrderDao productOrderDao;
@@ -31,37 +36,61 @@ public class UserProxy extends User {
 
     @Override
     public List<Role> getRoles() {
-        if (super.getRoles() == null) {
-            super.setRoles(roleDao.findUserRolesById(getUserId()));
+        if (!rolesLoaded) {
+            this.setRoles(roleDao.findUserRolesById(getUserId()));
         }
 
         return super.getRoles();
     }
 
     @Override
+    public void setRoles(List<Role> roles) {
+        rolesLoaded = true;
+        super.setRoles(roles);
+    }
+
+    @Override
     public List<Domain> getDomains() {
-        if (super.getDomains() == null) {
-            super.setDomains(domainDao.findByUserId(getUserId()));
+        if (!domainsLoaded) {
+            this.setDomains(domainDao.findByUserId(getUserId()));
         }
 
         return super.getDomains();
     }
 
     @Override
+    public void setDomains(List<Domain> domains) {
+        domainsLoaded = true;
+        super.setDomains(domains);
+    }
+
+    @Override
     public List<ProductOrder> getProductOrders() {
-        if (super.getProductOrders() == null) {
-            super.setProductOrders(productOrderDao.findByUserId(getUserId()));
+        if (!productOrdersLoaded) {
+            this.setProductOrders(productOrderDao.findByUserId(getUserId()));
         }
 
         return super.getProductOrders();
     }
 
     @Override
+    public void setProductOrders(List<ProductOrder> productOrders) {
+        productOrdersLoaded = true;
+        super.setProductOrders(productOrders);
+    }
+
+    @Override
     public List<Complain> getComplains() {
-        if (super.getComplains() == null) {
-            super.setComplains(complainDao.findByUserId(getUserId()));
+        if (!complainsLoaded) {
+            this.setComplains(complainDao.findByUserId(getUserId()));
         }
 
         return super.getComplains();
+    }
+
+    @Override
+    public void setComplains(List<Complain> complains) {
+        complainsLoaded = true;
+        super.setComplains(complains);
     }
 }

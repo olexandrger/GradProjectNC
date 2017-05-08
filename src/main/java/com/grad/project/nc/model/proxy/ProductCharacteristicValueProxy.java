@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductCharacteristicValue;
-import com.grad.project.nc.persistence.impl.ProductCharacteristicDaoImpl;
+import com.grad.project.nc.persistence.ProductCharacteristicDao;
 import com.grad.project.nc.persistence.ProductDao;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -15,47 +17,48 @@ import org.springframework.stereotype.Component;
 public class ProductCharacteristicValueProxy extends ProductCharacteristicValue {
 
     private ProductDao productDao;
-    private ProductCharacteristicDaoImpl productCharacteristicDao;
+    private ProductCharacteristicDao productCharacteristicDao;
 
+    @Getter @Setter
     private Long productId;
+    @Getter @Setter
     private Long productCharacteristicId;
 
+    private boolean productLoaded;
+    private boolean productCharacteristicLoaded;
+
     @Autowired
-    public ProductCharacteristicValueProxy(ProductCharacteristicDaoImpl productCharacteristicDao, ProductDao productDao) {
+    public ProductCharacteristicValueProxy(ProductCharacteristicDao productCharacteristicDao, ProductDao productDao) {
         this.productCharacteristicDao = productCharacteristicDao;
         this.productDao = productDao;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
-    public Long getProductCharacteristicId() {
-        return productCharacteristicId;
-    }
-
-    public void setProductCharacteristicId(Long productCharacteristicId) {
-        this.productCharacteristicId = productCharacteristicId;
     }
 
     @Override
     @JsonIgnore
     public Product getProduct() {
-        if (super.getProduct() == null) {
-            super.setProduct(productDao.find(getProductId()));
+        if (!productLoaded) {
+            this.setProduct(productDao.find(getProductId()));
         }
         return super.getProduct();
     }
 
     @Override
+    public void setProduct(Product product) {
+        productLoaded = true;
+        super.setProduct(product);
+    }
+
+    @Override
     public ProductCharacteristic getProductCharacteristic() {
-        if (super.getProductCharacteristic() == null) {
-            super.setProductCharacteristic(productCharacteristicDao.find(getProductCharacteristicId()));
+        if (!productCharacteristicLoaded) {
+            this.setProductCharacteristic(productCharacteristicDao.find(getProductCharacteristicId()));
         }
         return super.getProductCharacteristic();
+    }
+
+    @Override
+    public void setProductCharacteristic(ProductCharacteristic productCharacteristic) {
+        productCharacteristicLoaded = true;
+        super.setProductCharacteristic(productCharacteristic);
     }
 }

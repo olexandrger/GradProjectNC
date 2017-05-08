@@ -15,6 +15,9 @@ import java.util.List;
 @Scope("prototype")
 public class RegionProxy extends Region {
 
+    private boolean locationsLoaded;
+    private boolean pricesLoaded;
+
     private final LocationDao locationDao;
     private final ProductRegionPriceDao productRegionPriceDao;
 
@@ -26,19 +29,31 @@ public class RegionProxy extends Region {
 
     @Override
     public List<Location> getLocations() {
-        if (super.getLocations() == null) {
-            super.setLocations(locationDao.findByRegionId(getRegionId()));
+        if (!locationsLoaded) {
+            this.setLocations(locationDao.findByRegionId(getRegionId()));
         }
 
         return super.getLocations();
     }
 
     @Override
+    public void setLocations(List<Location> locations) {
+        locationsLoaded = true;
+        super.setLocations(locations);
+    }
+
+    @Override
     public List<ProductRegionPrice> getPrices() {
-        if (super.getPrices() == null) {
-            super.setPrices(productRegionPriceDao.findByRegionId(getRegionId()));
+        if (!pricesLoaded) {
+            this.setPrices(productRegionPriceDao.findByRegionId(getRegionId()));
         }
 
         return super.getPrices();
+    }
+
+    @Override
+    public void setPrices(List<ProductRegionPrice> prices) {
+        pricesLoaded = true;
+        super.setPrices(prices);
     }
 }

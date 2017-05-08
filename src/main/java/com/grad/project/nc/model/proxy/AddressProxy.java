@@ -2,7 +2,9 @@ package com.grad.project.nc.model.proxy;
 
 import com.grad.project.nc.model.Address;
 import com.grad.project.nc.model.Location;
-import com.grad.project.nc.persistence.impl.LocationDaoImpl;
+import com.grad.project.nc.persistence.LocationDao;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -10,28 +12,29 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("prototype")
 public class AddressProxy extends Address {
+    @Getter @Setter
     private Long locationId;
 
-    private final LocationDaoImpl locationDao;
+    private final LocationDao locationDao;
+
+    private boolean locationLoaded;
 
     @Autowired
-    public AddressProxy(LocationDaoImpl locationDao) {
+    public AddressProxy(LocationDao locationDao) {
         this.locationDao = locationDao;
-    }
-
-    public Long getLocationId() {
-        return locationId;
-    }
-
-    public void setLocationId(Long locationId) {
-        this.locationId = locationId;
     }
 
     @Override
     public Location getLocation() {
-        if (super.getLocation() == null) {
-            super.setLocation(locationDao.findAddressLocationById(getAddressId()));
+        if (!locationLoaded) {
+            this.setLocation(locationDao.findAddressLocationById(getAddressId()));
         }
         return super.getLocation();
+    }
+
+    @Override
+    public void setLocation(Location location) {
+        locationLoaded = true;
+        super.setLocation(location);
     }
 }

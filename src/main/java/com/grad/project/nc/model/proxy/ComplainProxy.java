@@ -7,6 +7,8 @@ import com.grad.project.nc.model.User;
 import com.grad.project.nc.persistence.CategoryDao;
 import com.grad.project.nc.persistence.ProductInstanceDao;
 import com.grad.project.nc.persistence.UserDao;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -14,11 +16,22 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("prototype")
 public class ComplainProxy extends Complain {
+    @Getter @Setter
     private Long userId;
+    @Getter @Setter
     private Long productInstanceId;
+    @Getter @Setter
     private Long statusId;
+    @Getter @Setter
     private Long responsibleId;
+    @Getter @Setter
     private Long complainReasonId;
+
+    private boolean userLoaded;
+    private boolean productInstanceLoaded;
+    private boolean statusLoaded;
+    private boolean responsibleLoaded;
+    private boolean complainReasonLoaded;
 
     private final UserDao userDao;
     private final ProductInstanceDao productInstanceDao;
@@ -31,88 +44,78 @@ public class ComplainProxy extends Complain {
         this.categoryDao = categoryDao;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getProductInstanceId() {
-        return productInstanceId;
-    }
-
-    public void setProductInstanceId(Long productInstanceId) {
-        this.productInstanceId = productInstanceId;
-    }
-
-    public Long getStatusId() {
-        return statusId;
-    }
-
-    public void setStatusId(Long statusId) {
-        this.statusId = statusId;
-    }
-
-    public Long getResponsibleId() {
-        return responsibleId;
-    }
-
-    public void setResponsibleId(Long responsibleId) {
-        this.responsibleId = responsibleId;
-    }
-
-    public Long getComplainReasonId() {
-        return complainReasonId;
-    }
-
-    public void setComplainReasonId(Long complainReasonId) {
-        this.complainReasonId = complainReasonId;
-    }
-
     @Override
     public User getUser() {
-        if (super.getUser() == null) {
-            super.setUser(userDao.find(getUserId()));
+        if (!userLoaded) {
+            this.setUser(userDao.find(getUserId()));
         }
 
         return super.getUser();
     }
 
     @Override
+    public void setUser(User user) {
+        userLoaded = true;
+        super.setUser(user);
+    }
+
+    @Override
     public ProductInstance getProductInstance() {
-        if (super.getProductInstance() == null) {
-            super.setProductInstance(productInstanceDao.find(getProductInstanceId()));
+        if (!productInstanceLoaded) {
+            this.setProductInstance(productInstanceDao.find(getProductInstanceId()));
         }
 
         return super.getProductInstance();
     }
 
     @Override
+    public void setProductInstance(ProductInstance productInstance) {
+        productInstanceLoaded = true;
+        super.setProductInstance(productInstance);
+    }
+
+    @Override
     public Category getStatus() {
-        if (super.getStatus() == null) {
-            super.setStatus(categoryDao.find(getStatusId()));
+        if (!statusLoaded) {
+            this.setStatus(categoryDao.find(getStatusId()));
         }
 
         return super.getStatus();
     }
 
     @Override
+    public void setStatus(Category status) {
+        statusLoaded = true;
+        super.setStatus(status);
+    }
+
+    @Override
     public User getResponsible() {
-        if (super.getResponsible() == null) {
-            super.setResponsible(userDao.find(getResponsibleId()));
+        if (!responsibleLoaded) {
+            this.setResponsible(userDao.find(getResponsibleId()));
         }
 
         return super.getResponsible();
     }
 
     @Override
+    public void setResponsible(User responsible) {
+        responsibleLoaded = true;
+        super.setResponsible(responsible);
+    }
+
+    @Override
     public Category getComplainReason() {
-        if (super.getComplainReason() == null) {
-            super.setComplainReason(categoryDao.find(getComplainReasonId()));
+        if (!complainReasonLoaded) {
+            this.setComplainReason(categoryDao.find(getComplainReasonId()));
         }
 
         return super.getComplainReason();
+    }
+
+    @Override
+    public void setComplainReason(Category complainReason) {
+        complainReasonLoaded = true;
+        super.setComplainReason(complainReason);
     }
 }
