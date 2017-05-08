@@ -2,7 +2,6 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.ProductOrder;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface ProductOrderDao extends CrudDao<ProductOrder> {
@@ -15,5 +14,5 @@ public interface ProductOrderDao extends CrudDao<ProductOrder> {
 
     List<ProductOrder> findByUserPhoneNumber(String phoneNumber);
 
-    Collection<ProductOrder> findByProductInstanceId(Long id);
+    List<ProductOrder> findByProductInstanceId(Long id);
 }

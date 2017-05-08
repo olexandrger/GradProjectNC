@@ -70,13 +70,16 @@ public class AdminProductsController {
         p.setProductType(new ProductType(frontendProduct.getProductTypeId()));
         p.setPrices(frontendProduct.getPrices().entrySet()
                 .stream()
-                .map((Map.Entry<Long, Double> entry) -> new ProductRegionPrice(new Region(entry.getKey()),
-                        entry.getValue()))
+                .map((Map.Entry<Long, Double> entry) ->
+                        ProductRegionPrice.builder()
+                                .region(new Region(entry.getKey())).price(entry.getValue()).build())
                 .collect(Collectors.toList()));
         p.setProductCharacteristicValues(frontendProduct.getCharacteristicValues().entrySet()
                 .stream()
-                .map((Map.Entry<Long, String> entry) -> new ProductCharacteristicValue
-                        ( new ProductCharacteristic(entry.getKey()), entry.getValue()))
+                .map((Map.Entry<Long, String> entry) ->
+                        ProductCharacteristicValue.builder()
+                                .productCharacteristic(new ProductCharacteristic(entry.getKey()))
+                                .stringValue(entry.getValue()).build())
                 .collect(Collectors.toList()));
 
         return p;
