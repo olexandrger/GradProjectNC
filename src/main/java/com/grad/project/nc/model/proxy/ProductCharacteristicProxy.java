@@ -1,5 +1,6 @@
 package com.grad.project.nc.model.proxy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.model.Category;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
@@ -41,6 +42,7 @@ public class ProductCharacteristicProxy extends ProductCharacteristic {
     }
 
     @Override
+    @JsonIgnore
     public ProductType getProductType() {
         if (super.getProductType() == null) {
             super.setProductType(productTypeDao.find(getProductTypeId()));

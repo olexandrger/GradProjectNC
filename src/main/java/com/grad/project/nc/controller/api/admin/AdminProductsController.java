@@ -38,26 +38,26 @@ public class AdminProductsController {
 
         productService.update(p);
 
-        response.put("status", "success");//or error
+        response.put("status", "success");
         response.put("message", "Product successfully updated");
-        response.put("id", p.getProductId().toString());//put here id of added object
+        response.put("id", p.getProductId().toString());
         return response;
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Map<String, String> add(@RequestBody FrontendProduct frontendProduct) {
         Map<String, String> response = new HashMap<>();
-        //TODO parse, validate and write to database + split
-        log.info(String.valueOf(frontendProduct.getIsActive()));
+
+//        log.info(String.valueOf(frontendProduct.getIsActive()));
         log.info("ADDING " + frontendProduct.toString());
 
         Product p = extractProduct(frontendProduct);
 
-        productService.add(p);
+        p = productService.add(p);
 
-        response.put("status", "success");//or error
+        response.put("status", "success");
         response.put("message", "Product successfully added");
-        response.put("id", frontendProduct.getId().toString());//put here id of added object
+        response.put("id", p.getProductId().toString());
         return response;
     }
 

@@ -158,7 +158,6 @@ public class OrdersServiceImpl implements OrdersService {
         order.setStatus(categoryDao.find(ORDER_STATUS_COMPLETED));
         order.setCloseDate(OffsetDateTime.now());
 
-        //TODO rework instance statuses
         if (order.getOrderAim().getCategoryId() == ORDER_AIM_CREATE) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_ACTIVATED));
         } else if (order.getOrderAim().getCategoryId() == ORDER_AIM_RESUME) {

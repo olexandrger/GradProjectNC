@@ -38,12 +38,12 @@ public class AdminProductTypesController {
         this.productCharacteristicDao = productCharacteristicDao;
     }
 
-    @RequestMapping(value = "/dataTypes", method = RequestMethod.GET)
-    public Map<Long, String> dataTypes() {
-        Map<Long, String> result = new HashMap<>();
-        //dataTypeDao.findAll().forEach(value -> result.put(value.getDataTypeId(), value.getDataType()));
-        return result;
-    }
+//    @RequestMapping(value = "/dataTypes", method = RequestMethod.GET)
+//    public Map<Long, String> dataTypes() {
+//        Map<Long, String> result = new HashMap<>();
+//        //dataTypeDao.findAll().forEach(value -> result.put(value.getDataTypeId(), value.getDataType()));
+//        return result;
+//    }
 
     @RequestMapping(value = "productTypes/delete", method = RequestMethod.POST)
     public Map<String, String> deleteType(@RequestBody Map<String, Long> productTypeId) {
@@ -63,6 +63,7 @@ public class AdminProductTypesController {
             productType.setProductTypeId(type.getId());
             productType.setProductTypeName(type.getName());
             productType.setProductTypeDescription(type.getDescription());
+            productType.setIsActive(type.getActive());
 
             if (productTypeDao.find(type.getId()) != null) {
                 productType = productTypeDao.update(productType);
@@ -116,6 +117,7 @@ public class AdminProductTypesController {
         private Long id;
         private String name;
         private String description;
+        private Boolean active;
         private Collection<Characteristic> characteristics;
     }
 

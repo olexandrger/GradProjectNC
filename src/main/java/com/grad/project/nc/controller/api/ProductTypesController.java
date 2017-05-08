@@ -52,6 +52,7 @@ public class ProductTypesController {
         type.setId(pt.getProductTypeId());
         type.setName(pt.getProductTypeName());
         type.setDescription(pt.getProductTypeDescription());
+        type.setActive(pt.getIsActive());
         type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
                 .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
                         item.getMeasure(), item.getDataType().getCategoryId()))
@@ -66,6 +67,7 @@ public class ProductTypesController {
             type.setId(productType.getProductTypeId());
             type.setName(productType.getProductTypeName());
             type.setDescription(productType.getProductTypeDescription());
+            type.setActive(productType.getIsActive());
             type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
                     .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
                                                         item.getMeasure(), item.getDataType().getCategoryId()))
@@ -80,6 +82,7 @@ public class ProductTypesController {
         private Long id;
         private String name;
         private String description;
+        private Boolean active;
         private Collection<Characteristic> characteristics;
     }
 

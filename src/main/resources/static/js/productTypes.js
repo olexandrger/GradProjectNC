@@ -84,6 +84,7 @@ function saveSelected() {
     productTypeData[savedId].name = $("#product-type-name-input").val();
     productTypeData[savedId].description = $("#product-type-description-input").val();
     productTypeData[savedId].characteristics = [];
+    productTypeData[savedId].active = $('input[name=product-type-status]:checked').val() == 'true';
 
     $("#product-type-values").find(".product-characteristic-input").each(function (element) {
        productTypeData[savedId].characteristics.push({
@@ -109,7 +110,6 @@ function saveSelected() {
             var alert;
             if (data.status == 'success') {
                 console.log("Saving success! " + JSON.stringify(data));
-
 
                 alert = $('<div id="new-product-type-alert" class="alert alert-success" role="alert">' +
                     '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
@@ -217,12 +217,15 @@ function selectItem(x) {
     var list = $("#product-types-list");
     list.find("a").removeClass("active");
     list.find("a:nth-child(" + (x+1) + ")").addClass("active");
+    // $('input:radio[name=product-type-status]').prop('checked', false);
+
 
     $(".product-characteristic-input").remove();
 
     if (selected != -1) {
         $("#product-type-name-input").val(productTypeData[selected].name);
         $("#product-type-description-input").val(productTypeData[selected].description);
+        $('input:radio[name=product-type-status]').filter('[value=' + productTypeData[selected].active + ']').prop('checked', true);
 
         for (var characteristic in productTypeData[selected].characteristics) {
             console.log("adding property " + characteristic + " for " + x);

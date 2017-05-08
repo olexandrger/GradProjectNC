@@ -122,15 +122,15 @@ function selectProduct(x) {
 
 
     if (currentSelected != -1) {
-        $("#product-name-input").val(productsData[currentSelected].name);
+        $("#product-name-input").val(productsData[currentSelected].productName);
 
         if (productsData[currentSelected].productType != undefined) {
             typeSelector.val(productsData[currentSelected].productType.productTypeId);
             typeSelector.prop("disabled", productsData[currentSelected].productId > 0);
             changeCharacteristics();
         }
-        if (productsData[currentSelected].description != undefined) {
-            $("#product-description-input").val(productsData[currentSelected].description);
+        if (productsData[currentSelected].productDescription != undefined) {
+            $("#product-description-input").val(productsData[currentSelected].productDescription);
         }
 
         if (productsData[currentSelected].prices != undefined) {
@@ -298,7 +298,8 @@ function addProduct(name, index) {
 
 function addLoadedProducts() {
     productsData.forEach(function (product, i) {
-        addProduct(product.name, i);
+        console.log(product);
+        addProduct(product.productName, i);
     });
 }
 
@@ -307,6 +308,8 @@ function loadProducts() {
     $.ajax({
         url: "/api/user/products/all",
         success: function (data) {
+
+            console.log(data);
 
             data.forEach(function(prod) {
                 prod.characteristics = {};

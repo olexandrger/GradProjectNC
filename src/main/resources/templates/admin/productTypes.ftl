@@ -55,7 +55,15 @@
                         <label for="product-type-description">Description</label>
                         <textarea class="form-control" rows="5" name="product-type-description" placeholder="Description" id="product-type-description-input"></textarea>
                     </div>
-
+                    <div class="form-group">
+                        <label class="radio" for="product-type-status">Status</label>
+                        <div class="radio">
+                            <label><input type="radio" value="true" name="product-type-status">Active</label>
+                        </div>
+                        <div class="radio">
+                            <label><input type="radio" value="false" name="product-type-status">Suspended</label>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label>Characteristics</label>
                         <a class="btn btn-default" onclick="addProductValue()">
@@ -71,9 +79,11 @@
                             <a class="btn btn-success" onclick="saveSelected()">
                                 <span class="glyphicon glyphicon-floppy-disk"></span>Save
                             </a>
-                            <a class="btn btn-danger" onclick="deleteSelected()">
-                                <span class="glyphicon glyphicon-remove "></span>Delete
-                            </a>
+
+                            <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
+                                <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
+                            <#--</a>-->
+
                         </div>
                     </div>
                 </div>
