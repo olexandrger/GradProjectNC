@@ -145,6 +145,15 @@ public class ProductRegionPriceDaoImpl extends AbstractDao implements ProductReg
         return findMultiple(query, new ProductRegionPriceRowMapper(), regionId);
     }
 
+    @Override
+    public ProductRegionPrice findByRegionIdAndProductId(Long regionId, Long priceId) {
+        String query = "SELECT prp.\"price_id\", prp.\"product_id\", prp.\"region_id\", prp.\"price\" " +
+                "FROM \"product_region_price\" prp " +
+                "WHERE prp.\"region_id\"=? AND prp.\"product_id\" = ?";
+
+        return findOne(query, new ProductRegionPriceRowMapper(), regionId, priceId);
+    }
+
     private class ProductRegionPriceRowMapper implements RowMapper<ProductRegionPrice> {
 
         @Override

@@ -31,6 +31,14 @@ public class OrdersServiceImpl implements OrdersService {
     private static final long INSTANCE_STATUS_SUSPENDED = 11L;
     private static final long INSTANCE_STATUS_DEACTIVATED = 12L;
 
+
+    13	CREATE
+14	SUSPEND
+15	DEACTIVATE
+25	RESUME
+26	MODIFY
+
+
     private static final long ORDER_AIM_CREATE = 13L;
     private static final long ORDER_AIM_SUSPEND = 14L;
     private static final long ORDER_AIM_DEACTIVATE = 15L;

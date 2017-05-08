@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -133,6 +134,16 @@ public class ProductOrderDaoImpl extends AbstractDao
                 "WHERE u.\"phone_number\" = ?";
 
         return findMultiple(query, new ProductOrderRowMapper(), phoneNumber);
+    }
+
+    @Override
+    public Collection<ProductOrder> findByProductInstanceId(Long id) {
+        String query = "SELECT po.\"product_order_id\", po.\"product_instance_id\", po.\"user_id\", " +
+            "po.\"order_aim_id\", po.\"status_id\", po.\"responsible_id\", po.\"open_date\", po.\"close_date\" " +
+            "FROM \"product_order\" po " +
+            "WHERE po.\"product_instance_id\" = ?";
+
+        return findMultiple(query, new ProductOrderRowMapper(), id);
     }
 
     private class ProductOrderRowMapper implements RowMapper<ProductOrder> {
