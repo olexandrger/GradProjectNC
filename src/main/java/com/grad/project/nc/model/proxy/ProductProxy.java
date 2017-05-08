@@ -1,10 +1,10 @@
 package com.grad.project.nc.model.proxy;
 
 import com.grad.project.nc.model.*;
-import com.grad.project.nc.persistence.ProductCharacteristicDao;
+import com.grad.project.nc.persistence.ProductTypeDao;
+import com.grad.project.nc.persistence.impl.ProductCharacteristicDaoImpl;
 import com.grad.project.nc.persistence.ProductCharacteristicValueDao;
 import com.grad.project.nc.persistence.ProductRegionPriceDao;
-import com.grad.project.nc.persistence.ProductTypeDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,14 +17,14 @@ public class ProductProxy extends Product {
 
     private final ProductTypeDao productTypeDao;
     private final ProductCharacteristicValueDao productCharacteristicValueDao;
-    private final ProductCharacteristicDao productCharacteristicDao;
+    private final ProductCharacteristicDaoImpl productCharacteristicDao;
     private final ProductRegionPriceDao productRegionPriceDao;
 
     private Long productTypeId;
 
     @Autowired
     public ProductProxy(ProductCharacteristicValueDao productCharacteristicValueDao, ProductTypeDao productTypeDao,
-                        ProductCharacteristicDao productCharacteristicDao, ProductRegionPriceDao productRegionPriceDao) {
+                        ProductCharacteristicDaoImpl productCharacteristicDao, ProductRegionPriceDao productRegionPriceDao) {
         this.productCharacteristicValueDao = productCharacteristicValueDao;
         this.productTypeDao = productTypeDao;
         this.productCharacteristicDao = productCharacteristicDao;
@@ -68,7 +68,7 @@ public class ProductProxy extends Product {
     @Override
     public List<ProductRegionPrice> getPrices() {
         if (super.getPrices() == null) {
-            super.setPrices(productRegionPriceDao.getPricesByProductId(getProductId()));
+            super.setPrices(productRegionPriceDao.findByProductId(getProductId()));
         }
 
         return super.getPrices();

@@ -1,50 +1,54 @@
 package com.grad.project.nc.controller.api.admin;
 
-import com.grad.project.nc.model.DataType;
+import com.grad.project.nc.model.Category;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
-import com.grad.project.nc.persistence.DataTypeDao;
-import com.grad.project.nc.persistence.ProductCharacteristicDao;
-import com.grad.project.nc.persistence.ProductTypeDao;
+import com.grad.project.nc.persistence.CategoryDao;
+import com.grad.project.nc.persistence.impl.ProductCharacteristicDaoImpl;
+import com.grad.project.nc.persistence.impl.ProductTypeDaoImpl;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
 @Slf4j
 public class AdminProductTypesController {
 
-    private ProductTypeDao productTypeDao;
-    private DataTypeDao dataTypeDao;
-    private ProductCharacteristicDao productCharacteristicDao;
+    private ProductTypeDaoImpl productTypeDao;
+    private CategoryDao categoryDao;
+    private ProductCharacteristicDaoImpl productCharacteristicDao;
 
     @Autowired
-    public AdminProductTypesController(ProductTypeDao productTypeDao, DataTypeDao dataTypeDao, ProductCharacteristicDao productCharacteristicDao) {
+    public AdminProductTypesController(ProductTypeDaoImpl productTypeDao, CategoryDao categoryDao, ProductCharacteristicDaoImpl productCharacteristicDao) {
         this.productTypeDao = productTypeDao;
-        this.dataTypeDao = dataTypeDao;
+        this.categoryDao = categoryDao;
         this.productCharacteristicDao = productCharacteristicDao;
     }
 
     @RequestMapping(value = "/dataTypes", method = RequestMethod.GET)
     public Map<Long, String> dataTypes() {
         Map<Long, String> result = new HashMap<>();
-        dataTypeDao.findAll().forEach(value -> result.put(value.getDataTypeId(), value.getDataType()));
+        //dataTypeDao.findAll().forEach(value -> result.put(value.getDataTypeId(), value.getDataType()));
         return result;
     }
 
     @RequestMapping(value = "productTypes/delete", method = RequestMethod.POST)
     public Map<String, String> deleteType(@RequestBody Map<String, Long> productTypeId) {
         Map<String, String> result = new HashMap<>();
-        productTypeDao.delete(productTypeDao.find(productTypeId.get("id")));
+        productTypeDao.delete(productTypeId.get("id"));
         result.put("status", "success");
         result.put("message", "Product deleted successfully");
         return result;
@@ -71,7 +75,7 @@ public class AdminProductTypesController {
             productType.setProductCharacteristics(new LinkedList<>());
 
             for (Characteristic c : type.getCharacteristics()) {
-                DataType dataType = dataTypeDao.find(c.getDataTypeId());
+                Category dataType = categoryDao.find(c.getDataTypeId());
                 if (dataType == null) {
                     result.put("status", "error");
                     result.put("message", "Invalid data type in characteristic " + c.getName());
@@ -82,7 +86,7 @@ public class AdminProductTypesController {
                 characteristic.setCharacteristicName(c.getName());
                 characteristic.setDataType(dataType);
                 characteristic.setMeasure(c.getMeasure());
-                characteristic.setProductTypeId(productType.getProductTypeId());
+                characteristic.setProductType(productType);
                 if (c.getId() < 0) {
                     productCharacteristicDao.add(characteristic);
                 } else {

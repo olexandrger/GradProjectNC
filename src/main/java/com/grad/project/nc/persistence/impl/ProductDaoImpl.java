@@ -16,7 +16,7 @@ import java.util.*;
  * edited by Pavlo Rospopa
  */
 @Repository
-public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
+public class ProductDaoImpl extends AbstractDao implements ProductDao {
 
     private static final String PK_COLUMN_NAME = "product_id";
 
@@ -33,7 +33,7 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
         String insertQuery = "INSERT INTO \"product\" (\"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\") VALUES (?, ?, ?, ?)";
 
-        Long productId = executeInsertWithId(insertQuery, PK_COLUMN_NAME, product.getName(), product.getDescription(),
+        Long productId = executeInsertWithId(insertQuery, PK_COLUMN_NAME, product.getProductName(), product.getProductDescription(),
                 product.getIsActive(), product.getProductType().getProductTypeId());
 
         product.setProductId(productId);
@@ -57,16 +57,16 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
                 "\"product_type_id\"=? " +
                 "WHERE \"product_id\"=?";
 
-        executeUpdate(updateQuery, product.getName(), product.getDescription(), product.getIsActive(),
-                product.getProductType().getProductTypeId());
+        executeUpdate(updateQuery, product.getProductName(), product.getProductDescription(), product.getIsActive(),
+                product.getProductType().getProductTypeId(), product.getProductId());
 
         return product;
     }
 
     @Override
-    public void delete(Product product) {
+    public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"product\" WHERE \"product_id\" =?";
-        executeUpdate(deleteQuery, product.getProductId());
+        executeUpdate(deleteQuery, id);
     }
 
     @Override
@@ -74,45 +74,45 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
         String findAllQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\"";
 
-        return query(findAllQuery, new ProductRowMapper());
+        return findMultiple(findAllQuery, new ProductRowMapper());
     }
 
     @Override
-    public List<Product> findProductsByRegion(Region region) {
-        String findProductByRegionQuery = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
+    public List<Product> findByRegionId(Long regionId) {
+        String query = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
                 "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
                 "JOIN \"product_region_price\" prp " +
                 "ON p.\"product_id\" = prp.\"product_id\" " +
                 "WHERE prp.\"region_id\" =?";
 
-        return query(findProductByRegionQuery, new ProductRowMapper(), region.getRegionId());
+        return findMultiple(query, new ProductRowMapper(), regionId);
     }
 
     @Override
     public Product findByName(String productName) {
-        String findByNameQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
+        String query = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\" WHERE \"product_name\"=?";
 
-        return findOne(findByNameQuery, new ProductRowMapper(), productName);
+        return findOne(query, new ProductRowMapper(), productName);
     }
 
     @Override
-    public List<Product> findProductsByType(ProductType productType) {
-        String findByProductTypeQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
+    public List<Product> findByProductTypeId(Long productTypeId) {
+        String query = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\" WHERE \"product_type_id\"=?";
 
-        return query(findByProductTypeQuery, new ProductRowMapper(), productType.getProductTypeId());
+        return findMultiple(query, new ProductRowMapper(), productTypeId);
     }
 
     @Override
-    public Product getProductByProductRegionPrice(ProductRegionPrice productRegionPrice) {
+    public Product findByProductRegionPriceId(Long productRegionPriceId) {
         String query = "SELECT pr.\"product_id\", pr.\"product_name\", pr.\"product_description\", pr.\"is_active\", " +
                 "pr.\"product_type_id\" FROM \"product\" pr " +
                 "WHERE pr.\"product_id\" = " +
                 "(SELECT prp.\"product_id\" " +
                 "FROM \"product_region_price\" prp WHERE prp.\"price_id\" = ?)";
 
-        return findOne(query, new ProductRowMapper(), productRegionPrice.getPriceId());
+        return findOne(query, new ProductRowMapper(), productRegionPriceId);
     }
 
     private class ProductRowMapper implements RowMapper<Product> {
@@ -122,8 +122,8 @@ public class ProductDaoImpl extends AbstractDao<Product> implements ProductDao {
             ProductProxy product = proxyFactory.getObject();
 
             product.setProductId(rs.getLong("product_id"));
-            product.setName(rs.getString("product_name"));
-            product.setDescription(rs.getString("product_description"));
+            product.setProductName(rs.getString("product_name"));
+            product.setProductDescription(rs.getString("product_description"));
             product.setIsActive(rs.getBoolean("is_active"));
             product.setProductTypeId(rs.getLong("product_type_id"));
 

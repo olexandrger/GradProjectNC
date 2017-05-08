@@ -39,16 +39,16 @@ public class AccountController {
 
             List<Link> profileLinks = new LinkedList<>();
 
-            if (user.getRoles().contains(roleDao.getRoleByName("ROLE_CLIENT"))) {
+            if (user.getRoles().contains(roleDao.findByName("ROLE_CLIENT"))) {
                 profileLinks.add(new Link("Domains", "/client/domains"));
             }
 
-            if (user.getRoles().contains(roleDao.getRoleByName("ROLE_ADMIN"))) {
+            if (user.getRoles().contains(roleDao.findByName("ROLE_ADMIN"))) {
                 profileLinks.add(new Link("Edit product types", "/admin/productTypes"));
                 profileLinks.add(new Link("Edit products", "/admin/products"));
             }
 
-            if (user.getRoles().add(roleDao.getRoleByName("ROLE_CSR"))) {
+            if (user.getRoles().contains(roleDao.findByName("ROLE_CSR"))) {
                 profileLinks.add(new Link("Orders", "/csr/orders"));
             }
 

@@ -2,10 +2,12 @@ package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.Category;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface CategoryDao extends CrudDao<Category> {
-    Collection<Category> findByCategoryTypeId(Long categoryTypeId);
+    List<Category> findByCategoryTypeId(Long categoryTypeId);
+
+    List<Category> findByCategoryTypeName(String categoryTypeName);
 
     Category findProductOrderAim(Long productOrderId);
 

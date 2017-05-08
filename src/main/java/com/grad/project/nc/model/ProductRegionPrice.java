@@ -3,8 +3,7 @@ package com.grad.project.nc.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
-
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,5 +12,12 @@ public class ProductRegionPrice {
     private Product product;
     private Region region;
     private double price;
-    private Collection<Discount> discounts;
+
+    private List<Discount> discounts;
+    private List<ProductInstance> productInstances;
+
+    public ProductRegionPrice(Region region, double price) {
+        this.region = region;
+        this.price = price;
+    }
 }

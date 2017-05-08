@@ -1,19 +1,27 @@
 package com.grad.project.nc.persistence;
 
-import com.grad.project.nc.model.Discount;
-import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface ProductRegionPriceDao extends CrudDao<ProductRegionPrice> {
-    List<ProductRegionPrice> getProductRegionPricesByDiscount(Discount discount);
 
-    void deleteAllDiscounts(ProductRegionPrice productRegionPrice);
+    List<ProductRegionPrice> findByDiscountId(Long discountId);
 
-    void saveAllDiscounts(ProductRegionPrice productRegionPrice);
+    void deleteDiscounts(Long productRegionPriceId);
 
-    void addBatch(List<ProductRegionPrice> prices);
+    @Transactional
+    void persistDiscounts(ProductRegionPrice productRegionPrice);
 
-    List<ProductRegionPrice> getPricesByProductId(Long productId);
+    @Transactional
+    void persistBatch(Long productId, List<ProductRegionPrice> prices);
+
+    void deleteByProductId(Long productId);
+
+    List<ProductRegionPrice> findByProductId(Long productId);
+
+    List<ProductRegionPrice> findByRegionId(Long regionId);
+
+    ProductRegionPrice findByRegionIdAndProductId(Long regionId, Long priceId);
 }

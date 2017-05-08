@@ -1,10 +1,8 @@
 package com.grad.project.nc.model;
 
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
 import java.util.List;
 
 @NoArgsConstructor
@@ -14,5 +12,7 @@ public class Domain {
     private String domainName;
     private Address address;
     private Category domainType;
-    private Collection<User> users;
+
+    private List<User> users;
+    private List<ProductInstance> productInstances;
 }

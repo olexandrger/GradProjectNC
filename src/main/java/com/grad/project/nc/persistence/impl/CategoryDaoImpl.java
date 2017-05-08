@@ -12,14 +12,13 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * @author Pavlo Rospopa
  */
 @Repository
-public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDao {
+public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
 
     private static final String PK_COLUMN_NAME = "category_id";
 
@@ -32,24 +31,24 @@ public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDa
     }
 
     @Override
-    public Category add(Category entity) {
+    public Category add(Category category) {
         String insertQuery = "INSERT INTO \"category\" (\"category_name\", \"category_type_id\") VALUES (?, ?)";
-        Long categoryId = executeInsertWithId(insertQuery, PK_COLUMN_NAME, entity.getCategoryName(),
-                entity.getCategoryType().getCategoryTypeId());
+        Long categoryId = executeInsertWithId(insertQuery, PK_COLUMN_NAME, category.getCategoryName(),
+                category.getCategoryType().getCategoryTypeId());
 
-        entity.setCategoryId(categoryId);
+        category.setCategoryId(categoryId);
 
-        return entity;
+        return category;
     }
 
     @Override
-    public Category update(Category entity) {
+    public Category update(Category category) {
         String updateQuery = "UPDATE \"category\" SET \"category_name\"=?, \"category_type_id\"=? " +
                 "WHERE \"category_id\"=?";
-        executeUpdate(updateQuery, entity.getCategoryName(), entity.getCategoryType().getCategoryTypeId(),
-                entity.getCategoryId());
+        executeUpdate(updateQuery, category.getCategoryName(), category.getCategoryType().getCategoryTypeId(),
+                category.getCategoryId());
 
-        return entity;
+        return category;
     }
 
     @Override
@@ -62,20 +61,29 @@ public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDa
     @Override
     public List<Category> findAll() {
         String findAllQuery = "SELECT \"category_id\", \"category_name\", \"category_type_id\" FROM \"category\"";
-        return query(findAllQuery, new CategoryRowMapper());
+        return findMultiple(findAllQuery, new CategoryRowMapper());
     }
 
     @Override
-    public Collection<Category> findByCategoryTypeId(Long categoryTypeId) {
-        String findAllQuery = "SELECT \"category_id\", \"category_name\", \"category_type_id\" FROM \"category\" " +
+    public List<Category> findByCategoryTypeId(Long categoryTypeId) {
+        String query = "SELECT \"category_id\", \"category_name\", \"category_type_id\" FROM \"category\" " +
                 "WHERE \"category_type_id\"=?";
-        return query(findAllQuery, new CategoryRowMapper(), categoryTypeId);
+        return findMultiple(query, new CategoryRowMapper(), categoryTypeId);
     }
 
     @Override
-    public void delete(Category entity) {
+    public List<Category> findByCategoryTypeName(String categoryTypeName) {
+        String query = "SELECT \"category_id\", \"category_name\", c.\"category_type_id\" FROM \"category\" c " +
+                "JOIN \"category_type\" ct " +
+                "ON c.\"category_type_id\" = ct.\"category_type_id\" " +
+                "WHERE ct.\"category_type_name\"=?";
+        return findMultiple(query, new CategoryRowMapper(), categoryTypeName);
+    }
+
+    @Override
+    public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"category\" WHERE category_id = ?";
-        executeUpdate(deleteQuery, entity.getCategoryId());
+        executeUpdate(deleteQuery, id);
     }
 
     @Override
@@ -142,6 +150,7 @@ public class CategoryDaoImpl extends AbstractDao<Category> implements CategoryDa
         @Override
         public Category mapRow(ResultSet resultSet, int i) throws SQLException {
             CategoryProxy category = proxyFactory.getObject();
+
             category.setCategoryId(resultSet.getLong("category_id"));
             category.setCategoryName(resultSet.getString("category_name"));
             category.setCategoryTypeId(resultSet.getLong("category_type_id"));

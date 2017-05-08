@@ -58,7 +58,7 @@ public class RegistrationService {
             return false;
         }
         try {
-            userService.createUser(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), Collections.singletonList("CLIENT"));
+            userService.createUser(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), Collections.singletonList("ROLE_CLIENT"));
         } catch (DuplicateKeyException e) {
             status = ERROR;
             messageError = EMAIL_ALREADY_EXISTS;

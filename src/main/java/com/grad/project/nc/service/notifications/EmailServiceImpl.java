@@ -95,8 +95,8 @@ public class EmailServiceImpl implements EmailService {
     }
     /*
         private Template createTemplateFromString(String templateString) {
-            //Generate template cache name so they can be used again
-            //return new Template("name", new StringReader(templateString), );
+            //Generate template cache productName so they can be used again
+            //return new Template("productName", new StringReader(templateString), );
         }
     */
     @Override

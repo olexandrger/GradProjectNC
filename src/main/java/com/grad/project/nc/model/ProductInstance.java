@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductInstance {
     private Long instanceId;
-    private Long priceId;
-    private Long domainId;
-    private Long statusId;
-
-
+    private ProductRegionPrice price;
+    private Domain domain;
+    private Category status;
 }

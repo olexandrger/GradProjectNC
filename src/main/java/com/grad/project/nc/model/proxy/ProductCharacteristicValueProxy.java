@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductCharacteristicValue;
-import com.grad.project.nc.persistence.ProductCharacteristicDao;
+import com.grad.project.nc.persistence.impl.ProductCharacteristicDaoImpl;
 import com.grad.project.nc.persistence.ProductDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 public class ProductCharacteristicValueProxy extends ProductCharacteristicValue {
 
     private ProductDao productDao;
-    private ProductCharacteristicDao productCharacteristicDao;
+    private ProductCharacteristicDaoImpl productCharacteristicDao;
 
     private Long productId;
     private Long productCharacteristicId;
 
     @Autowired
-    public ProductCharacteristicValueProxy(ProductCharacteristicDao productCharacteristicDao, ProductDao productDao) {
+    public ProductCharacteristicValueProxy(ProductCharacteristicDaoImpl productCharacteristicDao, ProductDao productDao) {
         this.productCharacteristicDao = productCharacteristicDao;
         this.productDao = productDao;
     }

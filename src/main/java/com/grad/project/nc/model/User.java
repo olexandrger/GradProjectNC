@@ -1,6 +1,5 @@
 package com.grad.project.nc.model;
 
-import com.grad.project.nc.persistence.UserDao;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,9 +17,10 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
     private String phoneNumber;
+
     private List<Role> roles;
     private List<Domain> domains;
-    private List<ProductOrder> orders;
+    private List<ProductOrder> productOrders;
     private List<Complain> complains;
 
     @Override

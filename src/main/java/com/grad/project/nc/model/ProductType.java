@@ -11,10 +11,14 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class ProductType {
-
     private Long productTypeId;
     private String productTypeName;
     private String productTypeDescription;
+    private Boolean isActive;
 
     private List<ProductCharacteristic> productCharacteristics;
+
+    public ProductType(Long productTypeId) {
+        this.productTypeId = productTypeId;
+    }
 }

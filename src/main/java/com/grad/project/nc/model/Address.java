@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Address {
     private Long addressId;
-    private int apartmentNumber;
+    private String apartmentNumber;
     private Location location;
-
-
 }

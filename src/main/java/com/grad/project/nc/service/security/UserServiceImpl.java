@@ -2,11 +2,8 @@ package com.grad.project.nc.service.security;
 
 import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.User;
-
-import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.RoleDao;
 import com.grad.project.nc.persistence.UserDao;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -53,7 +50,7 @@ public class UserServiceImpl implements UserService{
         user.setRoles(new LinkedList<>());
 
         roles.forEach(roleName -> {
-            Role role = roleDao.getRoleByName(roleName);
+            Role role = roleDao.findByName(roleName);
             if (role != null) {
                 user.getRoles().add(role);
             } else {
@@ -61,7 +58,8 @@ public class UserServiceImpl implements UserService{
             }
         });
 
-        userDao.createUser(user);
+        userDao.add(user);
+        userDao.persistUserRoles(user);
 
         return user;
     }

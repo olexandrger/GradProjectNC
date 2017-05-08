@@ -5,16 +5,15 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
 @Data
 @NoArgsConstructor
 public class Product {
     private Long productId;
-    private String name;
-    private String description;
+    private String productName;
+    private String productDescription;
     private Boolean isActive;
-
     private ProductType productType;
+
     private List<ProductCharacteristicValue> productCharacteristicValues;
     private List<ProductCharacteristic> productCharacteristics;
     private List<ProductRegionPrice> prices;

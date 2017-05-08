@@ -1,6 +1,6 @@
 package com.grad.project.nc.service.orders;
 
-import com.grad.project.nc.exceptions.ServiceSecurityException;
+import com.grad.project.nc.service.exceptions.ServiceSecurityException;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.function.Supplier;
 
@@ -68,7 +69,7 @@ public class OrdersServiceImpl implements OrdersService {
     private ProductOrder newOrder(long instanceId, long userId, long aimId) {
         ProductOrder order = new ProductOrder();
 
-        order.setOpenDate(LocalDateTime.now());
+        order.setOpenDate(OffsetDateTime.now());
         order.setOrderAim(categoryDao.find(aimId));
         order.setProductInstance(productInstanceDao.find(instanceId));
         order.setUser(userDao.find(userId));
@@ -83,10 +84,12 @@ public class OrdersServiceImpl implements OrdersService {
 
         ProductInstance instance = new ProductInstance();
 
-        instance.setDomainId(domainId);
-        instance.setStatusId(INSTANCE_STATUS_CREATED);
-        instance.setPriceId(productRegionPriceDao.getPriceByProductAndRegion(productId,
-                domain.getAddress().getLocation().getGoogleRegion().getRegion().getRegionId()).getPriceId());
+        Category category = categoryDao.find(INSTANCE_STATUS_CREATED);
+
+        instance.setDomain(domain);
+        instance.setStatus(category);
+        instance.setPrice(productRegionPriceDao.findByRegionIdAndProductId(
+                domain.getAddress().getLocation().getRegion().getRegionId(), productId));
 
         instance = productInstanceDao.add(instance);
 
@@ -143,10 +146,10 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = orderDao.find(orderId);
 
         order.setStatus(categoryDao.find(ORDER_STATUS_CANCELLED));
-        order.setCloseDate(LocalDateTime.now());
+        order.setCloseDate(OffsetDateTime.now());
 
         if (order.getOrderAim().getCategoryId() == ORDER_AIM_CREATE) {
-            order.getProductInstance().setStatusId(INSTANCE_STATUS_DEACTIVATED);
+            order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_DEACTIVATED));
 //            productInstanceDao.delete(order.getProductInstance());
         }
     }
@@ -156,22 +159,23 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = orderDao.find(orderId);
 
         order.setStatus(categoryDao.find(ORDER_STATUS_COMPLETED));
-        order.setCloseDate(LocalDateTime.now());
+        order.setCloseDate(OffsetDateTime.now());
 
+        //TODO rework instance statuses
         if (order.getOrderAim().getCategoryId() == ORDER_AIM_CREATE) {
-            order.getProductInstance().setStatusId(INSTANCE_STATUS_ACTIVATED);
+            order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_ACTIVATED));
         } else if (order.getOrderAim().getCategoryId() == ORDER_AIM_ACTIVATE) {
-            order.getProductInstance().setStatusId(INSTANCE_STATUS_ACTIVATED);
+            order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_ACTIVATED));
         } else if (order.getOrderAim().getCategoryId() == ORDER_AIM_DEACTIVATE) {
-            order.getProductInstance().setStatusId(INSTANCE_STATUS_DEACTIVATED);
+            order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_DEACTIVATED));
         } else if (order.getOrderAim().getCategoryId() == ORDER_AIM_SUSPEND) {
-            order.getProductInstance().setStatusId(INSTANCE_STATUS_SUSPENDED);
+            order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_SUSPENDED));
         }
     }
 
     @Override
     public Collection<ProductOrder> getUserOrders(long size, long offset) {
-        return orderDao.findByClientId(getCurrentUser().getUserId());
+        return orderDao.findByUserId(getCurrentUser().getUserId());
     }
 
     @Override
@@ -189,14 +193,14 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = orderDao.find(orderId);
         Domain domain = domainDao.find(domainId);
 
-        ProductRegionPrice price = productRegionPriceDao.getPriceByProductAndRegion(productId,
-                domain.getAddress().getLocation().getGoogleRegion().getRegion().getRegionId());
+        ProductRegionPrice price = productRegionPriceDao.findByRegionIdAndProductId(
+                domain.getAddress().getLocation().getRegion().getRegionId(), productId);
 
         if (price == null) {
             return null;
         } else {
-            order.getProductInstance().setDomainId(domainId);
-            order.getProductInstance().setPriceId(price.getPriceId());
+            order.getProductInstance().setDomain(domain);
+            order.getProductInstance().setPrice(price);
             return order;
         }
     }

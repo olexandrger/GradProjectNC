@@ -9,15 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class ProductCharacteristicValueDaoImpl extends AbstractDao<ProductCharacteristicValue>
+public class ProductCharacteristicValueDaoImpl extends AbstractDao
         implements ProductCharacteristicValueDao {
 
     private final ObjectFactory<ProductCharacteristicValueProxy> proxyFactory;
@@ -30,32 +31,28 @@ public class ProductCharacteristicValueDaoImpl extends AbstractDao<ProductCharac
     }
 
     @Override
-    public ProductCharacteristicValue add(ProductCharacteristicValue entity) {
+    public ProductCharacteristicValue add(ProductCharacteristicValue value) {
         String insertQuery = "INSERT INTO \"product_characteristic_value\" (\"product_id\", " +
                 "\"product_characteristic_id\", \"number_value\", \"date_value\", \"string_value\") " +
                 "VALUES (?,?,?,?,?)";
-        executeUpdate(insertQuery, entity.getProduct().getProductId(),
-                entity.getProductCharacteristic().getProductCharacteristicId(),
-                entity.getNumberValue(), entity.getDateValue(), entity.getStringValue());
 
-        return entity;
+        executeUpdate(insertQuery, value.getProduct().getProductId(),
+                value.getProductCharacteristic().getProductCharacteristicId(),
+                value.getNumberValue(), value.getDateValue(), value.getStringValue());
+
+        return value;
     }
 
     @Override
-    public ProductCharacteristicValue update(ProductCharacteristicValue entity) {
+    public ProductCharacteristicValue update(ProductCharacteristicValue value) {
         String updateQuery = "UPDATE \"product_characteristic_value\" SET \"number_value\"=?, " +
                 "\"date_value\"=?, \"string_value\"=? WHERE \"product_id\"=? AND \"product_characteristic_id\"=?";
 
-        executeUpdate(updateQuery, entity.getNumberValue(), entity.getDateValue(),
-                entity.getStringValue(), entity.getProduct().getProductId(),
-                entity.getProductCharacteristic().getProductCharacteristicId());
+        executeUpdate(updateQuery, value.getNumberValue(), value.getDateValue(),
+                value.getStringValue(), value.getProduct().getProductId(),
+                value.getProductCharacteristic().getProductCharacteristicId());
 
-        return entity;
-    }
-
-    @Override
-    public ProductCharacteristicValue find(Long id) {
-        throw new NotImplementedException();
+        return value;
     }
 
     @Override
@@ -73,41 +70,40 @@ public class ProductCharacteristicValueDaoImpl extends AbstractDao<ProductCharac
         String findAllQuery = "SELECT \"product_id\" \"product_characteristic_id\", " +
                 "\"number_value\", \"date_value\", \"string_value\" " +
                 "FROM \"product_characteristic_value\"";
-        return query(findAllQuery, new ProductCharacteristicValueRowMapper());
+        return findMultiple(findAllQuery, new ProductCharacteristicValueRowMapper());
     }
 
     @Override
-    public void delete(ProductCharacteristicValue entity) {
+    public void delete(Long productId, Long productCharacteristicId) {
         String deleteQuery = "DELETE FROM \"product_characteristic_value\" " +
                 "WHERE (\"product_id\"=? AND \"product_characteristic_id\"=?)";
 
-        executeUpdate(deleteQuery, entity.getProduct().getProductId(),
-                entity.getProductCharacteristic().getProductCharacteristicId());
+        executeUpdate(deleteQuery, productId, productCharacteristicId);
     }
 
     @Override
-    public List<ProductCharacteristicValue> findByProductId(Long id) {
+    public List<ProductCharacteristicValue> findByProductId(Long productId) {
         final String query = "SELECT \"product_id\", \"product_characteristic_id\", " +
                 "\"number_value\", \"date_value\", \"string_value\" " +
                 "FROM \"product_characteristic_value\" WHERE \"product_id\"=?";
-        return query(query, new ProductCharacteristicValueRowMapper(), id);
+        return findMultiple(query, new ProductCharacteristicValueRowMapper(), productId);
     }
 
     @Override
-    public void deleteProductCharacteristicValuesByProductId(Long productId) {
+    public void deleteByProductId(Long productId) {
         String deleteQuery = "DELETE FROM \"product_characteristic_value\" WHERE \"product_id\"=?";
         executeUpdate(deleteQuery, productId);
     }
 
     @Override
-    public void addBatch(List<ProductCharacteristicValue> values) {
+    public void persistBatch(Long productId, List<ProductCharacteristicValue> values) {
         String insertQuery = "INSERT INTO \"product_characteristic_value\" (\"product_id\", " +
                 "\"product_characteristic_id\", \"number_value\", \"date_value\", \"string_value\") " +
                 "VALUES (?, ?, ?, ?, ?)";
 
         List<Object[]> batchArgs = new ArrayList<>();
         for (ProductCharacteristicValue value : values) {
-            batchArgs.add(new Object[]{value.getProduct().getProductId(),
+            batchArgs.add(new Object[]{productId,
                     value.getProductCharacteristic().getProductCharacteristicId(),
                     value.getNumberValue(), value.getDateValue(), value.getStringValue()});
         }
@@ -115,6 +111,7 @@ public class ProductCharacteristicValueDaoImpl extends AbstractDao<ProductCharac
     }
 
     private class ProductCharacteristicValueRowMapper implements RowMapper<ProductCharacteristicValue> {
+
         @Override
         public ProductCharacteristicValue mapRow(ResultSet rs, int rowNum) throws SQLException {
             ProductCharacteristicValueProxy value = proxyFactory.getObject();
@@ -123,7 +120,8 @@ public class ProductCharacteristicValueDaoImpl extends AbstractDao<ProductCharac
             value.setProductCharacteristicId(rs.getLong("product_characteristic_id"));
             value.setNumberValue(rs.getDouble("number_value"));
             if (rs.getTimestamp("date_value") != null) {
-                value.setDateValue(rs.getTimestamp("date_value").toLocalDateTime());
+                value.setDateValue(OffsetDateTime
+                        .ofInstant(rs.getTimestamp("date_value").toInstant(), ZoneId.systemDefault()));
             }
             value.setStringValue(rs.getString("string_value"));
             return value;

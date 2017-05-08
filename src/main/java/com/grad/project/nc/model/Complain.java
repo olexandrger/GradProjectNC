@@ -3,8 +3,7 @@ package com.grad.project.nc.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
+import java.time.OffsetDateTime;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +16,7 @@ public class Complain {
     private Category status;
     private User responsible;
     private String response;
-    private LocalDateTime openDate;
-    private LocalDateTime closeDate;
+    private OffsetDateTime openDate;
+    private OffsetDateTime closeDate;
     private Category complainReason;
 }

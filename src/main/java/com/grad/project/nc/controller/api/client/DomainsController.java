@@ -37,7 +37,7 @@ public class DomainsController {
 //            new DomainAddress(1L, "Domain #1", 1L, "City1", "Street1", "13A", 14),
 //            new DomainAddress(2L, "Domain #3", 2L, "City 2", "Street 2", "6", 27)
 //        );
-        return domainDao.getDomainsByUserId(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId()).stream().map(item -> new DomainAddress(
+        return domainDao.findByUserId(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId()).stream().map(item -> new DomainAddress(
                 item.getDomainId(),
                 item.getDomainName(),
                 (long) (item.getDomainId() % 2 == 1 ? 1 : 2),

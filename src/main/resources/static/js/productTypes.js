@@ -63,7 +63,7 @@ function addProductValue(id, name, measure, dataType) {
         '<div class="input-group product-characteristic-input">'+
             '<input type="hidden" name="characteristic-id" value="' + id + '"/>' +
             '<span class="input-group-addon">Name</span>'+
-            '<input type="text" class="form-control" value="' + name + '" placeholder="Name" name="characteristic-name">'+
+            '<input type="text" class="form-control" value="' + name + '" placeholder="Name" name="characteristic-productName">'+
             '<span class="input-group-addon">Measure</span>'+
             '<input type="text" class="form-control" value="' + measure + '" placeholder="Measure" name="characteristic-measure">'+
             '<span class="input-group-addon">Data type</span>'+
@@ -88,7 +88,7 @@ function saveSelected() {
     $("#product-type-values").find(".product-characteristic-input").each(function (element) {
        productTypeData[savedId].characteristics.push({
            id: $(this).find("input[name='characteristic-id']").val(),
-           name: $(this).find("input[name='characteristic-name']").val(),
+           name: $(this).find("input[name='characteristic-productName']").val(),
            measure: $(this).find("input[name='characteristic-measure']").val(),
            dataTypeId: $(this).find("select").val()
        });
@@ -119,8 +119,8 @@ function saveSelected() {
                     type: 'GET',
                     url: '/api/user/productTypes/get/' + data.id,
                     success: function (data) {
-                        console.log("Update after saving successful");
-                        console.log("Set name " + data.name);
+                        // console.log("Update after saving successful");
+                        // console.log("Set name " + data.name);
                         $("#product-types-list").find("a:nth-child(" + (savedId+1) + ")").html(data.name);
                         productTypeData[savedId] = data;
                     },

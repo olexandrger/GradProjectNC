@@ -7,9 +7,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductCharacteristic {
     private Long productCharacteristicId;
-    private Long productTypeId;
+    private ProductType productType;
     private String characteristicName;
     private String measure;
-//    private Long dataTypeId;
-    private DataType dataType;
+    private Category dataType;
+
+    public ProductCharacteristic(Long productCharacteristicId) {
+        this.productCharacteristicId = productCharacteristicId;
+    }
 }
