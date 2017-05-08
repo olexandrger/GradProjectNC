@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService{
             }
         });
 
-        userDao.add(user);
+        userDao.createUser(user);
 
         return user;
     }
