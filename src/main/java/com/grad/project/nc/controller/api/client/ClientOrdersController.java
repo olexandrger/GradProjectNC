@@ -67,7 +67,7 @@ public class ClientOrdersController {
 
     @RequestMapping(value = "/new/activate", method = RequestMethod.POST)
     public Map<String, Object> activate(@RequestBody Map<String, String> params) {
-        return newOrder(ordersService::newActivationOrder, params);
+        return newOrder(ordersService::newResumeOrder, params);
     }
 
     @RequestMapping(value = "/new/deactivate", method = RequestMethod.POST)

@@ -17,8 +17,8 @@ public interface OrdersService {
     ProductOrder newSuspensionOrder(long instanceId);
     ProductOrder newSuspensionOrder(long instanceId, long userId);
 
-    ProductOrder newActivationOrder(long instanceId);
-    ProductOrder newActivationOrder(long instanceId, long userId);
+    ProductOrder newResumeOrder(long instanceId);
+    ProductOrder newResumeOrder(long instanceId, long userId);
 
     ProductOrder newDeactivationOrder(long instanceId);
     ProductOrder newDeactivationOrder(long instanceId, long userId);

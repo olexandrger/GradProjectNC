@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -31,20 +30,11 @@ public class OrdersServiceImpl implements OrdersService {
     private static final long INSTANCE_STATUS_SUSPENDED = 11L;
     private static final long INSTANCE_STATUS_DEACTIVATED = 12L;
 
-
-    13	CREATE
-14	SUSPEND
-15	DEACTIVATE
-25	RESUME
-26	MODIFY
-
-
     private static final long ORDER_AIM_CREATE = 13L;
     private static final long ORDER_AIM_SUSPEND = 14L;
     private static final long ORDER_AIM_DEACTIVATE = 15L;
-    //TODO resolve this
-//    private static final long ORDER_AIM_CANCEL = 16L;
-    private static final long ORDER_AIM_ACTIVATE = 16L;//or add 22L
+    private static final long ORDER_AIM_RESUME = 25L;
+    private static final long ORDER_AIM_MODIFY = 26L;
 
     private static final long ORDER_STATUS_CREATED = 1L;
     private static final long ORDER_STATUS_IN_PROGRESS = 2L;
@@ -110,9 +100,8 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public ProductOrder newActivationOrder(long instanceId, long userId) {
-        return newOrder(instanceId, userId, ORDER_AIM_ACTIVATE);
-
+    public ProductOrder newResumeOrder(long instanceId, long userId) {
+        return newOrder(instanceId, userId, ORDER_AIM_RESUME);
     }
 
     @Override
@@ -137,8 +126,8 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public ProductOrder newActivationOrder(long instanceId) {
-        return newActivationOrder(instanceId, getCurrentUser().getUserId());
+    public ProductOrder newResumeOrder(long instanceId) {
+        return newResumeOrder(instanceId, getCurrentUser().getUserId());
     }
 
     @Override
@@ -172,7 +161,7 @@ public class OrdersServiceImpl implements OrdersService {
         //TODO rework instance statuses
         if (order.getOrderAim().getCategoryId() == ORDER_AIM_CREATE) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_ACTIVATED));
-        } else if (order.getOrderAim().getCategoryId() == ORDER_AIM_ACTIVATE) {
+        } else if (order.getOrderAim().getCategoryId() == ORDER_AIM_RESUME) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_ACTIVATED));
         } else if (order.getOrderAim().getCategoryId() == ORDER_AIM_DEACTIVATE) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_DEACTIVATED));

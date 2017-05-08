@@ -1,10 +1,8 @@
 package com.grad.project.nc.controller.api.csr;
 
-import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.service.orders.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -68,7 +66,7 @@ public class CsrOrdersController {
 
     @RequestMapping(value = "/new/activate", method = RequestMethod.POST)
     public Map<String, Object> activate(@RequestBody Map<String, String> params) {
-        return newOrder(ordersService::newActivationOrder, params);
+        return newOrder(ordersService::newResumeOrder, params);
     }
 
     @RequestMapping(value = "/new/deactivate", method = RequestMethod.POST)
