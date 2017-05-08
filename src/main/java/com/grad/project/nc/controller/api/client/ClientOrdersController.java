@@ -42,7 +42,7 @@ public class ClientOrdersController {
 
     @RequestMapping(value = "/new/create", method = RequestMethod.POST)
     public Map<String, Object> create(@RequestBody Map<String, String> params) {
-        log.error(params.toString());
+//        log.error(params.toString());
         Map<String, Object> result = new HashMap<>();
         try {
             long productId = Long.parseLong(params.get("productId"));

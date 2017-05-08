@@ -49,6 +49,8 @@ function changeCharacteristics() {
     list.empty();
     if (data != undefined) {
         data.characteristics.forEach(function (item) {
+            console.log(item);
+
             var measureHtml = "";
 
             if (item.measure != undefined && item.measure != "") {
@@ -57,7 +59,7 @@ function changeCharacteristics() {
 
 
             var inputType = "text";
-            if (item.dataTypeId == 2)
+            if (item.dataTypeId == 23)
                 inputType = "datetime-local";
 
             var value = "";
@@ -108,7 +110,6 @@ function selectProduct(x) {
     var list = $("#products-list");
     list.find("a").removeClass("active");
     list.find("a:nth-child(" + (x+1) + ")").addClass("active");
-
 
     var typeSelector = $("#product-type-selector");
 
@@ -270,7 +271,7 @@ function addProduct(name, index) {
 
         name = nameField.val();
         nameField.val("");
-        productsData.push({productId: id, name: name, productCharacteristicValues: []});
+        productsData.push({productId: id, productName: name, productCharacteristicValues: []});
     }
 
     if (name != "") {
@@ -310,13 +311,6 @@ function loadProducts() {
         success: function (data) {
 
             console.log(data);
-
-            data.forEach(function(prod) {
-                prod.characteristics = {};
-                prod.productCharacteristics.forEach(function (char) {
-                    prod.characteristics[char.productCharacteristicId] = char;
-                });
-            });
 
             productsData = data;
 
