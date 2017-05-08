@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Products</title>
+    <title>Orders</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -15,7 +15,8 @@
 
 
     <link rel="stylesheet" href="/css/main.css">
-    <script src="/js/products.js"></script>
+    <script src="/js/orders.js"></script>
+    <script src="https://momentjs.com/downloads/moment.js"></script>
 
 </head>
 <body>
@@ -24,12 +25,15 @@
 <#include "../resources/navbar.ftl"/>
 
     <div class="row">
+        <div class="col-sm-12"><div id="csr-order-alert-place""></div></div>
+    </div>
+    <div class="row">
         <div class="col-sm-5">
 
-            <div class="list-group">
-                <a href="#" class="list-group-item">First order</a>
-                <a href="#" class="list-group-item">Second order</a>
-                <a href="#" class="list-group-item">Third order</a>
+            <div class="list-group" id="csr-orders-list">
+                <#--<a href="#" class="list-group-item">First order</a>-->
+                <#--<a href="#" class="list-group-item">Second order</a>-->
+                <#--<a href="#" class="list-group-item">Third order</a>-->
             </div>
 
             <ul class="pager">
@@ -37,55 +41,56 @@
                 <li class="next"><a href="#">Next</a></li>
             </ul>
         </div>
-        <div class="col-sm-7">
+        <div class="col-sm-7 hidden" id="order-main">
 
             <div class="form-group">
                 <label for="order-user-name">User</label>
-                <input type="text" class="form-control" name="order-user-name" id="order-user-name" value="Some User" readonly>
+                <input type="text" class="form-control" name="order-user-name" id="order-user-name" readonly>
             </div>
 
             <div class="form-group">
                 <label for="order-domain">Domain</label>
                 <select class="form-control" name="order-domain" id="order-domain">
-                    <option>Domain 1</option>
-                    <option selected>Domain 2</option>
-                    <option>Domain 3</option>
+                    <#--<option>Domain 1</option>-->
+                    <#--<option selected>Domain 2</option>-->
+                    <#--<option>Domain 3</option>-->
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="order-domain">Product</label>
+                <label for="order-product">Product</label>
                 <select class="form-control" name="order-product" id="order-product">
-                    <option>Product 1</option>
-                    <option selected>Product 2</option>
-                    <option>Product 3</option>
+                    <#--<option>Product 1</option>-->
+                    <#--<option selected>Product 2</option>-->
+                    <#--<option>Product 3</option>-->
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="order-user-name">Aim</label>
-                <input type="text" class="form-control" name="order-user-name" id="order-user-name" value="Suspend" readonly>
+                <label for="order-aim">Aim</label>
+                <input type="text" class="form-control" name="order-aim" id="order-aim" value="Suspend" readonly>
             </div>
 
             <div class="form-group">
-                <label for="order-user-name">Status</label>
-                <input type="text" class="form-control" name="order-user-name" id="order-user-name" value="In progress" readonly>
+                <label for="order-status">Status</label>
+                <input type="text" class="form-control" name="order-status" id="order-status" value="In progress" readonly>
             </div>
 
             <div class="form-group">
-                <label for="order-user-name">Start date</label>
-                <input type="text" class="form-control" name="order-user-name" id="order-user-name" value="11.11.1111" readonly>
+                <label for="order-start-date">Start date</label>
+                <input type="text" class="form-control" name="order-start-date" id="order-start-date" value="11.11.1111" readonly>
             </div>
 
             <div class="form-group">
-                <label for="order-user-name">End date</label>
-                <input type="text" class="form-control" name="order-user-name" id="order-user-name" value="" readonly>
+                <label for="order-end-date">End date</label>
+                <input type="text" class="form-control" name="order-end-date" id="order-end-date" value="" readonly>
             </div>
 
             <div class="form-group text-center">
-                <button class="btn">Update</button>
-                <button class="btn">Cancel</button>
-                <button class="btn">Complete</button>
+                <button class="btn order-button hidden" id="order-button-update" onclick="updateSelectedOrder()">Update</button>
+                <button class="btn order-button hidden" id="order-button-cancel" onclick="cancelSelectedOrder()">Cancel</button>
+                <button class="btn order-button hidden" id="order-button-start" onclick="startSelectedOrder()">Start</button>
+                <button class="btn order-button hidden" id="order-button-complete" onclick="completeSelectedOrder()">Complete</button>
             </div>
 
         </div>

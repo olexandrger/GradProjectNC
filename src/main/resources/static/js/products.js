@@ -135,7 +135,7 @@ function selectProduct(x) {
 
         if (productsData[currentSelected].prices != undefined) {
             productsData[currentSelected].prices.forEach(function (item) {
-                addRegionalPrice(item.region.regionId, item.price);
+                addRegionalPrice(item.regionId, item.price);
             });
         }
 

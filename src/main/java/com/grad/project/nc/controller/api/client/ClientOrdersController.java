@@ -82,6 +82,6 @@ public class ClientOrdersController {
 
     @RequestMapping(value = "/get/byInstance/{id}/size/{size}/offset/{offset}", method = RequestMethod.GET)
     public Collection<ProductOrder> getByProduct(@PathVariable Long id, @PathVariable Long size, @PathVariable Long offset) {
-        return ordersService.getOrdersByProduct(id, size, offset);
+        return ordersService.getOrdersByProductInstance(id, size, offset);
     }
 }

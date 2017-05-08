@@ -215,7 +215,6 @@ function selectItem(x) {
     selected = x;
 
     var list = $("#product-types-list");
-    list.find("a").removeClass("active");
     list.find("a:nth-child(" + (x+1) + ")").addClass("active");
     // $('input:radio[name=product-type-status]').prop('checked', false);
 
@@ -255,28 +254,28 @@ function loadProductTypes() {
     $.ajax({
         url: "/api/user/productTypes/all ",
         success: function(data) {
-        var list = $("#product-types-list");
+            var list = $("#product-types-list");
 
-        productTypeData = data;
+            productTypeData = data;
 
-        data.forEach(function(item, i) {
-            console.log(item.name + " loaded");
+            data.forEach(function(item, i) {
+                console.log(item.name + " loaded");
 
-            var ref = document.createElement("a");
-            ref.appendChild(document.createTextNode(item.name));
-            ref.className = "list-group-item";
-            ref.href = "#";
-            ref.onclick = function () {
-                selectItem(i);
-            };
+                var ref = document.createElement("a");
+                ref.appendChild(document.createTextNode(item.name));
+                ref.className = "list-group-item";
+                ref.href = "#";
+                ref.onclick = function () {
+                    selectItem(i);
+                };
 
-            list.append(ref);
-        });
-    },
-    error: function () {
-        console.error("Cannot load list product types");
-    }
-});
+                list.append(ref);
+            });
+        },
+        error: function () {
+            console.error("Cannot load list product types");
+        }
+    });
 }
 
 $(document).ready(function () {

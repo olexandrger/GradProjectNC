@@ -36,10 +36,12 @@ public class ProductOrderDaoImpl extends AbstractDao
                 "\"order_aim_id\", \"status_id\", \"responsible_id\", \"open_date\", \"close_date\") " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
+        Long responsibleId = productOrder.getResponsible() == null ? null : productOrder.getResponsible().getUserId();
+
         Long productOrderId = executeInsertWithId(insertQuery, PK_COLUMN_NAME,
                 productOrder.getProductInstance().getInstanceId(), productOrder.getUser().getUserId(),
                 productOrder.getOrderAim().getCategoryId(), productOrder.getStatus().getCategoryId(),
-                productOrder.getResponsible().getUserId(), productOrder.getOpenDate(), productOrder.getCloseDate());
+                responsibleId, productOrder.getOpenDate(), productOrder.getCloseDate());
 
         productOrder.setProductOrderId(productOrderId);
 
@@ -52,9 +54,12 @@ public class ProductOrderDaoImpl extends AbstractDao
                 "\"order_aim_id\"=?, \"status_id\"=?, \"responsible_id\"=?, \"open_date\"=?, " +
                 "\"close_date\"=? WHERE \"product_order_id\"=?";
 
+
+        Long responsibleId = productOrder.getResponsible() == null ? null : productOrder.getResponsible().getUserId();
+
         executeUpdate(updateQuery, productOrder.getProductInstance().getInstanceId(),
                 productOrder.getUser().getUserId(), productOrder.getOrderAim().getCategoryId(),
-                productOrder.getStatus().getCategoryId(), productOrder.getResponsible().getUserId(),
+                productOrder.getStatus().getCategoryId(), responsibleId,
                 productOrder.getOpenDate(), productOrder.getCloseDate(), productOrder.getProductOrderId());
 
         return productOrder;

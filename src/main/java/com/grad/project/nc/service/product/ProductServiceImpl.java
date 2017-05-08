@@ -1,6 +1,7 @@
 package com.grad.project.nc.service.product;
 
 import com.grad.project.nc.model.Product;
+import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.ProductCharacteristicValueDao;
 import com.grad.project.nc.persistence.ProductDao;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,6 +71,11 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
                 .stream()
                 .peek(value -> value.setProduct(product))
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public Collection<Product> getProductsByProductType(ProductType productType) {
+        return productDao.findByProductTypeId(productType.getProductTypeId());
     }
 
     @Override

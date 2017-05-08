@@ -2,7 +2,7 @@ var catalogProducts;
 var catalogSelectedItem = -1;
 
 var catalogSelectedCategory = decodeURIComponent(window.location.search.substr(1));
-var catalogCharacteristics = {};
+// var catalogCharacteristics = {};
 
 var catalogDomains;
 
@@ -15,23 +15,21 @@ function getCharacteristicStringValue(characteristic, dataType) {
         return characteristic.stringValue;
 
     if (dataType == "DATE") {
-        var date = characteristic.dateValue;
-        function addNumber(number) {
-            var result = "";
-            if (number < 10)
-                result += '0';
-            result += number;
-            return result;
-        }
-        return addNumber(date[3]) + ':' + addNumber(date[4]) + " " + addNumber(date[2]) + '.' + addNumber(date[1]) + "." + date[0];
+        // var date = characteristic.dateValue;
+        // function addNumber(number) {
+        //     var result = "";
+        //     if (number < 10)
+        //         result += '0';
+        //     result += number;
+        //     return result;
+        // }
+        // return addNumber(date[3]) + ':' + addNumber(date[4]) + " " + addNumber(date[2]) + '.' + addNumber(date[1]) + "." + date[0];
+        return moment.unix(characteristic.dateValue).format("LLL")
     }
 }
 
 function getRegionalPrice(regionId) {
     var price = "";
-
-    // var selectedRegion = localStorage.getItem("regionId");
-
     catalogProducts[catalogSelectedItem].prices.forEach(function(item) {
         if (item.region.regionId == regionId)
             price = item.price;
@@ -52,29 +50,30 @@ function selectCatalogProduct(index) {
 
     $(".table-row").remove();
 
-    $("#catalog-product-name").text(catalogProducts[index].name);
-    $("#catalog-product-description").text(catalogProducts[index].description);
+    $("#catalog-product-name").text(catalogProducts[index].productName);
+    $("#catalog-product-description").text(catalogProducts[index].productDescription);
 
-    catalogProducts[index].productCharacteristics.forEach(function (item) {
-        catalogCharacteristics[item.productCharacteristicId] = item;
-    });
+    // catalogProducts[index].productCharacteristics.forEach(function (item) {
+    //     catalogCharacteristics[item.productCharacteristicId] = item;
+    // });
 
     var table = $("#catalog-table-details");
     catalogProducts[index].productCharacteristicValues.forEach(function (item) {
+        console.log(item.productCharacteristic.measure);
            var html = '<tr class="table-row"><td>' +
-            catalogCharacteristics[item.productCharacteristicId].characteristicName +
+                   item.productCharacteristic.characteristicName +
             '</td>' +
             '<td>' +
-            getCharacteristicStringValue(item, catalogCharacteristics[item.productCharacteristicId].dataType.dataType) + ' ' +
-            catalogCharacteristics[item.productCharacteristicId].measure +
+                   getCharacteristicStringValue(item, item.productCharacteristic.dataType.categoryName) +
+                   item.productCharacteristic.measure +
             '</td></tr>';
 
         table.append($(html));
     });
 
     var html = '<tr class="table-row"><td>Price</td><td>' +
-        getRegionalPrice(localStorage.getItem("regionId")) +
-        '</td></tr>';
+                    getRegionalPrice(localStorage.getItem("regionId")) +
+                '</td></tr>';
     table.append($(html));
 }
 
@@ -87,7 +86,7 @@ function updateCatalog() {
     catalogProducts.forEach(function(item, index) {
         if (item.productType.productTypeName == catalogSelectedCategory) {
             var ref = document.createElement("a");
-            ref.appendChild(document.createTextNode(item.name));
+            ref.appendChild(document.createTextNode(item.productName));
             ref.className = "list-group-item";
             ref.href = "#";
             ref.onclick = function () {
@@ -99,7 +98,7 @@ function updateCatalog() {
 }
 
 function loadCatalogData() {
-    // console.log("trigger works");
+    console.log("Loading catalog data");
     $.ajax({
         url: "/api/user/products/byRegion/" + localStorage.getItem("regionId"),
         success: function(data) {
@@ -107,12 +106,13 @@ function loadCatalogData() {
             updateCatalog();
         },
         error: function () {
-            console.error("Cannot load list of regions");
+            console.error("Cannot load list of products");
         }
     });
 }
 
 function loadDomainsData() {
+    console.log("Loading domains data for catalog");
     $.ajax({
         url: "/api/client/domains/get/all",
         success: function(data) {
@@ -161,10 +161,10 @@ function catalogSubmitOrder() {
 
     var selectedDomainIndex = $("#catalog-domain-selector").val()[0];
 
-    console.log("Creating order for product " +
-        catalogProducts[catalogSelectedItem].name +
-        " at domain " +
-        catalogDomains[selectedDomainIndex].domainName);
+    // console.log("Creating order for product " +
+    //     catalogProducts[catalogSelectedItem].productName +
+    //     " at domain " +
+    //     catalogDomains[selectedDomainIndex].domainName);
 
     $.ajax({
         url: "/api/client/orders/new/create",

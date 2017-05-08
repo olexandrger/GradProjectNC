@@ -21,6 +21,6 @@ function loadInstance() {
     });
 }
 
-$(document).onload(function () {
+$(document).ready(function () {
     loadInstance();
 });

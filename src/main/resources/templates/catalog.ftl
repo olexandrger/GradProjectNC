@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Products</title>
+    <title>Catalog</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -15,9 +15,8 @@
 
 
     <link rel="stylesheet" href="/css/main.css">
-
-
     <script src="/js/catalog.js"></script>
+    <script src="https://momentjs.com/downloads/moment.js"></script>
 </head>
 <body>
 

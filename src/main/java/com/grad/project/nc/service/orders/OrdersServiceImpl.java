@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Supplier;
 
 @Service
@@ -136,6 +139,7 @@ public class OrdersServiceImpl implements OrdersService {
 
         order.setStatus(categoryDao.find(ORDER_STATUS_IN_PROGRESS));
         order.setResponsible(getCurrentUser());
+        orderDao.update(order);
     }
 
     @Override
@@ -149,6 +153,7 @@ public class OrdersServiceImpl implements OrdersService {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_DEACTIVATED));
 //            productInstanceDao.delete(order.getProductInstance());
         }
+        orderDao.update(order);
     }
 
     @Override
@@ -167,6 +172,8 @@ public class OrdersServiceImpl implements OrdersService {
         } else if (order.getOrderAim().getCategoryId() == ORDER_AIM_SUSPEND) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_SUSPENDED));
         }
+
+        orderDao.update(order);
     }
 
     @Override
@@ -176,15 +183,19 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public Collection<ProductOrder> getAllOrders(long size, long offset) {
-
-        return orderDao.findAll();
+        List<ProductOrder> orders = orderDao.findAll();
+        Collections.reverse(orders);
+        return orders;
     }
 
     @Override
-    public Collection<ProductOrder> getOrdersByProduct(Long id, Long size, Long offset) {
-        return orderDao.findByProductInstanceId(id);
+    public Collection<ProductOrder> getOrdersByProductInstance(Long id, Long size, Long offset) {
+        List<ProductOrder> orders = new LinkedList<>(orderDao.findByProductInstanceId(id));
+        Collections.reverse(orders);
+        return orders;
     }
 
+    @Override
     public ProductOrder updateOrderInfo(long orderId, long domainId, long productId) {
         ProductOrder order = orderDao.find(orderId);
         Domain domain = domainDao.find(domainId);
@@ -197,6 +208,8 @@ public class OrdersServiceImpl implements OrdersService {
         } else {
             order.getProductInstance().setDomain(domain);
             order.getProductInstance().setPrice(price);
+            productInstanceDao.update(order.getProductInstance());
+            orderDao.update(order);
             return order;
         }
     }
