@@ -181,15 +181,13 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public Collection<ProductOrder> getUserOrders(long size, long offset) {
-        return orderDao.findByUserId(getCurrentUser().getUserId());
+    public List<ProductOrder> getUserOrders(long size, long offset) {
+        return orderDao.findByUserId(getCurrentUser().getUserId(), size, offset);
     }
 
     @Override
-    public Collection<ProductOrder> getAllOrders(long size, long offset) {
-        List<ProductOrder> orders = orderDao.findAll();
-        Collections.reverse(orders);
-        return orders;
+    public List<ProductOrder> getAllOrders(long size, long offset) {
+        return orderDao.findAll(size, offset);
     }
 
     @Override
@@ -198,10 +196,8 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public Collection<ProductOrder> getOrdersByProductInstance(Long id, Long size, Long offset) {
-        List<ProductOrder> orders = new LinkedList<>(orderDao.findByProductInstanceId(id));
-        Collections.reverse(orders);
-        return orders;
+    public List<ProductOrder> getOrdersByProductInstance(long id, long size, long offset) {
+        return orderDao.findByProductInstanceId(id, size, offset);
     }
 
     @Override

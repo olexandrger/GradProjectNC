@@ -15,4 +15,8 @@ public interface ProductOrderDao extends CrudDao<ProductOrder> {
     List<ProductOrder> findByUserPhoneNumber(String phoneNumber);
 
     List<ProductOrder> findByProductInstanceId(Long id);
+
+    List<ProductOrder> findByProductInstanceId(Long id, Long size, Long offset);
+
+    List<ProductOrder> findByUserId(Long userId, long size, long offset);
 }

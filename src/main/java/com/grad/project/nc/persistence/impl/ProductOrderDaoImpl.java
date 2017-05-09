@@ -84,6 +84,15 @@ public class ProductOrderDaoImpl extends AbstractDao
     }
 
     @Override
+    public List<ProductOrder> findAll(long size, long offset) {
+        String findAllQuery = "SELECT \"product_order_id\", \"product_instance_id\", \"user_id\", " +
+                "\"order_aim_id\", \"status_id\", \"responsible_id\", \"open_date\", \"close_date\" " +
+                "FROM \"product_order\"";
+
+        return findMultiplePage(findAllQuery, new ProductOrderRowMapper(), size, offset);
+    }
+
+    @Override
     public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"product_order\" " +
                 "WHERE \"product_order_id\"=?";
@@ -148,6 +157,25 @@ public class ProductOrderDaoImpl extends AbstractDao
             "WHERE po.\"product_instance_id\" = ?";
 
         return findMultiple(query, new ProductOrderRowMapper(), id);
+    }
+
+    @Override
+    public List<ProductOrder> findByProductInstanceId(Long id, Long size, Long offset) {
+        String query = "SELECT po.\"product_order_id\", po.\"product_instance_id\", po.\"user_id\", " +
+                "po.\"order_aim_id\", po.\"status_id\", po.\"responsible_id\", po.\"open_date\", po.\"close_date\" " +
+                "FROM \"product_order\" po " +
+                "WHERE po.\"product_instance_id\" = ?";
+
+        return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, id);
+    }
+
+    @Override
+    public List<ProductOrder> findByUserId(Long userId, long size, long offset) {
+        String query = "SELECT \"product_order_id\", \"product_instance_id\", \"user_id\", \"order_aim_id\", " +
+            "\"status_id\", \"responsible_id\", \"open_date\", \"close_date\" " +
+            "FROM \"product_order\" WHERE \"user_id\"=?";
+
+        return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, userId);
     }
 
     private class ProductOrderRowMapper implements RowMapper<ProductOrder> {

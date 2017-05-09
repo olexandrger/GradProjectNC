@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractDao {
@@ -59,6 +60,17 @@ public abstract class AbstractDao {
 
     protected <E> List<E> findMultiple(String sql, RowMapper<E> rowMapper, Object... params) {
         return jdbcTemplate.query(sql, rowMapper, params);
+    }
+
+    protected <E> List<E> findMultiplePage(String sql, RowMapper<E> rowMapper, Long size, Long offset) {
+        return jdbcTemplate.query(sql + " LIMIT ? OFFSET ?", rowMapper, size, offset);
+    }
+
+    protected <E> List<E> findMultiplePage(String sql, RowMapper<E> rowMapper, Long size, Long offset, Object... params) {
+        Object[] newParams = Arrays.copyOf(params, params.length + 2);
+        newParams[params.length] = size;
+        newParams[params.length + 1] = offset;
+        return jdbcTemplate.query(sql + " LIMIT ? OFFSET ?", rowMapper, newParams);
     }
 
     protected int[] batchUpdate(String sql, List<Object[]> batchArgs) {

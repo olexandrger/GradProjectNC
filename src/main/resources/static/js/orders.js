@@ -218,9 +218,19 @@ function selectOrder(index) {
     }
 }
 
+function nextPage() {
+    ordersListCurrentPage++;
+    loadOrders();
+}
+
+function previousPage() {
+    ordersListCurrentPage--;
+    loadOrders();
+}
+
 function loadOrders() {
     $.ajax({
-        url: "/api/csr/orders/get/all/size/" + ordersListSize + "/offset/" + ordersListCurrentPage * ordersListSize,
+        url: "/api/csr/orders/get/all/size/" + (ordersListSize + 1) + "/offset/" + ordersListCurrentPage * ordersListSize,
         success: function (data) {
             var list = $("#csr-orders-list");
             list.empty();
@@ -228,16 +238,29 @@ function loadOrders() {
             ordersData = data;
 
             data.forEach(function (item, i) {
-                var ref = document.createElement("a");
-                ref.appendChild(document.createTextNode("Order #" + item.productOrderId));
-                ref.className = "list-group-item";
-                ref.href = "#";
-                ref.onclick = function () {
-                    selectOrder(i);
-                };
+                if (i < ordersListSize) {
+                    var ref = document.createElement("a");
+                    ref.appendChild(document.createTextNode("Order #" + item.productOrderId));
+                    ref.className = "list-group-item";
+                    ref.href = "#";
+                    ref.onclick = function () {
+                        selectOrder(i);
+                    };
 
-                list.append(ref);
+                    list.append(ref);
+                }
             });
+
+            var prevPage = $("#orders-page-previous");
+            var nextPage = $("#orders-page-next");
+            nextPage.addClass("hidden");
+            prevPage.addClass("hidden");
+            if (ordersListCurrentPage > 0) {
+                prevPage.removeClass("hidden");
+            }
+            if (data.length > ordersListSize) {
+                nextPage.removeClass("hidden");
+            }
 
             selectOrder(-1);
         },

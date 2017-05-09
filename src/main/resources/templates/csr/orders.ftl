@@ -37,8 +37,8 @@
             </div>
 
             <ul class="pager">
-                <li class="previous"><a href="#">Previous</a></li>
-                <li class="next"><a href="#">Next</a></li>
+                <li class="previous hidden" id="orders-page-previous"><a href="#" onclick="previousPage()">Previous</a></li>
+                <li class="next hidden" id="orders-page-next"><a href="#" onclick="nextPage()">Next</a></li>
             </ul>
         </div>
         <div class="col-sm-7 hidden" id="order-main">

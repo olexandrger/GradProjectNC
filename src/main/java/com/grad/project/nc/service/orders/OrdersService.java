@@ -27,7 +27,7 @@ public interface OrdersService {
 
     ProductOrder newDeactivationOrder(long instanceId, long userId);
 
-    Collection<ProductOrder> getOrdersByProductInstance(Long id, Long size, Long offset);
+    Collection<ProductOrder> getOrdersByProductInstance(long id, long size, long offset);
 
     ProductOrder updateOrderInfo(long orderId, long domainId, long productId);
 
