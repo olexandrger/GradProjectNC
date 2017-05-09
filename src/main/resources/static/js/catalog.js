@@ -15,24 +15,13 @@ function getCharacteristicStringValue(characteristic, dataType) {
         return characteristic.stringValue;
 
     if (dataType == "DATE") {
-        // var date = characteristic.dateValue;
-        // function addNumber(number) {
-        //     var result = "";
-        //     if (number < 10)
-        //         result += '0';
-        //     result += number;
-        //     return result;
-        // }
-        // return addNumber(date[3]) + ':' + addNumber(date[4]) + " " + addNumber(date[2]) + '.' + addNumber(date[1]) + "." + date[0];
         return moment.unix(characteristic.dateValue).format("LLL")
     }
 }
 
 function getRegionalPrice(regionId) {
     var price = "";
-    console.log("Region " + regionId);
     catalogProducts[catalogSelectedItem].prices.forEach(function(item) {
-        console.log("Price " + item.region.regionId);
         if (item.region.regionId == regionId)
             price = item.price;
     });
@@ -40,7 +29,7 @@ function getRegionalPrice(regionId) {
     return price;
 }
 
-function selectCatalogProduct(index) {
+function selectCatalogProduct(index, positionInList) {
 
     $("#catalog-main-info").removeClass("hidden");
 
@@ -48,7 +37,8 @@ function selectCatalogProduct(index) {
 
     var list = $("#catalog-products-list");
     list.find("a").removeClass("active");
-    list.find("a:nth-child(" + (index+1) + ")").addClass("active");
+    // console.log("Child: " + (index+1));
+    list.find("a:nth-child(" + positionInList + ")").addClass("active");
 
     $(".table-row").remove();
 
@@ -61,7 +51,7 @@ function selectCatalogProduct(index) {
 
     var table = $("#catalog-table-details");
     catalogProducts[index].productCharacteristicValues.forEach(function (item) {
-        console.log(item.productCharacteristic.measure);
+        // console.log(item.productCharacteristic.measure);
            var html = '<tr class="table-row"><td>' +
                    item.productCharacteristic.characteristicName +
             '</td>' +
@@ -85,6 +75,7 @@ function updateCatalog() {
     list.empty();
     $("#catalog-main-info").addClass("hidden");
 
+    var positionInList = 1;
     catalogProducts.forEach(function(item, index) {
         if (item.productType.productTypeName == catalogSelectedCategory) {
             var ref = document.createElement("a");
@@ -92,7 +83,7 @@ function updateCatalog() {
             ref.className = "list-group-item";
             ref.href = "#";
             ref.onclick = function () {
-                selectCatalogProduct(index);
+                selectCatalogProduct(index, positionInList++);
             };
             list.append(ref);
         }
@@ -143,8 +134,6 @@ function loadDomainsData() {
 }
 
 function catalogChangeDomain(domainId) {
-    // console.log(catalogDomains[domainId]);
-    // $('#new-product-order-modal-submit').removeClass("disabled");
     //TODO display address
 
     var price = getRegionalPrice(catalogDomains[domainId].regionId);
@@ -155,18 +144,12 @@ function catalogChangeDomain(domainId) {
         $('#new-product-order-modal-submit').removeClass("disabled");
     }
 
-    // $('#new-product-order-modal-submit').addClass("disabled");
     $('#catalog-price-field').val(price);
 }
 
 function catalogSubmitOrder() {
 
     var selectedDomainIndex = $("#catalog-domain-selector").val()[0];
-
-    // console.log("Creating order for product " +
-    //     catalogProducts[catalogSelectedItem].productName +
-    //     " at domain " +
-    //     catalogDomains[selectedDomainIndex].domainName);
 
     $.ajax({
         url: "/api/client/orders/new/create",
@@ -182,14 +165,12 @@ function catalogSubmitOrder() {
         success: function(data) {
             if (data.status == "success") {
                 console.log(data.message);
-                // sessionStorage.setItem("selectedInstance", data.instanceId);
                 var info = window.name == "" ? {} : JSON.parse(window.name);
                 info.selectedInstanceId = data.instanceId;
                 window.name = JSON.stringify(info);
                 window.location.href = "/client/instance";
             } else {
                 console.error("Cannot create order: " + data.message);
-                // console.error(data);
             }
         },
         error: function (data) {
