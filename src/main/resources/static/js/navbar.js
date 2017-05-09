@@ -71,25 +71,46 @@ function getAccountInformation() {
 }
 
 function logout() {
-    //TODO if user is not on allowed page, redirect him to main page
-
     console.log("Logout");
-    var _csrf = $('meta[name=_csrf]').attr("content");
     $.ajax({
-        type: 'POST',
-        url: '/logout',
+        url: "/signout",
+        method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': _csrf
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
         },
+        processData: false,
+        contentType: 'application/json',
+        data: JSON.stringify({currentURL : window.location.pathname.substr(1)}),
         success: function (data) {
-            console.log("Logout success! " + JSON.stringify(data));
-            location.reload();
+            signOut(data)
         },
         error: function (data) {
+            signOut(data)
+        }
+    });
+}
+
+function signOut(data) {
+    $.ajax({
+        url: '/logout',
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        success: function () {
+            console.log("Logout success! " + JSON.stringify(data));
+            if (data.redirect) {
+                location = data.redirect;
+            } else {
+                location.reload();
+            }
+        },
+        error: function () {
             console.error("Logout failure! " + JSON.stringify(data));
         }
     });
 }
+
 
 function login() {
     var form = $("#login-form");

@@ -1,15 +1,18 @@
 package com.grad.project.nc.controller.api;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.grad.project.nc.service.security.LogoutService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.Map;
 
 @RestController
 public class AuthenticationController {
+
+    @Autowired
+    private LogoutService logoutService;
 
     @RequestMapping("/login/success")
     public Map loginSuccess() {
@@ -26,6 +29,13 @@ public class AuthenticationController {
     @ResponseBody
     public Map logoutSuccess() {
         return Collections.singletonMap("status", "success");
+    }
+
+    @RequestMapping(value = "/signout", method = RequestMethod.POST, consumes = "application/json", produces = "application/json" )
+    @ResponseBody
+    public Map logout(@RequestBody Map<String, String> params) {
+        String url = params.get("currentURL");
+        return logoutService.getRedirectUrl(url);
     }
 
 }
