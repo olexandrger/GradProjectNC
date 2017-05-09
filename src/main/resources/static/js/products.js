@@ -49,7 +49,6 @@ function changeCharacteristics() {
     list.empty();
     if (data != undefined) {
         data.characteristics.forEach(function (item) {
-            console.log(item);
 
             var measureHtml = "";
 
@@ -95,8 +94,6 @@ function selectProduct(x) {
     if (x == undefined) {
         x = productsData.length - 1;
     }
-
-    console.log("Selected " + x);
 
     if (currentSelected == -1) {
         $("#products-editor").removeClass("hidden");
@@ -299,7 +296,6 @@ function addProduct(name, index) {
 
 function addLoadedProducts() {
     productsData.forEach(function (product, i) {
-        console.log(product);
         addProduct(product.productName, i);
     });
 }
@@ -309,9 +305,6 @@ function loadProducts() {
     $.ajax({
         url: "/api/user/products/all",
         success: function (data) {
-
-            console.log(data);
-
             productsData = data;
 
             addLoadedProducts();
@@ -327,9 +320,6 @@ function loadProductTypes() {
     $.ajax({
         url: "/api/user/productTypes/all",
         success: function (data) {
-
-            console.log("loaded " + data.length + " product types");
-
             var sel = $("#product-type-selector");
 
             data.forEach(function(item, i) {
@@ -351,7 +341,6 @@ function loadProductTypes() {
 }
 
 function loadRegions() {
-    console.log('loadRegions');
     $.ajax({
         url: "/api/user/regions/all",
         success: function(data) {
@@ -372,7 +361,6 @@ function loadRegions() {
 }
 
 function loadData() {
-    console.log("loadData");
     loadRegions();
 }
 

@@ -30,7 +30,9 @@ function getCharacteristicStringValue(characteristic, dataType) {
 
 function getRegionalPrice(regionId) {
     var price = "";
+    console.log("Region " + regionId);
     catalogProducts[catalogSelectedItem].prices.forEach(function(item) {
+        console.log("Price " + item.region.regionId);
         if (item.region.regionId == regionId)
             price = item.price;
     });
@@ -180,6 +182,11 @@ function catalogSubmitOrder() {
         success: function(data) {
             if (data.status == "success") {
                 console.log(data.message);
+                // sessionStorage.setItem("selectedInstance", data.instanceId);
+                var info = window.name == "" ? {} : JSON.parse(window.name);
+                info.selectedInstanceId = data.instanceId;
+                window.name = JSON.stringify(info);
+                window.location.href = "/client/instance";
             } else {
                 console.error("Cannot create order: " + data.message);
                 // console.error(data);

@@ -34,7 +34,6 @@ public class ProductCharacteristicValueProxy extends ProductCharacteristicValue 
     }
 
     @Override
-    @JsonIgnore
     public Product getProduct() {
         if (!productLoaded) {
             this.setProduct(productDao.find(getProductId()));

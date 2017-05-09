@@ -1,5 +1,6 @@
 package com.grad.project.nc.controller.api.client;
 
+import com.grad.project.nc.controller.api.dto.FrontendOrder;
 import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.service.orders.OrdersService;
 import lombok.extern.slf4j.Slf4j;
@@ -7,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -42,7 +45,6 @@ public class ClientOrdersController {
 
     @RequestMapping(value = "/new/create", method = RequestMethod.POST)
     public Map<String, Object> create(@RequestBody Map<String, String> params) {
-//        log.error(params.toString());
         Map<String, Object> result = new HashMap<>();
         try {
             long productId = Long.parseLong(params.get("productId"));
@@ -51,6 +53,7 @@ public class ClientOrdersController {
             result.put("status", "success");
             result.put("message", "Order created");
             result.put("id", order.getProductOrderId());
+            result.put("instanceId", order.getProductInstance().getInstanceId());
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
             result.put("status", "error");
@@ -65,9 +68,9 @@ public class ClientOrdersController {
         return newOrder(ordersService::newSuspensionOrder, params);
     }
 
-    @RequestMapping(value = "/new/activate", method = RequestMethod.POST)
+    @RequestMapping(value = "/new/continue", method = RequestMethod.POST)
     public Map<String, Object> activate(@RequestBody Map<String, String> params) {
-        return newOrder(ordersService::newResumeOrder, params);
+        return newOrder(ordersService::newContinueOrder, params);
     }
 
     @RequestMapping(value = "/new/deactivate", method = RequestMethod.POST)
@@ -75,13 +78,19 @@ public class ClientOrdersController {
         return newOrder(ordersService::newDeactivationOrder, params);
     }
 
+    @RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST)
+    public Map<String, String> cancel(@PathVariable Long id) {
+        ordersService.userCancelOrder(id);
+        return Collections.singletonMap("status", "success");
+    }
+
     @RequestMapping(value = "/get/all/size/{size}/offset/{offset}", method = RequestMethod.GET)
-    public Collection<ProductOrder> getOrders(@PathVariable Long size, @PathVariable Long offset) {
-        return ordersService.getUserOrders(size, offset);
+    public Collection<FrontendOrder> getOrders(@PathVariable Long size, @PathVariable Long offset) {
+        return ordersService.getUserOrders(size, offset).stream().map(FrontendOrder::fromEntity).collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/get/byInstance/{id}/size/{size}/offset/{offset}", method = RequestMethod.GET)
-    public Collection<ProductOrder> getByProduct(@PathVariable Long id, @PathVariable Long size, @PathVariable Long offset) {
-        return ordersService.getOrdersByProductInstance(id, size, offset);
+    public Collection<FrontendOrder> getByProductInstance(@PathVariable Long id, @PathVariable Long size, @PathVariable Long offset) {
+        return ordersService.getOrdersByProductInstance(id, size, offset).stream().map(FrontendOrder::fromEntity).collect(Collectors.toList());
     }
 }

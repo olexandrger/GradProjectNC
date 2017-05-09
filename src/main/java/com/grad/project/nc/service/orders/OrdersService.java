@@ -19,9 +19,9 @@ public interface OrdersService {
 
     ProductOrder newSuspensionOrder(long instanceId, long userId);
 
-    ProductOrder newResumeOrder(long instanceId);
+    ProductOrder newContinueOrder(long instanceId);
 
-    ProductOrder newResumeOrder(long instanceId, long userId);
+    ProductOrder newContinueOrder(long instanceId, long userId);
 
     ProductOrder newDeactivationOrder(long instanceId);
 
@@ -40,5 +40,7 @@ public interface OrdersService {
     Collection<ProductOrder> getUserOrders(long size, long offset);
 
     Collection<ProductOrder> getAllOrders(long size, long offset);
+
+    void userCancelOrder(Long id);
 }
 

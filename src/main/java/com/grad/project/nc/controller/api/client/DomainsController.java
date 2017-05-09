@@ -1,6 +1,7 @@
 package com.grad.project.nc.controller.api.client;
 
 
+import com.grad.project.nc.controller.api.dto.FrontendDomain;
 import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.model.User;
 import com.grad.project.nc.persistence.DomainDao;
@@ -21,49 +22,31 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/client/domains/")
 public class DomainsController {
 
-    //TODO rework this class after
-
     @Autowired
     private DomainDao domainDao;
 
+    //TODO rework after base domains done
     @RequestMapping(path = "/get/all", method = RequestMethod.GET)
-    public Collection<DomainAddress> getUserDomains() {
-        return domainDao.findByUserId(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId()).stream().map(item -> new DomainAddress(
-                item.getDomainId(),
-                item.getDomainName(),
-                item.getAddress().getLocation().getRegion().getRegionId(),
-                "City",
-                "Street",
-                "Building",
-                12
-                )).collect(Collectors.toList());
+    public Collection<FrontendDomain> getUserDomains() {
+        return domainDao.findByUserId(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId())
+                .stream().map(FrontendDomain::fromEntity).collect(Collectors.toList());
     }
 
     @RequestMapping(path = "/get/byId/{id}", method = RequestMethod.GET)
-    public DomainAddress getDomain(@PathVariable Long id) {
-        Domain item = domainDao.find(id);
-
-        return new DomainAddress(
-                item.getDomainId(),
-                item.getDomainName(),
-                item.getAddress().getLocation().getRegion().getRegionId(),
-                "City",
-                "Street",
-                "Building",
-                12
-        );
+    public FrontendDomain getDomain(@PathVariable Long id) {
+        return FrontendDomain.fromEntity(domainDao.find(id));
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class DomainAddress {
-        private Long domainId;
-        private String domainName;
-        private Long regionId;
-        private String city;
-        private String street;
-        private String building;
-        private Integer apartment;
-    }
+//    @Data
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    private static class DomainAddress {
+//        private Long domainId;
+//        private String domainName;
+//        private Long regionId;
+//        private String city;
+//        private String street;
+//        private String building;
+//        private Integer apartment;
+//    }
 }

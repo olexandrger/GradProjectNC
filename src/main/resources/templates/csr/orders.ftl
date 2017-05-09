@@ -68,29 +68,29 @@
 
             <div class="form-group">
                 <label for="order-aim">Aim</label>
-                <input type="text" class="form-control" name="order-aim" id="order-aim" value="Suspend" readonly>
+                <input type="text" class="form-control" name="order-aim" id="order-aim" readonly>
             </div>
 
             <div class="form-group">
                 <label for="order-status">Status</label>
-                <input type="text" class="form-control" name="order-status" id="order-status" value="In progress" readonly>
+                <input type="text" class="form-control" name="order-status" id="order-status" readonly>
             </div>
 
             <div class="form-group">
                 <label for="order-start-date">Start date</label>
-                <input type="text" class="form-control" name="order-start-date" id="order-start-date" value="11.11.1111" readonly>
+                <input type="text" class="form-control" name="order-start-date" id="order-start-date" readonly>
             </div>
 
             <div class="form-group">
                 <label for="order-end-date">End date</label>
-                <input type="text" class="form-control" name="order-end-date" id="order-end-date" value="" readonly>
+                <input type="text" class="form-control" name="order-end-date" id="order-end-date" readonly>
             </div>
 
             <div class="form-group text-center">
-                <button class="btn order-button hidden" id="order-button-update" onclick="updateSelectedOrder()">Update</button>
-                <button class="btn order-button hidden" id="order-button-cancel" onclick="cancelSelectedOrder()">Cancel</button>
-                <button class="btn order-button hidden" id="order-button-start" onclick="startSelectedOrder()">Start</button>
-                <button class="btn order-button hidden" id="order-button-complete" onclick="completeSelectedOrder()">Complete</button>
+                <button class="btn btn-default order-button hidden" id="order-button-update" onclick="updateSelectedOrder()">Update</button>
+                <button class="btn btn-default order-button hidden" id="order-button-cancel" onclick="cancelSelectedOrder()">Cancel</button>
+                <button class="btn btn-default order-button hidden" id="order-button-start" onclick="startSelectedOrder()">Start</button>
+                <button class="btn btn-default order-button hidden" id="order-button-complete" onclick="completeSelectedOrder()">Complete</button>
             </div>
 
         </div>

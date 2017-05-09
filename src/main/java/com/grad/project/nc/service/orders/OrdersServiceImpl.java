@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
+//TODO security
+
 @Service
 public class OrdersServiceImpl implements OrdersService {
 
@@ -103,7 +105,7 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public ProductOrder newResumeOrder(long instanceId, long userId) {
+    public ProductOrder newContinueOrder(long instanceId, long userId) {
         return newOrder(instanceId, userId, ORDER_AIM_RESUME);
     }
 
@@ -129,8 +131,8 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public ProductOrder newResumeOrder(long instanceId) {
-        return newResumeOrder(instanceId, getCurrentUser().getUserId());
+    public ProductOrder newContinueOrder(long instanceId) {
+        return newContinueOrder(instanceId, getCurrentUser().getUserId());
     }
 
     @Override
@@ -151,6 +153,7 @@ public class OrdersServiceImpl implements OrdersService {
 
         if (order.getOrderAim().getCategoryId() == ORDER_AIM_CREATE) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_DEACTIVATED));
+            productInstanceDao.update(order.getProductInstance());
 //            productInstanceDao.delete(order.getProductInstance());
         }
         orderDao.update(order);
@@ -173,6 +176,7 @@ public class OrdersServiceImpl implements OrdersService {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_SUSPENDED));
         }
 
+        productInstanceDao.update(order.getProductInstance());
         orderDao.update(order);
     }
 
@@ -186,6 +190,11 @@ public class OrdersServiceImpl implements OrdersService {
         List<ProductOrder> orders = orderDao.findAll();
         Collections.reverse(orders);
         return orders;
+    }
+
+    @Override
+    public void userCancelOrder(Long id) {
+        cancelOrder(id);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.grad.project.nc.controller.api.client;
 
+import com.grad.project.nc.controller.api.dto.FrontendInstance;
 import com.grad.project.nc.model.ProductInstance;
 import com.grad.project.nc.service.instances.InstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class InstancesController {
     }
 
     @RequestMapping(value = "/get/byId/{id}", method = RequestMethod.GET)
-    public ProductInstance getInstance(@PathVariable Long id) {
-        return instanceService.getById(id);
+    public FrontendInstance getInstance(@PathVariable Long id) {
+        return FrontendInstance.fromEntity(instanceService.getById(id));
     }
 }

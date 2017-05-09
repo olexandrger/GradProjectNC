@@ -1,22 +1,16 @@
 package com.grad.project.nc.controller.api.csr;
 
+import com.grad.project.nc.controller.api.dto.FrontendOrder;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.service.orders.OrdersService;
 import com.grad.project.nc.service.product.ProductService;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -77,7 +71,7 @@ public class CsrOrdersController {
 
     @RequestMapping(value = "/new/activate", method = RequestMethod.POST)
     public Map<String, Object> activate(@RequestBody Map<String, String> params) {
-        return newOrder(ordersService::newResumeOrder, params);
+        return newOrder(ordersService::newContinueOrder, params);
     }
 
     @RequestMapping(value = "/new/deactivate", method = RequestMethod.POST)
@@ -146,60 +140,31 @@ public class CsrOrdersController {
 
     @RequestMapping(value = "/get/all/size/{size}/offset/{offset}")
     public Collection<FrontendOrder> getOrders(@PathVariable Long size, @PathVariable Long offset) {
-        return ordersService.getAllOrders(size, offset).stream().map(FrontendOrder::new).collect(Collectors.toList());
-    }
 
-    @Data
-    @NoArgsConstructor
-    private class FrontendOrder {
-        private Long productOrderId;
-        private Long productInstanceId;
-        private String userName;
-        private String orderAim;
-        private String status;
-        private Long responsibleId;
-        private Long domainId;
-        private Long productId;
-        private OffsetDateTime openDate;
-        private OffsetDateTime closeDate;
-        private Map<Long, String> possibleDomains;
-        private Map<Long, String> possibleProducts;
-
-        String getFullAddress(Address address) {
-            String apt = "";
-            if (address.getApartmentNumber() != null && !address.getApartmentNumber().isEmpty()) {
-                apt = " apt: " + address.getApartmentNumber();
-            }
-            return address.getLocation().getGooglePlaceId() + apt;
-        }
-
-        FrontendOrder(ProductOrder item) {
-            setProductOrderId(item.getProductOrderId());
-            setProductInstanceId(item.getProductInstance().getInstanceId());
-            setUserName(item.getUser().getFirstName() + " " + item.getUser().getLastName());
-            setOrderAim(item.getOrderAim().getCategoryName());
-            setStatus(item.getStatus().getCategoryName());
-            setResponsibleId(item.getResponsible() == null ? null : item.getResponsible().getUserId());
-            setOpenDate(item.getOpenDate());
-            setCloseDate(item.getCloseDate());
-            setDomainId(item.getProductInstance().getDomain().getDomainId());
-            setProductId(item.getProductInstance().getPrice().getProduct().getProductId());
+        return ordersService.getAllOrders(size, offset).stream().map((item) -> {
+            FrontendOrder order = FrontendOrder.fromEntity(item);
 
             if ("CREATE".equals(item.getOrderAim().getCategoryName())) {
-                setPossibleDomains(new HashMap<>());
+                order.setPossibleDomains(new HashMap<>());
                 item.getUser().getDomains().forEach((domain) -> {
-                    getPossibleDomains().put(domain.getDomainId(), getFullAddress(domain.getAddress()));
+                    order.getPossibleDomains().put(domain.getDomainId(), getFullAddress(domain.getAddress()));
                 });
 
-                setPossibleProducts(new HashMap<>());
+                order.setPossibleProducts(new HashMap<>());
                 productService.getProductsByProductType(item.getProductInstance().getPrice().getProduct().getProductType()).forEach((product -> {
-                    getPossibleProducts().put(product.getProductId(), product.getProductName());
+                    order.getPossibleProducts().put(product.getProductId(), product.getProductName());
                 }));
             }
-        }
 
-        ProductOrder toProductOrder(FrontendOrder item) {
-            return null;
+            return order;
+        }).collect(Collectors.toList());
+    }
+
+    private static String getFullAddress(Address address) {
+        String apt = "";
+        if (address.getApartmentNumber() != null && !address.getApartmentNumber().isEmpty()) {
+            apt = " apt: " + address.getApartmentNumber();
         }
+        return address.getLocation().getGooglePlaceId() + apt;
     }
 }
