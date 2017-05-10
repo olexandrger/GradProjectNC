@@ -176,8 +176,9 @@ function register() {
             var alert;
             if (data.status == 'success') {
                 console.log("Registration success! " + JSON.stringify(data));
-                alert = $('<div id="registration-header-alert" class="alert alert-success" role="alert">' +
-                    data.message + "</div>");
+                location.reload();
+                // alert = $('<div id="registration-header-alert" class="alert alert-success" role="alert">' +
+                //     data.message + "</div>");
             } else {
                 console.log("Registration error! " + JSON.stringify(data));
                 alert = $('<div id="registration-header-alert" class="alert alert-danger" role="alert">' +
