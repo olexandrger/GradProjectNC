@@ -87,7 +87,7 @@ public class ProductOrderDaoImpl extends AbstractDao
     public List<ProductOrder> findAll(long size, long offset) {
         String findAllQuery = "SELECT \"product_order_id\", \"product_instance_id\", \"user_id\", " +
                 "\"order_aim_id\", \"status_id\", \"responsible_id\", \"open_date\", \"close_date\" " +
-                "FROM \"product_order\"";
+                "FROM \"product_order\" ORDER BY close_date DESC NULLS FIRST, open_date DESC";
 
         return findMultiplePage(findAllQuery, new ProductOrderRowMapper(), size, offset);
     }
@@ -154,7 +154,7 @@ public class ProductOrderDaoImpl extends AbstractDao
         String query = "SELECT po.\"product_order_id\", po.\"product_instance_id\", po.\"user_id\", " +
             "po.\"order_aim_id\", po.\"status_id\", po.\"responsible_id\", po.\"open_date\", po.\"close_date\" " +
             "FROM \"product_order\" po " +
-            "WHERE po.\"product_instance_id\" = ?";
+            "WHERE po.\"product_instance_id\" = ?  ORDER BY close_date DESC NULLS FIRST, open_date DESC";
 
         return findMultiple(query, new ProductOrderRowMapper(), id);
     }
@@ -164,7 +164,7 @@ public class ProductOrderDaoImpl extends AbstractDao
         String query = "SELECT po.\"product_order_id\", po.\"product_instance_id\", po.\"user_id\", " +
                 "po.\"order_aim_id\", po.\"status_id\", po.\"responsible_id\", po.\"open_date\", po.\"close_date\" " +
                 "FROM \"product_order\" po " +
-                "WHERE po.\"product_instance_id\" = ?";
+                "WHERE po.\"product_instance_id\" = ? ORDER BY close_date DESC NULLS FIRST, open_date DESC";
 
         return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, id);
     }
@@ -173,7 +173,7 @@ public class ProductOrderDaoImpl extends AbstractDao
     public List<ProductOrder> findByUserId(Long userId, long size, long offset) {
         String query = "SELECT \"product_order_id\", \"product_instance_id\", \"user_id\", \"order_aim_id\", " +
             "\"status_id\", \"responsible_id\", \"open_date\", \"close_date\" " +
-            "FROM \"product_order\" WHERE \"user_id\"=?";
+            "FROM \"product_order\" WHERE \"user_id\"=? ORDER BY close_date DESC NULLS FIRST, open_date DESC";
 
         return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, userId);
     }
