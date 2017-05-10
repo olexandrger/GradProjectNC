@@ -306,6 +306,32 @@ function loadOrders() {
     });
 }
 
+function loadNewOrderModal() {
+    $("#new-order-user-email").val("");
+    $("#new-oeder-domain").empty();
+    $("#new-oeder-instanse").empty();
+    $("#new-oeder-aim").empty();
+}
+
+function createNewOrderFromModal() {
+
+}
+
+function loadDomainsInModal() {
+
+}
+
+function loadProductInstancesInModal() {
+
+}
+function loadOrderAaimsInModal() {
+
+}
+
+$(document).ready(function() {
+    loadOrders();
+});
+
 $(document).ready(function() {
     loadOrders();
 });
