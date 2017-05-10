@@ -120,7 +120,8 @@ function loadInstance() {
             var ordersTable = $("#instance-orders-table");
             ordersTable.find(".order-row").remove();
             data.productOrders.forEach(function(order) {
-                var cancelButton = '<button class="btn pull-right" onclick="cancelOrder(' + order.productOrderId + ')">Cancel</button>';
+                var cancelId = order.productOrderId;
+                var cancelButton = '<button class="btn pull-right" onclick="cancelOrder(' + cancelId + ')">Cancel</button>';
 
                 var html = "<tr class='order-row' id='table-order-" + order.productOrderId + "'>" +
                     "<td class='col-sm-2'>" + order.orderAim + "</td>" +

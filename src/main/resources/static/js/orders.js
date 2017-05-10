@@ -73,6 +73,7 @@ function cancelSelectedOrder() {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
                 ordersData[selectedId].status = "CANCELLED";
+                ordersData[selectedId].closeDate = Date.now()/1000;
 
                 if (selectedOrder == selectedId) {
                     selectOrder(selectedOrder);
@@ -129,6 +130,7 @@ function completeSelectedOrder() {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
                 ordersData[selectedId].status = "COMPLETED";
+                ordersData[selectedId].closeDate = Date.now()/1000;
 
                 if (selectedOrder == selectedId) {
                     selectOrder(selectedOrder);
@@ -158,9 +160,14 @@ function selectOrder(index) {
 
     list.find("a").removeClass("active");
     list.find("a:nth-child(" + (index+1) + ")").addClass("active");
-    list.find("a:nth-child(" + (index+1) + ")").find("span").get(0).className = getIconName(ordersData[selectedOrder].status);
 
     if (selectedOrder != -1) {
+        list.find("a:nth-child(" + (index+1) + ")").find("span").text(ordersData[selectedOrder].status);
+
+        var span = list.find("a:nth-child(" + (index+1) + ")").find("span").get(0);
+        span.className = "label orders-list ";
+        span.className += getLabelName(ordersData[selectedOrder].status);
+
         $("#order-user-name").val(ordersData[selectedOrder].userName);
         $("#order-aim").val(ordersData[selectedOrder].orderAim);
         $("#order-status").val(ordersData[selectedOrder].status);
@@ -182,23 +189,33 @@ function selectOrder(index) {
             productSelector.prop("disabled", true);
         }
 
-        domainSelector.empty();
-        for (var domainId in ordersData[selectedOrder].possibleDomains) {
-            var domainHtml = "<option value='" + domainId + "' " +
-                                (domainId == ordersData[selectedOrder].domainId ? "selected" : "") + " >" +
-                                ordersData[selectedOrder].possibleDomains[domainId] +
-                            "</option>";
-            domainSelector.append($(domainHtml));
+        if (ordersData[selectedOrder].possibleDomains == null) {
+            domainSelector.get(0).parentNode.style.display = "none";
+        } else {
+            domainSelector.get(0).parentNode.style.display = "block";
+            domainSelector.empty();
+            for (var domainId in ordersData[selectedOrder].possibleDomains) {
+                var domainHtml = "<option value='" + domainId + "' " +
+                    (domainId == ordersData[selectedOrder].domainId ? "selected" : "") + " >" +
+                    ordersData[selectedOrder].possibleDomains[domainId] +
+                    "</option>";
+                domainSelector.append($(domainHtml));
+            }
         }
 
-        productSelector.empty();
-        for (var productId in ordersData[selectedOrder].possibleProducts) {
+        if (ordersData[selectedOrder].possibleProducts == null) {
+            productSelector.get(0).parentNode.style.display = "none";
+        } else {
+            productSelector.get(0).parentNode.style.display = "block";
+            productSelector.empty();
+            for (var productId in ordersData[selectedOrder].possibleProducts) {
 
-            var productHtml = "<option value='" + productId + "' " +
-                                (productId == ordersData[selectedOrder].productId ? "selected" : "") + " >" +
-                                ordersData[selectedOrder].possibleProducts[productId] +
-                            "</option>";
-            productSelector.append($(productHtml));
+                var productHtml = "<option value='" + productId + "' " +
+                    (productId == ordersData[selectedOrder].productId ? "selected" : "") + " >" +
+                    ordersData[selectedOrder].possibleProducts[productId] +
+                    "</option>";
+                productSelector.append($(productHtml));
+            }
         }
 
         $(".order-button").addClass("hidden");
@@ -229,17 +246,18 @@ function previousPage() {
     loadOrders();
 }
 
-function getIconName(status) {
+function getLabelName(status) {
     if (status == "CREATED") {
-        return  "glyphicon glyphicon-plus orders-list";
+        return  "label label-info orders-list";
     } else if (status == "IN_PROGRESS") {
-        return "glyphicon glyphicon-refresh orders-list";
+        return "label label-primary orders-list";
     } else if (status == "CANCELLED") {
-        return "glyphicon glyphicon-remove orders-list";
+        return "label label-danger orders-list";
     } else if (status == "COMPLETED") {
-        return "glyphicon glyphicon-ok orders-list";
+        return "label label-success orders-list";
     }
 }
+
 
 function loadOrders() {
     $.ajax({
@@ -253,10 +271,12 @@ function loadOrders() {
             data.forEach(function (item, i) {
                 if (i < ordersListSize) {
                     var ref = document.createElement("a");
-                    var span = document.createElement("span");
-                    span.className = getIconName(item.status);
-                    ref.appendChild(span);
                     ref.appendChild(document.createTextNode("Order #" + item.productOrderId));
+                    var span = document.createElement("span");
+                    span.className = "label orders-list ";
+                    span.className += getLabelName(item.status);
+                    span.appendChild(document.createTextNode(item.status));
+                    ref.appendChild(span);
                     ref.className = "list-group-item";
                     ref.href = "#";
                     ref.onclick = function () {
