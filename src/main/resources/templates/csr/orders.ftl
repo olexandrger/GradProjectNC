@@ -25,76 +25,143 @@
 <#include "../resources/navbar.ftl"/>
 
     <div class="row">
-        <div class="col-sm-12"><div id="csr-order-alert-place""></div></div>
+        <div class="col-sm-12">
+            <div id="csr-order-alert-place"
+            ">
+        </div>
     </div>
-    <div class="row">
-        <div class="col-sm-5">
+</div>
+<div class="row">
+    <div class="col-sm-5">
 
-            <div class="list-group" id="csr-orders-list">
-                <#--<a href="#" class="list-group-item">First order</a>-->
+        <div class="list-group" id="csr-orders-list">
+        <#--<a href="#" class="list-group-item">First order</a>-->
                 <#--<a href="#" class="list-group-item">Second order</a>-->
                 <#--<a href="#" class="list-group-item">Third order</a>-->
-            </div>
-
-            <ul class="pager">
-                <li class="previous hidden" id="orders-page-previous"><a href="#" onclick="previousPage()">Previous</a></li>
-                <li class="next hidden" id="orders-page-next"><a href="#" onclick="nextPage()">Next</a></li>
-            </ul>
         </div>
-        <div class="col-sm-7 hidden" id="order-main">
 
-            <div class="form-group">
-                <label for="order-user-name">User</label>
-                <input type="text" class="form-control" name="order-user-name" id="order-user-name" readonly>
+        <ul class="pager">
+            <li class="previous hidden" id="orders-page-previous"><a href="#" onclick="previousPage()">Previous</a></li>
+            <li class="next hidden" id="orders-page-next"><a href="#" onclick="nextPage()">Next</a></li>
+        </ul>
+
+        <!-- Trigger the modal with a button -->
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" onclick="loadNewOrderModal()">New Order</button>
+
+        <!-- Modal -->
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">New Order:</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="new-order-user-email">Email</label>
+                            <input type="email" class="form-control" name="new-order-email" placeholder="Email"
+                                   id="new-order-user-email" onblur = "loadDomainsInModal()", onkeypress = "loadDomainsInModal()">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-oeder-domain">Domain</label>
+                            <select class="form-control" name="new-order-domain" id="new-oeder-domain" disabled onchange ="loadProductInstancesInModal()">
+                                <option>Domain 1</option>
+                                <option selected>Domain 2</option>
+                                <option>Domain 3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-oeder-instanse">Product instance</label>
+                            <select class="form-control" name="new-oeder-instanse" id="new-oeder-instanse" disabled onchange ="loadOrderAaimsInModal()">
+                                <option>instanse 1</option>
+                                <option selected>instanse 2</option>
+                                <option>instanse 3</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-oeder-aim">Order aim</label>
+                            <select class="form-control" name="new-oeder-aim" id="new-oeder-aim" disabled >
+                                <option>Aim 1</option>
+                                <option selected>Aim 2</option>
+                                <option>Aim 3</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal" onclick="createNewOrderFromModal()">Create</button>
+                    </div>
+                </div>
+
             </div>
+        </div>
 
-            <div class="form-group">
-                <label for="order-domain">Domain</label>
-                <select class="form-control" name="order-domain" id="order-domain">
-                    <#--<option>Domain 1</option>-->
+    </div>
+    <div class="col-sm-7 hidden" id="order-main">
+
+        <div class="form-group">
+            <label for="order-user-name">User</label>
+            <input type="text" class="form-control" name="order-user-name" id="order-user-name" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="order-domain">Domain</label>
+            <select class="form-control" name="order-domain" id="order-domain">
+            <#--<option>Domain 1</option>-->
                     <#--<option selected>Domain 2</option>-->
                     <#--<option>Domain 3</option>-->
-                </select>
-            </div>
+            </select>
+        </div>
 
-            <div class="form-group">
-                <label for="order-product">Product</label>
-                <select class="form-control" name="order-product" id="order-product">
-                    <#--<option>Product 1</option>-->
+        <div class="form-group">
+            <label for="order-product">Product</label>
+            <select class="form-control" name="order-product" id="order-product">
+            <#--<option>Product 1</option>-->
                     <#--<option selected>Product 2</option>-->
                     <#--<option>Product 3</option>-->
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="order-aim">Aim</label>
-                <input type="text" class="form-control" name="order-aim" id="order-aim" readonly>
-            </div>
-
-            <div class="form-group">
-                <label for="order-status">Status</label>
-                <input type="text" class="form-control" name="order-status" id="order-status" readonly>
-            </div>
-
-            <div class="form-group">
-                <label for="order-start-date">Start date</label>
-                <input type="text" class="form-control" name="order-start-date" id="order-start-date" readonly>
-            </div>
-
-            <div class="form-group">
-                <label for="order-end-date">End date</label>
-                <input type="text" class="form-control" name="order-end-date" id="order-end-date" readonly>
-            </div>
-
-            <div class="form-group text-center">
-                <button class="btn btn-default order-button hidden" id="order-button-update" onclick="updateSelectedOrder()">Update</button>
-                <button class="btn btn-default order-button hidden" id="order-button-cancel" onclick="cancelSelectedOrder()">Cancel</button>
-                <button class="btn btn-default order-button hidden" id="order-button-start" onclick="startSelectedOrder()">Start</button>
-                <button class="btn btn-default order-button hidden" id="order-button-complete" onclick="completeSelectedOrder()">Complete</button>
-            </div>
-
+            </select>
         </div>
+
+        <div class="form-group">
+            <label for="order-aim">Aim</label>
+            <input type="text" class="form-control" name="order-aim" id="order-aim" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="order-status">Status</label>
+            <input type="text" class="form-control" name="order-status" id="order-status" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="order-start-date">Start date</label>
+            <input type="text" class="form-control" name="order-start-date" id="order-start-date" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="order-end-date">End date</label>
+            <input type="text" class="form-control" name="order-end-date" id="order-end-date" readonly>
+        </div>
+
+        <div class="form-group text-center">
+            <button class="btn btn-default order-button hidden" id="order-button-update"
+                    onclick="updateSelectedOrder()">Update
+            </button>
+            <button class="btn btn-default order-button hidden" id="order-button-cancel"
+                    onclick="cancelSelectedOrder()">Cancel
+            </button>
+            <button class="btn btn-default order-button hidden" id="order-button-start" onclick="startSelectedOrder()">
+                Start
+            </button>
+            <button class="btn btn-default order-button hidden" id="order-button-complete"
+                    onclick="completeSelectedOrder()">Complete
+            </button>
+        </div>
+
     </div>
+</div>
 
 </div>
 </body>
