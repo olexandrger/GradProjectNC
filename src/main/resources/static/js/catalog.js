@@ -30,14 +30,12 @@ function getRegionalPrice(regionId) {
 }
 
 function selectCatalogProduct(index, positionInList) {
-
     $("#catalog-main-info").removeClass("hidden");
 
     catalogSelectedItem = index;
 
     var list = $("#catalog-products-list");
     list.find("a").removeClass("active");
-    // console.log("Child: " + (index+1));
     list.find("a:nth-child(" + positionInList + ")").addClass("active");
 
     $(".table-row").remove();
@@ -45,13 +43,8 @@ function selectCatalogProduct(index, positionInList) {
     $("#catalog-product-name").text(catalogProducts[index].productName);
     $("#catalog-product-description").text(catalogProducts[index].productDescription);
 
-    // catalogProducts[index].productCharacteristics.forEach(function (item) {
-    //     catalogCharacteristics[item.productCharacteristicId] = item;
-    // });
-
     var table = $("#catalog-table-details");
     catalogProducts[index].productCharacteristicValues.forEach(function (item) {
-        // console.log(item.productCharacteristic.measure);
            var html = '<tr class="table-row"><td>' +
                    item.productCharacteristic.characteristicName +
             '</td>' +
@@ -82,8 +75,9 @@ function updateCatalog() {
             ref.appendChild(document.createTextNode(item.productName));
             ref.className = "list-group-item";
             ref.href = "#";
+            var position = positionInList++;
             ref.onclick = function () {
-                selectCatalogProduct(index, positionInList++);
+                selectCatalogProduct(index, position);
             };
             list.append(ref);
         }
@@ -122,7 +116,6 @@ function loadDomainsData() {
                 select.append(option);
             });
 
-            //TODO maybe add message
             if (data.length > 0) {
                 $("#catalog-new-order-button").removeClass("hidden");
             }
@@ -135,7 +128,6 @@ function loadDomainsData() {
 
 function catalogChangeDomain(domainId) {
     //TODO display address
-
     var price = getRegionalPrice(catalogDomains[domainId].regionId);
     if (price == "") {
         price = "Product unavailable in this region";

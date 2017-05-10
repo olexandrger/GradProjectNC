@@ -35,3 +35,7 @@
 .tab {
     padding-left: 1em;
 }
+
+span.orders-list {
+    margin-right: 10px;
+}

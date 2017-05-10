@@ -158,6 +158,7 @@ function selectOrder(index) {
 
     list.find("a").removeClass("active");
     list.find("a:nth-child(" + (index+1) + ")").addClass("active");
+    list.find("a:nth-child(" + (index+1) + ")").find("span").get(0).className = getIconName(ordersData[selectedOrder].status);
 
     if (selectedOrder != -1) {
         $("#order-user-name").val(ordersData[selectedOrder].userName);
@@ -228,6 +229,18 @@ function previousPage() {
     loadOrders();
 }
 
+function getIconName(status) {
+    if (status == "CREATED") {
+        return  "glyphicon glyphicon-plus orders-list";
+    } else if (status == "IN_PROGRESS") {
+        return "glyphicon glyphicon-refresh orders-list";
+    } else if (status == "CANCELLED") {
+        return "glyphicon glyphicon-remove orders-list";
+    } else if (status == "COMPLETED") {
+        return "glyphicon glyphicon-ok orders-list";
+    }
+}
+
 function loadOrders() {
     $.ajax({
         url: "/api/csr/orders/get/all/size/" + (ordersListSize + 1) + "/offset/" + ordersListCurrentPage * ordersListSize,
@@ -240,6 +253,9 @@ function loadOrders() {
             data.forEach(function (item, i) {
                 if (i < ordersListSize) {
                     var ref = document.createElement("a");
+                    var span = document.createElement("span");
+                    span.className = getIconName(item.status);
+                    ref.appendChild(span);
                     ref.appendChild(document.createTextNode("Order #" + item.productOrderId));
                     ref.className = "list-group-item";
                     ref.href = "#";
