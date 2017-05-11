@@ -305,7 +305,6 @@ function addLoadedProducts(k) {
 
 function loadProducts() {
     console.log("loadProducts");
-
     $.ajax({
         url: "/api/user/products/firstn",
         success: function (data) {
