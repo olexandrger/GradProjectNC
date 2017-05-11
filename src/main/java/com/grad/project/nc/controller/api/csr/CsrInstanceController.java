@@ -1,6 +1,7 @@
 package com.grad.project.nc.controller.api.csr;
 
 import com.grad.project.nc.controller.api.dto.FrontendInstance;
+import com.grad.project.nc.model.ProductInstance;
 import com.grad.project.nc.service.instances.InstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,10 +28,11 @@ public class CsrInstanceController {
         this.instanceService = instanceService;
     }
 
-    @RequestMapping(value = "/find/{id}", method = RequestMethod.GET)
-    Collection<FrontendInstance> findByID(@PathVariable Long id){
+    @RequestMapping(value = "/find/bydomain/{id}", method = RequestMethod.GET)
+    Collection<FrontendInstance> findByDomainID(@PathVariable Long id){
         return instanceService.getByDomainId(id)
                 .stream()
+                .filter(instance->{ return !instance.getStatus().getCategoryName().equals("DEACTIVATE");})
                 .map(FrontendInstance::fromEntity)
                 .collect(Collectors.toCollection(ArrayList::new));
     }

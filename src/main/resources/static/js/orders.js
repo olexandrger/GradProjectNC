@@ -345,10 +345,11 @@ function loadDomainsInModal(keyCode) {
                 var options = $("#new-order-domain");
                 data.forEach(function (item, i) {
                     var option =  document.createElement("option");
-                    option.setAttribute("id", item.domainId);
+                    option.setAttribute("value", item.domainId);
                     option.appendChild(document.createTextNode(item.domainName));
                     options.append(option);
                 });
+                loadProductInstancesInModal()
             } else {
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This user does not have any domains!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
@@ -366,12 +367,29 @@ function loadDomainsInModal(keyCode) {
 function loadProductInstancesInModal() {
 
     $("#new-order-instanse").empty();
-    var domains = $("#new-order-domain");
-    var index = domains.selectedIndex;
-    var id = domains.options[domains.selectedIndex].id;
+    $("#new-order-instanse").attr("disabled", "true");
+    var domainId = $("#new-order-domain").val();
+
     $.ajax({
-        url: "/api/csr/instances/find/{"+id+"/",
-        success: function () {
+        url: "/api/csr/instances/find/bydomain/"+domainId+"/",
+        success: function (data) {
+            if (data.length > 0) {
+                $("#new-order-modal-error-msg").empty();
+                $("#new-order-modal-error-msg").attr("hidden", "true");
+                $("#new-order-instanse").removeAttr("disabled");
+                var options = $("#new-order-instanse");
+                data.forEach(function (item, i) {
+                    var option =  document.createElement("option");
+                    option.setAttribute("value", item.instanceId);
+                    option.appendChild(document.createTextNode(item.product.productName));
+                    options.append(option);
+                })
+                loadOrderAaimsInModal();
+
+            } else {
+                $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This domain does not have any instances!");
+                $("#new-order-modal-error-msg").removeAttr("hidden");
+            }
 
         },
         error:function () {
@@ -382,6 +400,22 @@ function loadProductInstancesInModal() {
 
 }
 function loadOrderAaimsInModal() {
+    $("#new-order-aim").empty();
+    $("#new-order-aim").attr("disabled", "true");
+    var options = $("#new-order-aim");
+    var status;
+    $.ajax({
+        url:"/api/csr/category/getstatus/frominstance/"+$("#new-order-instanse").val()+"/",
+        success: function (data) {
+            if(data.categoryName.localeCompare("CREATED")){
+                //CANSEL
+            }
+
+        },
+        error:function () {
+
+        }
+    });
 
 }
 

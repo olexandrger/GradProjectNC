@@ -90,7 +90,7 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
     @Override
     public Category findProductOrderAim(Long productOrderId) {
         String query = "SELECT c.\"category_id\", c.\"category_name\", c.\"category_type_id\" " +
-                "FROM \"category\" c" +
+                "FROM \"category\" c " +
                 "JOIN \"product_order\" po " +
                 "ON po.\"order_aim_id\"=c.\"category_id\" " +
                 "AND po.\"product_order_id\"=?";
@@ -100,7 +100,7 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
     @Override
     public Category findProductOrderStatus(Long productOrderId) {
         String query = "SELECT c.\"category_id\", c.\"category_name\", c.\"category_type_id\" " +
-                "FROM \"category\" c" +
+                "FROM \"category\" c " +
                 "JOIN \"product_order\" po " +
                 "ON po.\"status_id\"=c.\"category_id\" " +
                 "AND po.\"product_order_id\"=?";
@@ -110,7 +110,7 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
     @Override
     public Category findComplainStatus(Long complainId) {
         String query = "SELECT c.\"category_id\", c.\"category_name\", c.\"category_type_id\" " +
-                "FROM \"category\" c" +
+                "FROM \"category\" c " +
                 "JOIN \"complain\" co " +
                 "ON co.\"status_id\"=c.\"category_id\" " +
                 "AND co.\"complain_id\"=?";
@@ -120,7 +120,7 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
     @Override
     public Category findComplainReason(Long complainId) {
         String query = "SELECT c.\"category_id\", c.\"category_name\", c.\"category_type_id\" " +
-                "FROM \"category\" c" +
+                "FROM \"category\" c " +
                 "JOIN \"complain\" co " +
                 "ON co.\"complain_reason_id\"=c.\"category_id\" " +
                 "AND co.\"complain_id\"=?";
@@ -130,7 +130,7 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
     @Override
     public Category findProductInstanceStatus(Long productInstanceId) {
         String query = "SELECT c.\"category_id\", c.\"category_name\", c.\"category_type_id\" " +
-                "FROM \"category\" c" +
+                "FROM \"category\" c " +
                 "JOIN \"product_instance\" pi " +
                 "ON pi.\"status_id\"=c.\"category_id\" " +
                 "AND pi.\"instance_id\"=?";
@@ -140,7 +140,7 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
     @Override
     public Category findDomainType(Long domainId) {
         String query = "SELECT c.\"category_id\", c.\"category_name\", c.\"category_type_id\" " +
-                "FROM \"category\" c" +
+                "FROM \"category\" c " +
                 "JOIN \"domain\" d " +
                 "ON d.\"domain_type_id\"=c.\"category_id\" " +
                 "AND d.\"domain_id\"=?";
@@ -151,7 +151,6 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
         @Override
         public Category mapRow(ResultSet resultSet, int i) throws SQLException {
             CategoryProxy category = proxyFactory.getObject();
-
             category.setCategoryId(resultSet.getLong("category_id"));
             category.setCategoryName(resultSet.getString("category_name"));
             category.setCategoryTypeId(resultSet.getLong("category_type_id"));
