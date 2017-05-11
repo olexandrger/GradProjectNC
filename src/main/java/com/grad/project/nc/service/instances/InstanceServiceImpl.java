@@ -5,6 +5,8 @@ import com.grad.project.nc.persistence.ProductInstanceDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+
 @Service
 public class InstanceServiceImpl implements InstanceService {
 
@@ -18,5 +20,10 @@ public class InstanceServiceImpl implements InstanceService {
     @Override
     public ProductInstance getById(Long id) {
         return productInstanceDao.find(id);
+    }
+
+    @Override
+    public Collection<ProductInstance> getByDomainId(Long domainId) {
+        return productInstanceDao.findByDomainId(domainId);
     }
 }

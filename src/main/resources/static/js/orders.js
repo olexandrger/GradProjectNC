@@ -42,7 +42,7 @@ function updateSelectedOrder() {
             productId: productId,
             domainId: domainId
         }),
-        success: function(data) {
+        success: function (data) {
             if (data.status == "success") {
                 ordersData[selectedOrder].productId = productId;
                 ordersData[selectedOrder].domainId = domainId;
@@ -73,7 +73,7 @@ function cancelSelectedOrder() {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
                 ordersData[selectedId].status = "CANCELLED";
-                ordersData[selectedId].closeDate = Date.now()/1000;
+                ordersData[selectedId].closeDate = Date.now() / 1000;
 
                 if (selectedOrder == selectedId) {
                     selectOrder(selectedOrder);
@@ -130,7 +130,7 @@ function completeSelectedOrder() {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
                 ordersData[selectedId].status = "COMPLETED";
-                ordersData[selectedId].closeDate = Date.now()/1000;
+                ordersData[selectedId].closeDate = Date.now() / 1000;
 
                 if (selectedOrder == selectedId) {
                     selectOrder(selectedOrder);
@@ -159,12 +159,12 @@ function selectOrder(index) {
     var list = $("#csr-orders-list");
 
     list.find("a").removeClass("active");
-    list.find("a:nth-child(" + (index+1) + ")").addClass("active");
+    list.find("a:nth-child(" + (index + 1) + ")").addClass("active");
 
     if (selectedOrder != -1) {
-        list.find("a:nth-child(" + (index+1) + ")").find("span").text(ordersData[selectedOrder].status);
+        list.find("a:nth-child(" + (index + 1) + ")").find("span").text(ordersData[selectedOrder].status);
 
-        var span = list.find("a:nth-child(" + (index+1) + ")").find("span").get(0);
+        var span = list.find("a:nth-child(" + (index + 1) + ")").find("span").get(0);
         span.className = "label orders-list ";
         span.className += getLabelName(ordersData[selectedOrder].status);
 
@@ -182,8 +182,8 @@ function selectOrder(index) {
         var productSelector = $('#order-product');
 
         if (ordersData[selectedOrder].orderAim == "CREATE" && ordersData[selectedOrder].status == "CREATED") {
-            domainSelector.prop( "disabled", false);
-            productSelector.prop( "disabled", false);
+            domainSelector.prop("disabled", false);
+            productSelector.prop("disabled", false);
         } else {
             domainSelector.prop("disabled", true);
             productSelector.prop("disabled", true);
@@ -248,7 +248,7 @@ function previousPage() {
 
 function getLabelName(status) {
     if (status == "CREATED") {
-        return  "label label-info orders-list";
+        return "label label-info orders-list";
     } else if (status == "IN_PROGRESS") {
         return "label label-primary orders-list";
     } else if (status == "CANCELLED") {
@@ -308,30 +308,83 @@ function loadOrders() {
 
 function loadNewOrderModal() {
     $("#new-order-user-email").val("");
-    $("#new-oeder-domain").empty();
-    $("#new-oeder-instanse").empty();
-    $("#new-oeder-aim").empty();
+    $("#new-order-domain").empty();
+    $("#new-order-domain").attr("disabled", "true");
+    $("#new-order-instanse").empty();
+    $("#new-order-instanse").attr("disabled", "true");
+    $("#new-order-aim").empty();
+    $("#new-order-aim").attr("disabled", "true");
+    //$("#new-order-aim").removeAttr("disabled");
+    $("#new-order-modal-error-msg").empty();
+    $("#new-order-modal-error-msg").attr("hidden", "true");
+
 }
 
 function createNewOrderFromModal() {
 
 }
 
-function loadDomainsInModal() {
+function loadDomainsInModal(keyCode) {
+    if (keyCode != 13) {
+        return;
+    }
+    $("#new-order-domain").empty();
+    if ($("#new-order-user-email").val().length < 1) {
+        $("#new-order-modal-error-msg").html("<strong>Warning! </strong> E-mail field is empty!");
+        $("#new-order-modal-error-msg").removeAttr("hidden");
+        return;
+    }
+
+    $.ajax({
+        url: "/api/csr/domains/find/" + $("#new-order-user-email").val() + "/",
+        success: function (data) {
+            if (data.length > 0) {
+                $("#new-order-modal-error-msg").empty();
+                $("#new-order-modal-error-msg").attr("hidden", "true");
+                $("#new-order-domain").removeAttr("disabled");
+                var options = $("#new-order-domain");
+                data.forEach(function (item, i) {
+                    var option =  document.createElement("option");
+                    option.setAttribute("id", item.domainId);
+                    option.appendChild(document.createTextNode(item.domainName));
+                    options.append(option);
+                });
+            } else {
+                $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This user does not have any domains!");
+                $("#new-order-modal-error-msg").removeAttr("hidden");
+            }
+        },
+        error: function () {
+            $("#new-order-modal-error-msg").html("<strong>Error! </strong> E-mail not found!");
+            $("#new-order-modal-error-msg").removeAttr("hidden");
+
+        }
+    });
 
 }
 
 function loadProductInstancesInModal() {
+
+    $("#new-order-instanse").empty();
+    var domains = $("#new-order-domain");
+    var index = domains.selectedIndex;
+    var id = domains.options[domains.selectedIndex].id;
+    $.ajax({
+        url: "/api/csr/instances/find/{"+id+"/",
+        success: function () {
+
+        },
+        error:function () {
+
+        }
+    });
+
 
 }
 function loadOrderAaimsInModal() {
 
 }
 
-$(document).ready(function() {
-    loadOrders();
-});
-
-$(document).ready(function() {
+$(document).ready(function () {
     loadOrders();
 });
