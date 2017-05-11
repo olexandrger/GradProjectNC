@@ -45,6 +45,17 @@ public class ProductsController {
         return productDao.findAll().stream().map(FrontendProduct::fromEntity).collect(Collectors.toList());
     }
 
+    @RequestMapping(value = "/firstn", method = RequestMethod.GET)
+    public Collection<FrontendProduct> getFirstN() {
+        Collection<FrontendProduct> frontendProducts;
+        return productDao.findFirstN(5).stream().map(FrontendProduct::fromEntity).collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/lastn", method = RequestMethod.GET)
+    public Collection<FrontendProduct> getLastN() {
+        return productDao.findLastN(5).stream().map(FrontendProduct::fromEntity).collect(Collectors.toList());
+    }
+
 
 
 

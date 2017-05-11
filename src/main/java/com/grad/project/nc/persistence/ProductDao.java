@@ -9,6 +9,10 @@ public interface ProductDao extends CrudDao<Product> {
 
     Product findByName(String productName);
 
+    List<Product> findFirstN(int n);
+
+    List<Product> findLastN(int n);
+
     List<Product> findByProductTypeId(Long productTypeId);
 
     Product findByProductRegionPriceId(Long productRegionPriceId);

@@ -294,20 +294,39 @@ function addProduct(name, index) {
     }
 }
 
-function addLoadedProducts() {
+function addLoadedProducts(k) {
     productsData.forEach(function (product, i) {
-        addProduct(product.productName, i);
+        console.log("addLoadedProducts");
+        if (i < k){}else {
+            addProduct(product.productName, i );
+        }
     });
 }
 
 function loadProducts() {
     console.log("loadProducts");
+
     $.ajax({
-        url: "/api/user/products/all",
+        url: "/api/user/products/firstn",
         success: function (data) {
             productsData = data;
+            addLoadedProducts(0);
+        },
+        error: function () {
+            console.error("Cannot load products");
+        }
+    });
+}
 
-            addLoadedProducts();
+function loadAllProducts() {
+    console.log("loadAllProducts");
+    $.ajax({
+        url: "/api/user/products/lastn",
+        success: function (data) {
+            data.forEach(function (product) {
+                productsData.push(product);
+            })
+            addLoadedProducts(5);
         },
         error: function () {
             console.error("Cannot load products");

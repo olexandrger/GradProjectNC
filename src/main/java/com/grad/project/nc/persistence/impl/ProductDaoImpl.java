@@ -78,6 +78,22 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
     }
 
     @Override
+    public List<Product> findFirstN(int n) {
+        String findAllQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
+                "\"product_type_id\" FROM \"product\"ORDER BY product_id LIMIT " + n;
+
+        return findMultiple(findAllQuery, new ProductRowMapper());
+    }
+
+    @Override
+    public List<Product> findLastN(int n) {
+        String findAllQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
+                "\"product_type_id\" FROM \"product\"ORDER BY product_id OFFSET " + n;
+
+        return findMultiple(findAllQuery, new ProductRowMapper());
+    }
+
+    @Override
     public List<Product> findByRegionId(Long regionId) {
         String query = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
                 "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
