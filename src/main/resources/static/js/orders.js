@@ -4,6 +4,7 @@ var ordersListCurrentPage = 0;
 var ordersData;
 
 var selectedOrder;
+var selectUserId
 
 
 function orderErrorMessage(message) {
@@ -322,6 +323,7 @@ function loadNewOrderModal() {
 }
 
 function createNewOrderFromModal() {
+    console.error(selectUserId);
     $.ajax({
         url: $("#new-order-aim").val(),
         method: 'POST',
@@ -332,7 +334,7 @@ function createNewOrderFromModal() {
         data: JSON.stringify({
             instanceId: $("#new-order-instanse").val(),
             domainId: $("#new-order-domain").val(),
-            userId:getUserIdByMail($("#new-order-user-email").val())
+            userId:selectUserId
         }),
         success: function (data) {
             loadOrders();
@@ -375,6 +377,7 @@ function loadDomainsInModal(keyCode) {
         url: "/api/csr/domains/find/" + $("#new-order-user-email").val() + "/",
         success: function (data) {
             if (data.length > 0) {
+                selectUserId = getUserIdByMail($("#new-order-user-email").val())
                 $("#new-order-modal-error-msg").empty();
                 $("#new-order-modal-error-msg").attr("hidden", "true");
                 $("#new-order-domain").removeAttr("disabled");
@@ -382,7 +385,7 @@ function loadDomainsInModal(keyCode) {
                 data.forEach(function (item, i) {
                     var option = document.createElement("option");
                     if(i==0){
-                        option.setAttribute("selected", "true");
+                        option.setAttribute("selected", "selected");
                     }
                     option.setAttribute("value", item.domainId);
                     option.appendChild(document.createTextNode(item.domainName));
@@ -421,7 +424,7 @@ function loadProductInstancesInModal() {
                     var option = document.createElement("option");
                     option.setAttribute("value", item.instanceId);
                     if(i==0){
-                        option.setAttribute("selected", "true");
+                        option.setAttribute("selected", "selected");
                     }
                     option.appendChild(document.createTextNode(item.product.productName));
                     options.append(option);
@@ -456,11 +459,11 @@ function loadOrderAaimsInModal() {
                 option.setAttribute("value", "/api/csr/orders/new/activate");
                 option.appendChild(document.createTextNode("ACTIVATE"));
 
-                option.setAttribute("selected", "true");
+                option.setAttribute("selected", "selected");
                 options.append(option);
             } else if (data.categoryName.localeCompare("ACTIVATED")) {
                 var option1 = document.createElement("option");
-                option1.setAttribute("selected", "true");
+                option1.setAttribute("selected", "selected");
                 option1.setAttribute("value", "/api/csr/orders/new/suspend");
                 option1.appendChild(document.createTextNode("SUSPEND"));
                 options.append(option1);
@@ -470,7 +473,7 @@ function loadOrderAaimsInModal() {
                 options.append(option2);
             } else if (data.categoryName.localeCompare("SUSPENDED")) {
                 var option = document.createElement("option");
-                option.setAttribute("selected", "true");
+                option.setAttribute("selected", "selected");
                 option.setAttribute("value", "/api/csr/orders/new/activate");
                 option.appendChild(document.createTextNode("ACTIVATE"));
                 options.append(option);
