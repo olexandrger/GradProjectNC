@@ -6,6 +6,7 @@ import com.grad.project.nc.persistence.RoleDao;
 import com.grad.project.nc.persistence.UserDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -67,5 +68,31 @@ public class UserServiceImpl implements UserService{
     @Override
     public User findByEMail(String eMail) {
         return userDao.findByEmail(eMail).get();
+    }
+
+    @Override
+    /**
+     * Because we store encoded user passwords,we cant se user password.If user password was not changed during editing
+     * user info by admin, it value sets to null.That's indicates that we should not change password i DB.
+     */
+    public Boolean update(User user) {
+
+        try {
+
+            if (user.getPassword() == null) {
+                user.getRoles();
+                userDao.updateWithoutPassword(user);
+            } else {
+                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+                user.getRoles();
+                userDao.update(user);
+            }
+        }
+        catch (DataAccessException e){
+            log.info("Error during user info update!");
+            return false;
+        }
+
+        return true;
     }
 }
