@@ -81,6 +81,7 @@ public class UserServiceImpl implements UserService{
 
             if (user.getPassword() == null) {
                 user.getRoles();
+                user.getDomains();
                 userDao.updateWithoutPassword(user);
             } else {
                 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));

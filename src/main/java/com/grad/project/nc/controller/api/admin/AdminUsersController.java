@@ -13,6 +13,7 @@ import com.grad.project.nc.service.security.UserServiceImpl;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -37,16 +38,6 @@ public class AdminUsersController {
     private UserService userService;
     @Autowired
     private RoleDao roleDao;
-
-   // private static List<FrontendDomain> domains = new ArrayList<>();
-    //static {
-      //  domains.add(FrontendDomain.builder()
-       //         .domainId(Long.parseLong("1"))
-      //          .domainName("NDomain")
-       //         .build());
-   // }
-
-
 
 
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
@@ -91,10 +82,7 @@ public class AdminUsersController {
     @ResponseBody
     public FrontUser get(@RequestParam("name") String name) {
         log.info( "Found:" + name  );
-        FrontUser frontUser = mapUserToFrontUser(userService.findByEmail(name));
-
-        //TODO rework after domains will be ready
-        //frontUser.setDomains(domains);
+        FrontUser frontUser = mapUserToFrontUser(userService.findByEMail(name));
 
         return frontUser;
     }
@@ -123,27 +111,27 @@ public class AdminUsersController {
         return user;
     }
     private FrontUser mapUserToFrontUser(User user){
-        FrontUser frontUser = new FrontUser();
 
-        frontUser.setUserId(user.getUserId());
-        frontUser.setFirstName(user.getFirstName());
-        frontUser.setLastName(user.getLastName());
-        frontUser.setEmail(user.getEmail());
-        frontUser.setPassword(user.getPassword());
-        frontUser.setPhoneNumber(user.getPhoneNumber());
-        frontUser.setRoles(user.getRoles());
-        frontUser.setDomains(user.getDomains().stream()
-                .map(FrontendDomain::fromEntity)
-                .collect(Collectors.toList()));
+         return FrontUser.builder().userId(user.getUserId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phoneNumber(user.getPhoneNumber())
+                .roles(user.getRoles())
+                .domains(user.getDomains().stream()
+                        .map(FrontendDomain::fromEntity)
+                        .collect(Collectors.toList()))
+                .build();
 
-        return frontUser;
     }
 
 
 
     @Data
-    @NoArgsConstructor
-    private static class FrontUser{
+
+    @Builder
+    private static   class FrontUser{
         private Long userId;
         private String email;
         private String password;

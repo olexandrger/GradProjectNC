@@ -160,7 +160,7 @@
                                         <input type="password" id="mf4" class="form-control" name="password"
                                                placeholder="Password">
                                     </div>
-                                    <div class="form-group">
+                                    <#--<div class="form-group">
                                         <label for="address">Address</label>
                                         <input type="text" id="mf5" class="form-control" name="address"
                                                placeholder="Address">
@@ -169,7 +169,7 @@
                                         <label for="aptNumber">Apartment number</label>
                                         <input type="text" id="mf6" class="form-control" name="aptNumber"
                                                placeholder="Apartment number">
-                                    </div>
+                                    </div>-->
 
                                     <div class="form-group">
                                         <label for="phone">Phone</label>
@@ -236,10 +236,10 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-12" style="margin-top: 10px;">
-                                            <div class="col-xs-12 text-center">
+                                           <#-- <div class="col-xs-12 text-center">
                                                 <div class="form-group">
                                                     <a class="btn btn-success" onclick="saveSelectedDomain()">
-                                                        <span class="glyphicon glyphicon-floppy-disk"></span>Save
+                                                        <span class="glyphicon glyphicon-floppy-disk"></span>Save as new Domain
                                                     </a>
 
                                                 <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
