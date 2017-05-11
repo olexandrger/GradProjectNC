@@ -76,6 +76,22 @@ public class ProductTypeDaoImpl extends AbstractDao implements ProductTypeDao {
     }
 
     @Override
+    public List<ProductType> findFirstN(int n) {
+        String findAllQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
+                "\"is_active\" FROM \"product_type\"ORDER BY product_type_id LIMIT " + n;
+
+        return findMultiple(findAllQuery, new ProductTypeRowMapper());
+    }
+
+    @Override
+    public List<ProductType> findLastN(int n) {
+        String findAllQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
+                "\"is_active\" FROM \"product_type\"ORDER BY product_type_id OFFSET " + n;
+
+        return findMultiple(findAllQuery, new ProductTypeRowMapper());
+    }
+
+    @Override
     public ProductType findByProductId(Long productId) {
         String query = "SELECT pt.\"product_type_id\", pt.\"product_type_name\", " +
                 "pt.\"product_type_description\", pt.\"is_active\" " +

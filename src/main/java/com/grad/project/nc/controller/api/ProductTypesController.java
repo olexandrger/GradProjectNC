@@ -76,6 +76,38 @@ public class ProductTypesController {
         }).collect(Collectors.toList());
     }
 
+    @RequestMapping(value = "/productTypes/first", method = RequestMethod.GET)
+    public List<Type> getFirstN() {
+        return productTypeDao.findFirstN(5).stream().map(productType -> {
+            Type type = new Type();
+            type.setId(productType.getProductTypeId());
+            type.setName(productType.getProductTypeName());
+            type.setDescription(productType.getProductTypeDescription());
+            type.setActive(productType.getIsActive());
+            type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
+                    .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
+                            item.getMeasure(), item.getDataType().getCategoryId()))
+                    .collect(Collectors.toList()));
+            return type;
+        }).collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/productTypes/last", method = RequestMethod.GET)
+    public List<Type> getLastN() {
+        return productTypeDao.findLastN(5).stream().map(productType -> {
+            Type type = new Type();
+            type.setId(productType.getProductTypeId());
+            type.setName(productType.getProductTypeName());
+            type.setDescription(productType.getProductTypeDescription());
+            type.setActive(productType.getIsActive());
+            type.setCharacteristics(productCharacteristicDao.findByProductTypeId(type.getId()).stream()
+                    .map(item -> new Characteristic(item.getProductCharacteristicId(), item.getCharacteristicName(),
+                            item.getMeasure(), item.getDataType().getCategoryId()))
+                    .collect(Collectors.toList()));
+            return type;
+        }).collect(Collectors.toList());
+    }
+
     @Data
     @NoArgsConstructor
     private static class Type {

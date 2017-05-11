@@ -215,8 +215,8 @@ function selectItem(x) {
     selected = x;
 
     var list = $("#product-types-list");
+    list.find("a").removeClass("active");
     list.find("a:nth-child(" + (x+1) + ")").addClass("active");
-    // $('input:radio[name=product-type-status]').prop('checked', false);
 
 
     $(".product-characteristic-input").remove();
@@ -242,7 +242,7 @@ function loadInfo() {
         url: "/api/user/dataTypes",
         success: function (data) {
             dataTypeData = data;
-            loadProductTypes();
+            loadFirstNProductTypes();
         },
         error: function () {
             console.error("Cannot load dataTypes");
@@ -267,6 +267,67 @@ function loadProductTypes() {
                 ref.href = "#";
                 ref.onclick = function () {
                     selectItem(i);
+                };
+
+                list.append(ref);
+            });
+        },
+        error: function () {
+            console.error("Cannot load list product types");
+        }
+    });
+}
+
+function loadFirstNProductTypes() {
+    $.ajax({
+        url: "/api/user/productTypes/first ",
+        success: function(data) {
+            var list = $("#product-types-list");
+
+            productTypeData = data;
+
+            data.forEach(function(item, i) {
+                console.log(item.name + " loaded");
+
+                var ref = document.createElement("a");
+                ref.appendChild(document.createTextNode(item.name));
+                ref.className = "list-group-item";
+                ref.href = "#";
+                ref.onclick = function () {
+                    selectItem(i);
+                };
+
+                list.append(ref);
+            });
+        },
+        error: function () {
+            console.error("Cannot load list product types");
+        }
+    });
+}
+
+function loadAllProductTypes() {
+    console.log("loadAllProductTypes");
+    $.ajax({
+        url: "/api/user/productTypes/last ",
+        success: function(data) {
+            var list = $("#product-types-list");
+
+            data.forEach(function (productType) {
+                productTypeData.push(productType);
+            })
+
+           // productTypeData = data;
+
+            data.forEach(function(item, i) {
+                console.log(item.name + " loaded");
+
+                var ref = document.createElement("a");
+                ref.appendChild(document.createTextNode(item.name));
+                ref.className = "list-group-item";
+                ref.href = "#";
+                ref.onclick = function () {
+                    selectItem(i + 5);
                 };
 
                 list.append(ref);
