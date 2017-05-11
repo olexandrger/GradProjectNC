@@ -332,7 +332,7 @@ function createNewOrderFromModal() {
         data: JSON.stringify({
             instanceId: $("#new-order-instanse").val(),
             domainId: $("#new-order-domain").val(),
-            userId: getUserIdByMail($("#new-order-user-email").val())
+            userId:getUserIdByMail($("#new-order-user-email").val())
         }),
         success: function (data) {
             loadOrders();
@@ -348,9 +348,10 @@ function createNewOrderFromModal() {
 function getUserIdByMail(email) {
     var userId =-1;
     $.ajax({
-        url: "/api/csr/users/find/" + email + "/",
+        url: "/api/csr/users/find/"+email+"/",
         success: function (data) {
             userId = data.userId;
+            return userId;
         },
         error: function () {
             console.error(email)
