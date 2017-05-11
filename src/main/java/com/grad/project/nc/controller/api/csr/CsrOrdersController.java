@@ -30,7 +30,7 @@ public class CsrOrdersController {
         Map<String, Object> result = new HashMap<>();
         try {
             long instanceId = Long.parseLong(params.get("instanceId"));
-            long userId = Long.parseLong("userId");
+            long userId = Long.parseLong(params.get("userId"));
             ProductOrder order = function.apply(instanceId, userId);
             result.put("status", "success");
             result.put("message", "Order created");

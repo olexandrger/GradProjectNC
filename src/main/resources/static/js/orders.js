@@ -323,7 +323,6 @@ function loadNewOrderModal() {
 }
 
 function createNewOrderFromModal() {
-    console.error(selectUserId);
     $.ajax({
         url: $("#new-order-aim").val(),
         method: 'POST',
@@ -348,12 +347,10 @@ function createNewOrderFromModal() {
 }
 
 function getUserIdByMail(email) {
-    var userId =-1;
     $.ajax({
         url: "/api/csr/users/find/"+email+"/",
         success: function (data) {
-            userId = data.userId;
-            return userId;
+           selectUserId = data.userId;
         },
         error: function () {
             console.error(email)
@@ -377,7 +374,7 @@ function loadDomainsInModal(keyCode) {
         url: "/api/csr/domains/find/" + $("#new-order-user-email").val() + "/",
         success: function (data) {
             if (data.length > 0) {
-                selectUserId = getUserIdByMail($("#new-order-user-email").val())
+                selectUserId = getUserIdByMail($("#new-order-user-email").val());
                 $("#new-order-modal-error-msg").empty();
                 $("#new-order-modal-error-msg").attr("hidden", "true");
                 $("#new-order-domain").removeAttr("disabled");
