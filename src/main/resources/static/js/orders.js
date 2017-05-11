@@ -380,9 +380,13 @@ function loadDomainsInModal(keyCode) {
                 var options = $("#new-order-domain");
                 data.forEach(function (item, i) {
                     var option = document.createElement("option");
+                    if(i==0){
+                        option.setAttribute("selected", "true");
+                    }
                     option.setAttribute("value", item.domainId);
                     option.appendChild(document.createTextNode(item.domainName));
                     options.append(option);
+                    loadProductInstancesInModal();
                 });
             } else {
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This user does not have any domains!");
@@ -415,10 +419,13 @@ function loadProductInstancesInModal() {
                 data.forEach(function (item, i) {
                     var option = document.createElement("option");
                     option.setAttribute("value", item.instanceId);
+                    if(i==0){
+                        option.setAttribute("selected", "true");
+                    }
                     option.appendChild(document.createTextNode(item.product.productName));
                     options.append(option);
-                })
-
+                });
+                loadOrderAaimsInModal();
             } else {
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This domain does not have any instances!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
@@ -447,19 +454,22 @@ function loadOrderAaimsInModal() {
                 var option = document.createElement("option");
                 option.setAttribute("value", "/api/csr/orders/new/activate");
                 option.appendChild(document.createTextNode("ACTIVATE"));
+
+                option.setAttribute("selected", "true");
                 options.append(option);
             } else if (data.categoryName.localeCompare("ACTIVATED")) {
                 var option1 = document.createElement("option");
+                option1.setAttribute("selected", "true");
                 option1.setAttribute("value", "/api/csr/orders/new/suspend");
                 option1.appendChild(document.createTextNode("SUSPEND"));
                 options.append(option1);
-
                 var option2 = document.createElement("option");
                 option2.setAttribute("value", "/api/csr/orders/new/deactivate");
                 option2.appendChild(document.createTextNode("DEACTIVATE"));
                 options.append(option2);
             } else if (data.categoryName.localeCompare("SUSPENDED")) {
                 var option = document.createElement("option");
+                option.setAttribute("selected", "true");
                 option.setAttribute("value", "/api/csr/orders/new/activate");
                 option.appendChild(document.createTextNode("ACTIVATE"));
                 options.append(option);
