@@ -1,8 +1,13 @@
 package com.grad.project.nc.controller.api.dto;
 
+import com.grad.project.nc.model.Category;
+import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -11,6 +16,7 @@ public class FrontendProductType {
     private String productTypeName;
     private String productTypeDescription;
     private Boolean isActive;
+    private List<FrontendCharacteristic> productCharacteristics;
 
     public static FrontendProductType fromEntity(ProductType productType) {
         return FrontendProductType.builder()
@@ -18,6 +24,29 @@ public class FrontendProductType {
                 .productTypeName(productType.getProductTypeName())
                 .productTypeDescription(productType.getProductTypeDescription())
                 .isActive(productType.getIsActive())
+                .productCharacteristics(productType.getProductCharacteristics()
+                        .stream()
+                        .map(FrontendCharacteristic::fromEntity)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    public ProductType toModel() {
+        return ProductType.builder()
+                .productTypeId(getProductTypeId())
+                .productTypeName(getProductTypeName())
+                .productTypeDescription(getProductTypeDescription())
+                .isActive(getIsActive())
+                .productCharacteristics(getProductCharacteristics()
+                        .stream()
+                        .map(fc -> ProductCharacteristic.builder()
+                                .productType(new ProductType(getProductTypeId()))
+                                .productCharacteristicId(fc.getProductCharacteristicId())
+                                .characteristicName(fc.getCharacteristicName())
+                                .measure(fc.getMeasure())
+                                .dataType(Category.builder().categoryId(fc.getDataTypeId()).build())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

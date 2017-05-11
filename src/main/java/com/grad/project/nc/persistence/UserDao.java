@@ -11,7 +11,6 @@ public interface UserDao extends CrudDao<User> {
 
     void deleteUserRoles(Long userId);
 
-    @Transactional
     void persistUserRoles(User user);
 
     Optional<User> findByEmail(String email);

@@ -21,4 +21,8 @@ public class Product {
     private List<ProductCharacteristicValue> productCharacteristicValues;
     private List<ProductCharacteristic> productCharacteristics;
     private List<ProductRegionPrice> prices;
+
+    public Product(Long productId) {
+        this.productId = productId;
+    }
 }

@@ -151,9 +151,10 @@ public class CsrOrdersController {
                 });
 
                 order.setPossibleProducts(new HashMap<>());
-                productService.getProductsByProductType(item.getProductInstance().getPrice().getProduct().getProductType()).forEach((product -> {
-                    order.getPossibleProducts().put(product.getProductId(), product.getProductName());
-                }));
+                productService.findByProductTypeId(item.getProductInstance().getPrice()
+                                .getProduct().getProductType().getProductTypeId())
+                        .forEach((product -> order.getPossibleProducts()
+                                .put(product.getProductId(), product.getProductName())));
             }
 
             return order;

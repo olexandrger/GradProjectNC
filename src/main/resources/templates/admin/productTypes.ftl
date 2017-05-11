@@ -66,7 +66,7 @@
                     </div>
                     <div class="form-group">
                         <label>Characteristics</label>
-                        <a class="btn btn-default" onclick="addProductValue()">
+                        <a class="btn btn-default" onclick="addProductCharacteristic()">
                             <span class="glyphicon glyphicon-plus"></span>Add
                         </a>
                     </div>
@@ -76,14 +76,9 @@
                 <div class="col-sm-12" style="margin-top: 10px;">
                     <div class="col-xs-12 text-center">
                         <div class="form-group">
-                            <a class="btn btn-success" onclick="saveSelected()">
+                            <a class="btn btn-success" onclick="saveSelectedProductType()">
                                 <span class="glyphicon glyphicon-floppy-disk"></span>Save
                             </a>
-
-                            <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
-                                <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
-                            <#--</a>-->
-
                         </div>
                     </div>
                 </div>

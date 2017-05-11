@@ -1,32 +1,24 @@
 package com.grad.project.nc.controller.api;
 
-import com.grad.project.nc.controller.api.dto.*;
-import com.grad.project.nc.model.*;
-import com.grad.project.nc.persistence.ProductDao;
-import com.grad.project.nc.persistence.RegionDao;
+import com.grad.project.nc.controller.api.dto.FrontendProduct;
 import com.grad.project.nc.service.product.ProductService;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user/products")
 public class ProductsController {
 
-    private ProductDao productDao;
-    private ProductService productService;
+    private final ProductService productService;
 
     @Autowired
-    public ProductsController(ProductDao productDao, ProductService productService) {
-        this.productDao = productDao;
+    public ProductsController(ProductService productService) {
         this.productService = productService;
     }
 
@@ -37,22 +29,17 @@ public class ProductsController {
 
     @RequestMapping(value = "/byRegion/{id}", method = RequestMethod.GET)
     public Collection<FrontendProduct> getByRegion(@PathVariable("id") Long id) {
-        return productDao.findByRegionId(id).stream().filter(Product::getIsActive).map(FrontendProduct::fromEntity).collect(Collectors.toList());
+        return productService.findActiveProductsByRegionId(id)
+                .stream()
+                .map(FrontendProduct::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public Collection<FrontendProduct> getAll() {
-        return productDao.findAll().stream().map(FrontendProduct::fromEntity).collect(Collectors.toList());
+        return productService.findAll()
+                .stream()
+                .map(FrontendProduct::fromEntity)
+                .collect(Collectors.toList());
     }
-
-
-
-
-
-
-
-
-
-
-
 }

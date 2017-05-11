@@ -11,9 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -91,7 +88,7 @@ public class OrdersServiceImpl implements OrdersService {
 
         instance.setDomain(domain);
         instance.setStatus(category);
-        instance.setPrice(productRegionPriceDao.findByRegionIdAndProductId(
+        instance.setPrice(productRegionPriceDao.find(
                 domain.getAddress().getLocation().getRegion().getRegionId(), productId));
 
         instance = productInstanceDao.add(instance);
@@ -205,7 +202,7 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = orderDao.find(orderId);
         Domain domain = domainDao.find(domainId);
 
-        ProductRegionPrice price = productRegionPriceDao.findByRegionIdAndProductId(
+        ProductRegionPrice price = productRegionPriceDao.find(
                 domain.getAddress().getLocation().getRegion().getRegionId(), productId);
 
         if (price == null) {

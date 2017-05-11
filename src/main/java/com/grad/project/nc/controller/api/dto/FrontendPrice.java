@@ -9,13 +9,13 @@ import lombok.Data;
 public class FrontendPrice {
     private Long priceId;
     private double price;
-    private FrontendRegion region;
+    private Long regionId;
 
     public static FrontendPrice fromEntity(ProductRegionPrice price) {
         return FrontendPrice.builder()
                 .priceId(price.getPriceId())
                 .price(price.getPrice())
-                .region(FrontendRegion.fromEntity(price.getRegion()))
+                .regionId(price.getRegion().getRegionId())
                 .build();
     }
 }

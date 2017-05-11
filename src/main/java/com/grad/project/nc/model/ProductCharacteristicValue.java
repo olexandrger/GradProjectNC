@@ -16,6 +16,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductCharacteristicValue {
+    private Long valueId;
     private Product product;
     private ProductCharacteristic productCharacteristic;
     private Number numberValue;

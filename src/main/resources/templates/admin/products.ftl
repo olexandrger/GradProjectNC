@@ -37,7 +37,7 @@
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="New product" id="new-product-name">
                     <span class="input-group-btn">
-                        <button type="button" onclick="addProduct(); selectProduct();" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+                        <button type="button" onclick="addProduct()" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                 </div>
             </div>
@@ -99,7 +99,7 @@
                     <div class="col-sm-12" style="margin-top: 10px;">
                         <div class="col-xs-12 text-center">
                             <div class="form-group">
-                                <a class="btn btn-success" onclick="saveSelected()">
+                                <a class="btn btn-success" onclick="saveSelectedProduct()">
                                     <span class="glyphicon glyphicon-floppy-disk"></span>Save
                                 </a>
                             </div>

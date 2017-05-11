@@ -1,10 +1,8 @@
 package com.grad.project.nc.controller.api.dto;
 
 import com.grad.project.nc.model.Category;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -16,6 +14,12 @@ public class FrontendCategory {
         return FrontendCategory.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getCategoryName())
+                .build();
+    }
+
+    public Category toModel() {
+        return Category.builder()
+                .categoryId(getCategoryId())
                 .build();
     }
 }
