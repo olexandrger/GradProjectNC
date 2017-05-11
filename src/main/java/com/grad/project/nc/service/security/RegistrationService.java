@@ -30,10 +30,12 @@ public class RegistrationService {
     private UserService userService;
 
     public boolean register(User user) {
-        List<String> roles = user.getRoles().stream().map(x -> x.getRoleName()).collect(Collectors.toList());
-        if(roles == null || roles.isEmpty()){
+        List<String> roles ;
+        if(user.getRoles() == null || user.getRoles().isEmpty()){
             roles = new ArrayList<>();
             roles.add("ROLE_CLIENT");
+        }else {
+            roles = user.getRoles().stream().map(x -> x.getRoleName()).collect(Collectors.toList());
         }
 
 
