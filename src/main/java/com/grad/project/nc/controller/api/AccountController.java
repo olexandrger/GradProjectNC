@@ -41,7 +41,6 @@ public class AccountController {
 
             if (user.getRoles().contains(roleDao.findByName("ROLE_CLIENT"))) {
                 profileLinks.add(new Link("Domains", "/client/domains"));
-                profileLinks.add(new Link("Instances", "/client/instance"));
 
             }
 
