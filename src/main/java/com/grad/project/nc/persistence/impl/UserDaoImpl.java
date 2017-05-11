@@ -4,11 +4,13 @@ import com.grad.project.nc.model.*;
 import com.grad.project.nc.model.proxy.UserProxy;
 import com.grad.project.nc.persistence.AbstractDao;
 import com.grad.project.nc.persistence.UserDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Slf4j
 public class UserDaoImpl extends AbstractDao implements UserDao {
 
     private static final String PK_COLUMN_NAME = "user_id";
@@ -43,12 +46,32 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     }
 
     @Override
+    @Transactional
     public User update(User user) {
         String updateQuery = "UPDATE \"user\" SET \"email\" = ?, \"password\" = ?, " +
                 "\"first_name\" = ?, \"last_name\" = ?, \"phone_number\" = ? WHERE \"user_id\" = ?";
 
         executeUpdate(updateQuery, user.getEmail(), user.getPassword(),
                 user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getUserId());
+
+        deleteUserRoles(user.getUserId());
+        persistUserRoles(user);
+
+        return user;
+    }
+    @Transactional
+    public User updateWithoutPassword(User user) {
+        String updateQuery = "UPDATE \"user\" SET \"email\" = ? ," +
+                "\"first_name\" = ?, \"last_name\" = ?, \"phone_number\" = ? WHERE \"user_id\" = ?";
+
+        log.info("Updating user with email: " + user.getEmail() + ", First name: " + user.getFirstName() + ", Phone: "
+                + user.getPhoneNumber() + ", ID= " + user.getUserId());
+
+        executeUpdate(updateQuery, user.getEmail(),
+                user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getUserId());
+
+        deleteUserRoles(user.getUserId());
+        persistUserRoles(user);
 
         return user;
     }
