@@ -103,7 +103,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" data-dismiss="modal"
-                                onclick="createNewOrderFromModal()">Create
+                                onclick="createNewOrderFromModal()" id="create-new-order-from-modal-button">Create
                         </button>
                     </div>
                 </div>

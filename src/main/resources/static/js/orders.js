@@ -5,6 +5,7 @@ var ordersData;
 
 var selectedOrder;
 
+
 function orderErrorMessage(message) {
     var alert = $('<div id="order-alert" class="alert alert-danger" role="alert">' +
         '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
@@ -321,6 +322,40 @@ function loadNewOrderModal() {
 }
 
 function createNewOrderFromModal() {
+    $.ajax({
+        url: $("#new-order-aim").val(),
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        contentType: 'application/json',
+        data: JSON.stringify({
+            instanceId: $("#new-order-instanse").val(),
+            domainId: $("#new-order-domain").val(),
+            userId: getUserIdByMail($("#new-order-user-email").val())
+        }),
+        success: function (data) {
+            loadOrders();
+        },
+        error: function () {
+
+        }
+
+    })
+
+}
+
+function getUserIdByMail(email) {
+    var userId =-1;
+    $.ajax({
+        url: "/api/csr/users/find/" + email + "/",
+        success: function (data) {
+            userId = data.userId;
+        },
+        error: function () {
+            console.error(email)
+        }
+    });
 
 }
 
@@ -344,12 +379,11 @@ function loadDomainsInModal(keyCode) {
                 $("#new-order-domain").removeAttr("disabled");
                 var options = $("#new-order-domain");
                 data.forEach(function (item, i) {
-                    var option =  document.createElement("option");
+                    var option = document.createElement("option");
                     option.setAttribute("value", item.domainId);
                     option.appendChild(document.createTextNode(item.domainName));
                     options.append(option);
                 });
-                loadProductInstancesInModal()
             } else {
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This user does not have any domains!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
@@ -371,7 +405,7 @@ function loadProductInstancesInModal() {
     var domainId = $("#new-order-domain").val();
 
     $.ajax({
-        url: "/api/csr/instances/find/bydomain/"+domainId+"/",
+        url: "/api/csr/instances/find/bydomain/" + domainId + "/",
         success: function (data) {
             if (data.length > 0) {
                 $("#new-order-modal-error-msg").empty();
@@ -379,12 +413,11 @@ function loadProductInstancesInModal() {
                 $("#new-order-instanse").removeAttr("disabled");
                 var options = $("#new-order-instanse");
                 data.forEach(function (item, i) {
-                    var option =  document.createElement("option");
+                    var option = document.createElement("option");
                     option.setAttribute("value", item.instanceId);
                     option.appendChild(document.createTextNode(item.product.productName));
                     options.append(option);
                 })
-                loadOrderAaimsInModal();
 
             } else {
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This domain does not have any instances!");
@@ -392,7 +425,7 @@ function loadProductInstancesInModal() {
             }
 
         },
-        error:function () {
+        error: function () {
 
         }
     });
@@ -402,17 +435,44 @@ function loadProductInstancesInModal() {
 function loadOrderAaimsInModal() {
     $("#new-order-aim").empty();
     $("#new-order-aim").attr("disabled", "true");
+    $("#new-order-modal-error-msg").empty();
+    $("#new-order-modal-error-msg").attr("hidden", "true");
     var options = $("#new-order-aim");
     var status;
     $.ajax({
-        url:"/api/csr/category/getstatus/frominstance/"+$("#new-order-instanse").val()+"/",
+        url: "/api/csr/category/getstatus/frominstance/" + $("#new-order-instanse").val() + "/",
         success: function (data) {
-            if(data.categoryName.localeCompare("CREATED")){
-                //CANSEL
+            $("#new-order-aim").removeAttr("disabled");
+            if (data.categoryName.localeCompare("CREATED")) {
+                var option = document.createElement("option");
+                option.setAttribute("value", "/api/csr/orders/new/activate");
+                option.appendChild(document.createTextNode("ACTIVATE"));
+                options.append(option);
+            } else if (data.categoryName.localeCompare("ACTIVATED")) {
+                var option1 = document.createElement("option");
+                option1.setAttribute("value", "/api/csr/orders/new/suspend");
+                option1.appendChild(document.createTextNode("SUSPEND"));
+                options.append(option1);
+
+                var option2 = document.createElement("option");
+                option2.setAttribute("value", "/api/csr/orders/new/deactivate");
+                option2.appendChild(document.createTextNode("DEACTIVATE"));
+                options.append(option2);
+            } else if (data.categoryName.localeCompare("SUSPENDED")) {
+                var option = document.createElement("option");
+                option.setAttribute("value", "/api/csr/orders/new/activate");
+                option.appendChild(document.createTextNode("ACTIVATE"));
+                options.append(option);
+            } else {
+                $("#new-order-aim").empty();
+                $("#new-order-aim").attr("disabled", "true");
+                $("#new-order-modal-error-msg").html("<strong>Warning! </strong> Incorrect state of the instance!");
+                $("#new-order-modal-error-msg").removeAttr("hidden");
+                $("#create-new-order-from-modal-button").attr("hidden", "true");
             }
 
         },
-        error:function () {
+        error: function () {
 
         }
     });

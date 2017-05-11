@@ -26,7 +26,7 @@ public class CsrUsersController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/find/{mail}", method = RequestMethod.POST)
+    @RequestMapping(value = "/find/{mail}", method = RequestMethod.GET)
     FrontendUser findUserByEmail(@PathVariable String mail){
         return FrontendUser.fromEntity(userService.findByEMail(mail));
     }
