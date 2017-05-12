@@ -115,12 +115,23 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public ProductOrder newSuspensionOrder(long instanceId, long userId) {
-        return newOrder(instanceId, userId, ORDER_AIM_SUSPEND);
+        ProductOrder order = newOrder(instanceId, userId, ORDER_AIM_SUSPEND);
+        if (order != null) {
+            completeOrder(order.getProductOrderId());
+        }
+
+        return order;
     }
 
     @Override
     public ProductOrder newContinueOrder(long instanceId, long userId) {
-        return newOrder(instanceId, userId, ORDER_AIM_RESUME);
+        ProductOrder order = newOrder(instanceId, userId, ORDER_AIM_RESUME);
+        if (order != null) {
+            completeOrder(order.getProductOrderId());
+            log.info("Completing too");
+        }
+
+        return order;
     }
 
     @Override

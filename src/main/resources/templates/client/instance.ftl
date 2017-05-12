@@ -38,7 +38,7 @@
                 <div class="col-sm-3 pull-down" style="margin-bottom: 5px">
                     <button class="btn btn-default btn-block hidden" id="instance-complain-button" onclick="">Create complain</button>
                     <button class="btn btn-default btn-block hidden" id="instance-suspend-button" onclick="suspendInstance()">Suspend</button>
-                    <button class="btn btn-default btn-block hidden" id="instance-continue-button" onclick="continueInstance()">Continue</button>
+                    <button class="btn btn-default btn-block hidden" id="instance-continue-button" onclick="continueInstance()">Resume</button>
                     <button class="btn btn-default btn-block hidden" id="instance-deactivate-button" onclick="deactivateInstance()">Deactivate</button>
                 </div>
             </div>
