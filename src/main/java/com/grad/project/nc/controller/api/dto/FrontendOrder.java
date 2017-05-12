@@ -18,6 +18,7 @@ public class FrontendOrder {
     private Long responsibleId;
     private Long domainId;
     private Long productId;
+    private String productName;
     private OffsetDateTime openDate;
     private OffsetDateTime closeDate;
     private Map<Long, String> possibleDomains;
@@ -35,6 +36,7 @@ public class FrontendOrder {
                 .closeDate(item.getCloseDate())
                 .domainId(item.getProductInstance().getDomain().getDomainId())
                 .productId(item.getProductInstance().getPrice().getProduct().getProductId())
+                .productName(item.getProductInstance().getPrice().getProduct().getProductName())
                 .build();
     }
 }

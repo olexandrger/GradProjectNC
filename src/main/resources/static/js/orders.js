@@ -260,7 +260,6 @@ function getLabelName(status) {
     }
 }
 
-
 function loadOrders() {
     $.ajax({
         url: "/api/csr/orders/get/all/size/" + (ordersListSize + 1) + "/offset/" + ordersListCurrentPage * ordersListSize,
@@ -273,7 +272,8 @@ function loadOrders() {
             data.forEach(function (item, i) {
                 if (i < ordersListSize) {
                     var ref = document.createElement("a");
-                    ref.appendChild(document.createTextNode("Order #" + item.productOrderId));
+                    var orderName = item.orderAim + " " + item.productName + " #" + item.productOrderId;
+                    ref.appendChild(document.createTextNode(orderName));
                     var span = document.createElement("span");
                     span.className = "label orders-list ";
                     span.className += getLabelName(item.status);
