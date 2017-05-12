@@ -45,7 +45,7 @@ public class ProductOrderDaoImpl extends AbstractDao
 
         productOrder.setProductOrderId(productOrderId);
 
-        return productOrder;
+        return find(productOrderId);
     }
 
     @Override

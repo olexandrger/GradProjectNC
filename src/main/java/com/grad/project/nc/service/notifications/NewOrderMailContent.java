@@ -1,7 +1,14 @@
 package com.grad.project.nc.service.notifications;
 
-/**
- * Created by Dima on 12.05.2017.
- */
-public class NewOrderMailContent {
+import com.grad.project.nc.model.ProductOrder;
+
+class NewOrderMailContent extends MailContent {
+    NewOrderMailContent(ProductOrder order) {
+        getContext().put("order", order);
+
+        setSender("support@ncgrad.herokuapp.com");
+        setSubject("New order");
+
+        setTemplateName("newOrder.ftl");
+    }
 }

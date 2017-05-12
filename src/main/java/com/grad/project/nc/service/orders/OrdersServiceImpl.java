@@ -1,9 +1,12 @@
 package com.grad.project.nc.service.orders;
 
+import com.grad.project.nc.controller.api.dto.FrontendOrder;
 import com.grad.project.nc.service.exceptions.ServiceSecurityException;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
+import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,9 +21,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
-//TODO security
+//TODO security of states changing
 
 @Service
+@Slf4j
 public class OrdersServiceImpl implements OrdersService {
 
     private UserDao userDao;
@@ -31,6 +35,7 @@ public class OrdersServiceImpl implements OrdersService {
     private CategoryDao categoryDao;
     private ProductDao productDao;
     private UserService userService;
+    private EmailService emailService;
 
     private static final long INSTANCE_STATUS_CREATED = 9L;
     private static final long INSTANCE_STATUS_ACTIVATED = 10L;
@@ -51,7 +56,7 @@ public class OrdersServiceImpl implements OrdersService {
     @Autowired
     public OrdersServiceImpl(UserDao userDao, ProductOrderDao orderDao, ProductRegionPriceDao productRegionPriceDao,
                              DomainDao domainDao, ProductInstanceDao productInstanceDao, CategoryDao categoryDao,
-                             ProductDao productDao, UserService userService) {
+                             ProductDao productDao, UserService userService, EmailService emailService) {
         this.userDao = userDao;
         this.orderDao = orderDao;
         this.productRegionPriceDao = productRegionPriceDao;
@@ -60,6 +65,7 @@ public class OrdersServiceImpl implements OrdersService {
         this.categoryDao = categoryDao;
         this.productDao = productDao;
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     private ProductOrder newOrder(long instanceId, long userId, long aimId) {
@@ -71,7 +77,11 @@ public class OrdersServiceImpl implements OrdersService {
         order.setUser(userDao.find(userId));
         order.setStatus(categoryDao.find(ORDER_STATUS_CREATED));
 
-        return orderDao.add(order);
+        order = orderDao.add(order);
+
+        emailService.sendNewOrderEmail(order);
+
+        return order;
     }
 
     @Override
@@ -171,6 +181,8 @@ public class OrdersServiceImpl implements OrdersService {
 
         productInstanceDao.update(order.getProductInstance());
         orderDao.update(order);
+
+        emailService.sendInstanceStatusChangedEmail(order.getProductInstance());
     }
 
     @Override

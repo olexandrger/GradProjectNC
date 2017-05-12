@@ -1,5 +1,7 @@
 package com.grad.project.nc.service.notifications;
 
+import com.grad.project.nc.model.ProductInstance;
+import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.model.User;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.TemplateLoader;
@@ -41,6 +43,7 @@ public class EmailServiceImpl implements EmailService {
         this.mailSender = mailSender;
         this.freemarkerConfiguration = configuration;
     }
+
     private void sendEmail(Mail mail) {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -64,6 +67,23 @@ public class EmailServiceImpl implements EmailService {
     public void sendRegistrationEmail(User user) {
         logger.info("Sending registration email to " + user.getUsername());
         sendEmail(new Mail(user.getEmail(), new RegistrationMailContent(user)));
+    }
+
+    @Override
+    @Async
+    public void sendNewOrderEmail(ProductOrder order) {
+        User user = order.getUser();
+        logger.info("Sending new order email to " + user.getUsername());
+        sendEmail(new Mail(user.getEmail(), new NewOrderMailContent(order)));
+    }
+
+    @Override
+    @Async
+    public void sendInstanceStatusChangedEmail(ProductInstance instance) {
+        logger.info("Sending instance mails");
+        instance.getDomain().getUsers().forEach((user) -> {
+            sendEmail(new Mail(user.getEmail(), new InstanceStatusChangedMailContent(user, instance)));
+        });
     }
 
     @Data
