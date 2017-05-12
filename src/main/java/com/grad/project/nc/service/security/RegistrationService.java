@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RegistrationService {
@@ -27,6 +30,15 @@ public class RegistrationService {
     private UserService userService;
 
     public boolean register(User user) {
+        List<String> roles ;
+        if(user.getRoles() == null || user.getRoles().isEmpty()){
+            roles = new ArrayList<>();
+            roles.add("ROLE_CLIENT");
+        }else {
+            roles = user.getRoles().stream().map(x -> x.getRoleName()).collect(Collectors.toList());
+        }
+
+
         if (user.getFirstName().isEmpty()) {
             status = ERROR;
             messageError = FIRST_NAME_IS_EMPTY;
@@ -58,7 +70,7 @@ public class RegistrationService {
             return false;
         }
         try {
-            userService.createUser(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), Collections.singletonList("ROLE_CLIENT"));
+            userService.createUser(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), roles/*Collections.singletonList("ROLE_CLIENT")*/);
         } catch (DuplicateKeyException e) {
             status = ERROR;
             messageError = EMAIL_ALREADY_EXISTS;

@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 @Service
 @PropertySource("classpath:locations.properties")
@@ -21,23 +23,30 @@ public class LocationServiceImpl implements LocationService {
     private String googleKey;
 
     private JSONObject location;
-    private JSONReader jsonReader=new JSONReader();
+    private JSONLocationReader jsonLocationReader = new JSONLocationReader();
 
     @Override
-    public boolean doRequestForJSON(String address) {
-        if (doRequestForJSON(address, mainLanguage) != null) {
-            location = doRequestForJSON(address, mainLanguage);
-            return true;
-        } else {
-            return false;
+    public LocationService doRequestForJSONByAddress(String address) {
+        if (doRequestForJSONByAddress(address, mainLanguage) != null) {
+            location = doRequestForJSONByAddress(address, mainLanguage);
         }
+        return this;
+    }
+
+    @Override
+    public LocationService doRequestForJSONByGooglePlaceId(String id) {
+        if (doRequestForJSONByGooglePlaceId(id, mainLanguage) != null) {
+            location = doRequestForJSONByGooglePlaceId(id, mainLanguage);
+
+        }
+        return this;
     }
 
     @Override
     public String getFullAddress(String language) {
         try {
             String fullAddress = location.getString("formatted_address");
-            return doRequestForJSON(fullAddress, language).getString("formatted_address");
+            return doRequestForJSONByAddress(fullAddress, language).getString("formatted_address");
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -66,7 +75,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public String getLocationId() {
+    public String getGooglePlaceId() {
         try {
             return location.getString("place_id");
         } catch (JSONException e) {
@@ -75,18 +84,63 @@ public class LocationServiceImpl implements LocationService {
         }
     }
 
-    private JSONObject doRequestForJSON(String address, String language) {
+    @Override
+    public String getStreet() {
+        try {
+            return location.getJSONArray("address_components").getJSONObject(1).getString("long_name");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public String getBuildingNumber() {
+        try {
+            return location.getJSONArray("address_components").getJSONObject(0).getString("long_name");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public String getCity() {
+        try {
+            return location.getJSONArray("address_components").getJSONObject(3).getString("long_name");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private JSONObject doRequestForJSONByAddress(String address, String language) {
         try {
             String url = baseUrl + "language=" + language + "&address=" + URLEncoder.encode(address, "utf-8")
                     + "&key=" + googleKey;
-            JSONObject response = jsonReader.getJSONObject(url);
-            if ("OK".equals(response.getString("status"))) {
-                return response.getJSONArray("results").getJSONObject(0);
-            } else {
-                return null;
-            }
+            return doRequestForJSON(url);
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    private JSONObject doRequestForJSONByGooglePlaceId(String id, String language) {
+        try {
+            String url = baseUrl + "language=" + language + "&place_id=" + id
+                    + "&key=" + googleKey;
+            return doRequestForJSON(url);
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private JSONObject doRequestForJSON(String url) throws IOException, JSONException {
+        JSONObject response = jsonLocationReader.getJSONObject(url);
+        if ("OK".equals(response.getString("status"))) {
+            return response.getJSONArray("results").getJSONObject(0);
+        } else {
             return null;
         }
     }
@@ -126,6 +180,29 @@ public class LocationServiceImpl implements LocationService {
             e.printStackTrace();
         }
         return coordinate;
+    }
+
+    private final class JSONLocationReader {
+        private String readJSON(Reader rd) throws IOException {
+            StringBuilder sb = new StringBuilder();
+            int cp;
+            while ((cp = rd.read()) != -1) {
+                sb.append((char) cp);
+            }
+            return sb.toString();
+        }
+
+        public JSONObject getJSONObject(String url) throws IOException, JSONException {
+            final InputStream is = new URL(url).openStream();
+            try {
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                String jsonText = readJSON(rd);
+                JSONObject json = new JSONObject(jsonText);
+                return json;
+            } finally {
+                is.close();
+            }
+        }
     }
 }
 

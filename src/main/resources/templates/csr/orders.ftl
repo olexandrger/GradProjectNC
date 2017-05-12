@@ -46,7 +46,9 @@
         </ul>
 
         <!-- Trigger the modal with a button -->
-        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" onclick="loadNewOrderModal()">New Order</button>
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal"
+                onclick="loadNewOrderModal()">New Order
+        </button>
 
         <!-- Modal -->
         <div id="myModal" class="modal fade" role="dialog">
@@ -59,40 +61,50 @@
                         <h4 class="modal-title">New Order:</h4>
                     </div>
                     <div class="modal-body">
+
+                        <div class="alert alert-danger" id="new-order-modal-error-msg">
+                            <strong>Danger!</strong> Indicates a dangerous or potentially negative action.
+                        </div>
+
                         <div class="form-group">
                             <label for="new-order-user-email">Email</label>
                             <input type="email" class="form-control" name="new-order-email" placeholder="Email"
-                                   id="new-order-user-email" onblur = "loadDomainsInModal()", onkeypress = "loadDomainsInModal()">
+                                   id="new-order-user-email" onblur="loadDomainsInModal(13)" ,
+                                   onkeypress="loadDomainsInModal(event.keyCode)">
                         </div>
                         <div class="form-group">
-                            <label for="new-oeder-domain">Domain</label>
-                            <select class="form-control" name="new-order-domain" id="new-oeder-domain" disabled onchange ="loadProductInstancesInModal()">
-                                <option>Domain 1</option>
+                            <label for="new-order-domain">Domain</label>
+                            <select class="form-control" name="new-order-domain" id="new-order-domain"
+                                    onchange="loadProductInstancesInModal()">
+                            <#--<option>Domain 1</option>
                                 <option selected>Domain 2</option>
-                                <option>Domain 3</option>
+                                <option>Domain 3</option>-->
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="new-oeder-instanse">Product instance</label>
-                            <select class="form-control" name="new-oeder-instanse" id="new-oeder-instanse" disabled onchange ="loadOrderAaimsInModal()">
-                                <option>instanse 1</option>
+                            <label for="new-order-instanse">Product instance</label>
+                            <select class="form-control" name="new-order-instanse" id="new-order-instanse"
+                                    onchange="loadOrderAaimsInModal()">
+                            <#--<option>instanse 1</option>
                                 <option selected>instanse 2</option>
-                                <option>instanse 3</option>
+                                <option>instanse 3</option>-->
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="new-oeder-aim">Order aim</label>
-                            <select class="form-control" name="new-oeder-aim" id="new-oeder-aim" disabled >
-                                <option>Aim 1</option>
+                            <label for="new-order-aim">Order aim</label>
+                            <select class="form-control" name="new-order-aim" id="new-order-aim" disabled>
+                            <#-- <option>Aim 1</option>
                                 <option selected>Aim 2</option>
-                                <option>Aim 3</option>
+                                <option>Aim 3</option>-->
                             </select>
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal" onclick="createNewOrderFromModal()">Create</button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal"
+                                onclick="createNewOrderFromModal()" id="create-new-order-from-modal-button">Create
+                        </button>
                     </div>
                 </div>
 
