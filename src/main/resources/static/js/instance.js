@@ -81,7 +81,9 @@ function cancelOrder(orderId) {
 }
 
 function loadInstance() {
-    var instanceId = JSON.parse(window.name).selectedInstanceId;
+    // var instanceId = JSON.parse(window.name).selectedInstanceId;
+    var path = window.location.pathname.split("/");
+    var instanceId = path[path.length - 1];
 
     $.ajax({
         url: "/api/client/instance/get/byId/" + instanceId,

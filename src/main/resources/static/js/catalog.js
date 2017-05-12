@@ -156,11 +156,11 @@ function catalogSubmitOrder() {
         }),
         success: function(data) {
             if (data.status == "success") {
-                console.log(data.message);
-                var info = window.name == "" ? {} : JSON.parse(window.name);
-                info.selectedInstanceId = data.instanceId;
-                window.name = JSON.stringify(info);
-                window.location.href = "/client/instance";
+                // console.log(data.message);
+                // var info = window.name == "" ? {} : JSON.parse(window.name);
+                // info.selectedInstanceId = data.instanceId;
+                // window.name = JSON.stringify(info);
+                window.location.href = "/client/instance/" + data.instanceId;
             } else {
                 console.error("Cannot create order: " + data.message);
             }

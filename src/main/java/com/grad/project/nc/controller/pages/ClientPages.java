@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/client")
 public class ClientPages {
-    @RequestMapping("/instance")
+    @RequestMapping("/instance/*")
     public String getInstancePage() {
         return "/client/instance";
     }
