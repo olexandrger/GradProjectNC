@@ -3,6 +3,7 @@ package com.grad.project.nc.service.orders;
 import com.grad.project.nc.service.exceptions.ServiceSecurityException;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
+import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,7 @@ public class OrdersServiceImpl implements OrdersService {
     private ProductInstanceDao productInstanceDao;
     private CategoryDao categoryDao;
     private ProductDao productDao;
+    private UserService userService;
 
     private static final long INSTANCE_STATUS_CREATED = 9L;
     private static final long INSTANCE_STATUS_ACTIVATED = 10L;
@@ -39,7 +41,7 @@ public class OrdersServiceImpl implements OrdersService {
     private static final long ORDER_AIM_SUSPEND = 14L;
     private static final long ORDER_AIM_DEACTIVATE = 15L;
     private static final long ORDER_AIM_RESUME = 25L;
-    private static final long ORDER_AIM_MODIFY = 26L;
+//    private static final long ORDER_AIM_MODIFY = 26L;
 
     private static final long ORDER_STATUS_CREATED = 1L;
     private static final long ORDER_STATUS_IN_PROGRESS = 2L;
@@ -49,7 +51,7 @@ public class OrdersServiceImpl implements OrdersService {
     @Autowired
     public OrdersServiceImpl(UserDao userDao, ProductOrderDao orderDao, ProductRegionPriceDao productRegionPriceDao,
                              DomainDao domainDao, ProductInstanceDao productInstanceDao, CategoryDao categoryDao,
-                             ProductDao productDao) {
+                             ProductDao productDao, UserService userService) {
         this.userDao = userDao;
         this.orderDao = orderDao;
         this.productRegionPriceDao = productRegionPriceDao;
@@ -57,16 +59,7 @@ public class OrdersServiceImpl implements OrdersService {
         this.productInstanceDao = productInstanceDao;
         this.categoryDao = categoryDao;
         this.productDao = productDao;
-    }
-
-    private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!(auth instanceof AnonymousAuthenticationToken)) {
-            String username = ((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-            return userDao.findByEmail(username).orElseThrow((Supplier<RuntimeException>) () -> new ServiceSecurityException("User must be authorised to use this"));
-        } else {
-            throw new ServiceSecurityException("User must be authorised to use this");
-        }
+        this.userService = userService;
     }
 
     private ProductOrder newOrder(long instanceId, long userId, long aimId) {
@@ -116,23 +109,23 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public ProductOrder newCreationOrder(long productId, long domainId) {
-        return newCreationOrder(productId, domainId, getCurrentUser().getUserId());
+        return newCreationOrder(productId, domainId, userService.getCurrentUser().getUserId());
     }
 
     @Override
     public ProductOrder newSuspensionOrder(long instanceId) {
-        return newSuspensionOrder(instanceId, getCurrentUser().getUserId());
+        return newSuspensionOrder(instanceId, userService.getCurrentUser().getUserId());
 
     }
 
     @Override
     public ProductOrder newDeactivationOrder(long instanceId) {
-        return newDeactivationOrder(instanceId, getCurrentUser().getUserId());
+        return newDeactivationOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
     @Override
     public ProductOrder newContinueOrder(long instanceId) {
-        return newContinueOrder(instanceId, getCurrentUser().getUserId());
+        return newContinueOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
     @Override
@@ -140,7 +133,7 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = orderDao.find(orderId);
 
         order.setStatus(categoryDao.find(ORDER_STATUS_IN_PROGRESS));
-        order.setResponsible(getCurrentUser());
+        order.setResponsible(userService.getCurrentUser());
         orderDao.update(order);
     }
 
@@ -182,7 +175,7 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public List<ProductOrder> getUserOrders(long size, long offset) {
-        return orderDao.findByUserId(getCurrentUser().getUserId(), size, offset);
+        return orderDao.findByUserId(userService.getCurrentUser().getUserId(), size, offset);
     }
 
     @Override

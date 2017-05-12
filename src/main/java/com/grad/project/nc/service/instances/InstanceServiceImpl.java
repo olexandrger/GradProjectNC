@@ -19,4 +19,9 @@ public class InstanceServiceImpl implements InstanceService {
     public ProductInstance getById(Long id) {
         return productInstanceDao.find(id);
     }
+
+    @Override
+    public boolean isInstanceOwnedBy(long instanceId, long userId) {
+        return productInstanceDao.find(instanceId).getDomain().getUsers().stream().anyMatch(user -> user.getUserId() == userId);
+    }
 }
