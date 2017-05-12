@@ -178,6 +178,30 @@ public class ProductOrderDaoImpl extends AbstractDao
         return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, userId);
     }
 
+    @Override
+    public List<ProductOrder> findOpenOrdersByInstanseId(Long instanceId, long size, long offset) {
+        String query =
+                "SELECT " +
+                        "po.product_order_id, " +
+                        "po.product_instance_id, " +
+                        "po.user_id, " +
+                        "po.order_aim_id, " +
+                        "po.status_id, " +
+                        "po.responsible_id, " +
+                        "po.open_date, " +
+                        "po.close_date " +
+                        "FROM product_order po " +
+                        "INNER JOIN category c " +
+                        "ON c.category_id=po.status_id " +
+                        "WHERE c.category_name " +
+                        "NOT IN (\'CANCELLED\', \'COMPLETED\') " +
+                        "AND po.product_instance_id = ? " +
+                        "ORDER BY close_date DESC " +
+                        "NULLS FIRST, " +
+                        "open_date DESC";
+        return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, instanceId);
+    }
+
     private class ProductOrderRowMapper implements RowMapper<ProductOrder> {
 
         @Override

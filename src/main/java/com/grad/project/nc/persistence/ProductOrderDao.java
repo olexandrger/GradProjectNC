@@ -19,4 +19,6 @@ public interface ProductOrderDao extends CrudDao<ProductOrder> {
     List<ProductOrder> findByProductInstanceId(Long id, Long size, Long offset);
 
     List<ProductOrder> findByUserId(Long userId, long size, long offset);
+
+    List<ProductOrder> findOpenOrdersByInstanseId(Long instanceId, long size, long offset);
 }

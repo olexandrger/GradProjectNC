@@ -39,6 +39,8 @@ public interface OrdersService {
 
     Collection<ProductOrder> getUserOrders(long size, long offset);
 
+    Collection<ProductOrder> getOpenInstanceOrders(long instanceId, long size, long offset);
+
     Collection<ProductOrder> getAllOrders(long size, long offset);
 
     void userCancelOrder(Long id);

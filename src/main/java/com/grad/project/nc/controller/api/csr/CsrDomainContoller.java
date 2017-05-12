@@ -1,6 +1,7 @@
 package com.grad.project.nc.controller.api.csr;
 
 import com.grad.project.nc.controller.api.dto.*;
+import com.grad.project.nc.model.User;
 import com.grad.project.nc.persistence.DomainDao;
 import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,11 +35,23 @@ public class CsrDomainContoller {
     }
 
     @RequestMapping(value = "/find/{email}", method = RequestMethod.GET)
-    Collection<FrontendDomain> findByUserEMail(@PathVariable String email){
-        return domainDao.findByUserId(userService.findByEMail(email).getUserId())
-                .stream()
-                .map(FrontendDomain::fromEntity)
-                .collect(Collectors.toCollection(ArrayList::new));
+    Map<String, Object> findByUserEMail(@PathVariable String email) {
+        Map<String, Object> result = new HashMap<>();
+        User user = userService.findByEMail(email);
+        if (user != null) {
+            result.put("status", "found");
+            result.put("userId", user.getUserId());
+            result.put("domains",
+                    domainDao.findByUserId(user.getUserId())
+                            .stream()
+                            .map(FrontendDomain::fromEntity)
+                            .collect(Collectors.toCollection(ArrayList::new)));
+        } else {
+            result.put("status", "not found");
+        }
+
+        return result;
+
     }
 
 }

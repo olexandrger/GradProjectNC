@@ -46,12 +46,12 @@
         </ul>
 
         <!-- Trigger the modal with a button -->
-        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal"
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#new-order-modal"
                 onclick="loadNewOrderModal()">New Order
         </button>
 
         <!-- Modal -->
-        <div id="myModal" class="modal fade" role="dialog">
+        <div id="new-order-modal" class="modal fade" role="dialog">
             <div class="modal-dialog">
 
                 <!-- Modal content-->
@@ -76,27 +76,18 @@
                             <label for="new-order-domain">Domain</label>
                             <select class="form-control" name="new-order-domain" id="new-order-domain"
                                     onchange="loadProductInstancesInModal()">
-                            <#--<option>Domain 1</option>
-                                <option selected>Domain 2</option>
-                                <option>Domain 3</option>-->
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="new-order-instanse">Product instance</label>
                             <select class="form-control" name="new-order-instanse" id="new-order-instanse"
                                     onchange="loadOrderAaimsInModal()">
-                            <#--<option>instanse 1</option>
-                                <option selected>instanse 2</option>
-                                <option>instanse 3</option>-->
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="new-order-aim">Order aim</label>
                             <select class="form-control" name="new-order-aim" id="new-order-aim" disabled>
-                            <#-- <option>Aim 1</option>
-                                <option selected>Aim 2</option>
-                                <option>Aim 3</option>-->
                             </select>
                         </div>
 

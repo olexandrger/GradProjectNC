@@ -359,6 +359,43 @@ function getUserIdByMail(email) {
 
 }
 
+function loadNewOrderModal() {
+    $("#new-order-user-email").val("");
+    $("#new-order-domain").empty();
+    $("#new-order-domain").attr("disabled", "true");
+    $("#new-order-instanse").empty();
+    $("#new-order-instanse").attr("disabled", "true");
+    $("#new-order-aim").empty();
+    $("#new-order-aim").attr("disabled", "true");
+    $("#new-order-modal-error-msg").empty();
+    $("#new-order-modal-error-msg").attr("hidden", "true");
+    $("#create-new-order-from-modal-button").attr("disabled", "true");
+
+}
+
+function createNewOrderFromModal() {
+    $.ajax({
+        url: $("#new-order-aim").val(),
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        contentType: 'application/json',
+        data: JSON.stringify({
+            instanceId: $("#new-order-instanse").val(),
+            domainId: $("#new-order-domain").val(),
+            userId:selectUserId
+        }),
+        success: function (data) {
+            loadOrders();
+        },
+        error: function () {
+
+        }
+
+    })
+}
+
 function loadDomainsInModal(keyCode) {
     if (keyCode != 13) {
         return;
@@ -367,19 +404,32 @@ function loadDomainsInModal(keyCode) {
     if ($("#new-order-user-email").val().length < 1) {
         $("#new-order-modal-error-msg").html("<strong>Warning! </strong> E-mail field is empty!");
         $("#new-order-modal-error-msg").removeAttr("hidden");
+        $("#create-new-order-from-modal-button").attr("disabled", "true");
         return;
     }
 
     $.ajax({
         url: "/api/csr/domains/find/" + $("#new-order-user-email").val() + "/",
         success: function (data) {
-            if (data.length > 0) {
-                selectUserId = getUserIdByMail($("#new-order-user-email").val());
+            if(data.status == "not found"){
+                $("#new-order-modal-error-msg").html("<strong>Error! </strong> E-mail not found!");
+                $("#new-order-modal-error-msg").removeAttr("hidden");
+                $("#new-order-domain").empty();
+                $("#new-order-domain").attr("disabled", "true");
+                $("#new-order-instanse").empty();
+                $("#new-order-instanse").attr("disabled", "true");
+                $("#new-order-aim").empty();
+                $("#new-order-aim").attr("disabled", "true");
+                $("#create-new-order-from-modal-button").attr("disabled", "true");
+                return;
+            }
+            selectUserId = data.userId;
+            if (data.domains.length > 0) {
                 $("#new-order-modal-error-msg").empty();
                 $("#new-order-modal-error-msg").attr("hidden", "true");
                 $("#new-order-domain").removeAttr("disabled");
                 var options = $("#new-order-domain");
-                data.forEach(function (item, i) {
+                data.domains.forEach(function (item, i) {
                     var option = document.createElement("option");
                     if(i==0){
                         option.setAttribute("selected", "selected");
@@ -387,17 +437,31 @@ function loadDomainsInModal(keyCode) {
                     option.setAttribute("value", item.domainId);
                     option.appendChild(document.createTextNode(item.domainName));
                     options.append(option);
-                    loadProductInstancesInModal();
                 });
+                loadProductInstancesInModal();
             } else {
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This user does not have any domains!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
+                $("#new-order-domain").empty();
+                $("#new-order-domain").attr("disabled", "true");
+                $("#new-order-instanse").empty();
+                $("#new-order-instanse").attr("disabled", "true");
+                $("#new-order-aim").empty();
+                $("#new-order-aim").attr("disabled", "true");
+                $("#create-new-order-from-modal-button").attr("disabled", "true");
             }
+
         },
         error: function () {
-            $("#new-order-modal-error-msg").html("<strong>Error! </strong> E-mail not found!");
+            $("#new-order-modal-error-msg").html("<strong>Error! </strong> Internal server error!");
             $("#new-order-modal-error-msg").removeAttr("hidden");
-
+            $("#new-order-domain").empty();
+            $("#new-order-domain").attr("disabled", "true");
+            $("#new-order-instanse").empty();
+            $("#new-order-instanse").attr("disabled", "true");
+            $("#new-order-aim").empty();
+            $("#new-order-aim").attr("disabled", "true");
+            $("#create-new-order-from-modal-button").attr("disabled", "true");
         }
     });
 
@@ -405,13 +469,18 @@ function loadDomainsInModal(keyCode) {
 
 function loadProductInstancesInModal() {
 
-    $("#new-order-instanse").empty();
-    $("#new-order-instanse").attr("disabled", "true");
     var domainId = $("#new-order-domain").val();
 
     $.ajax({
         url: "/api/csr/instances/find/bydomain/" + domainId + "/",
         success: function (data) {
+            $("#new-order-instanse").empty();
+            $("#new-order-instanse").attr("disabled", "true");
+            $("#new-order-aim").empty();
+            $("#new-order-aim").attr("disabled", "true");
+            $("#new-order-modal-error-msg").empty();
+            $("#new-order-modal-error-msg").attr("hidden", "true");
+            $("#create-new-order-from-modal-button").attr("disabled", "true");
             if (data.length > 0) {
                 $("#new-order-modal-error-msg").empty();
                 $("#new-order-modal-error-msg").attr("hidden", "true");
@@ -430,10 +499,13 @@ function loadProductInstancesInModal() {
             } else {
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> This domain does not have any instances!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
+                $("#create-new-order-from-modal-button").attr("disabled", "true");
+
             }
 
         },
         error: function () {
+            $("#create-new-order-from-modal-button").attr("disabled", "true");
 
         }
     });
@@ -445,20 +517,30 @@ function loadOrderAaimsInModal() {
     $("#new-order-aim").attr("disabled", "true");
     $("#new-order-modal-error-msg").empty();
     $("#new-order-modal-error-msg").attr("hidden", "true");
+    $("#create-new-order-from-modal-button").attr("disabled", "true");
     var options = $("#new-order-aim");
     var status;
     $.ajax({
         url: "/api/csr/category/getstatus/frominstance/" + $("#new-order-instanse").val() + "/",
         success: function (data) {
+            if(data.openOrders == "true"){
+                $("#new-order-aim").empty();
+                $("#new-order-aim").attr("disabled", "true");
+                $("#new-order-modal-error-msg").html("<strong>Warning! </strong> The instance has at least one open order!");
+                $("#new-order-modal-error-msg").removeAttr("hidden");
+                $("#create-new-order-from-modal-button").attr("disabled", "true");
+                return;
+            }
+            $("#new-order-aim").empty();
             $("#new-order-aim").removeAttr("disabled");
-            if (data.categoryName.localeCompare("CREATED")) {
+            $("#create-new-order-from-modal-button").removeAttr("disabled");
+            if (data.productStatus.categoryName.localeCompare("CREATED")) {
                 var option = document.createElement("option");
                 option.setAttribute("value", "/api/csr/orders/new/activate");
                 option.appendChild(document.createTextNode("ACTIVATE"));
-
                 option.setAttribute("selected", "selected");
                 options.append(option);
-            } else if (data.categoryName.localeCompare("ACTIVATED")) {
+            } else if (data.productStatus.categoryName.localeCompare("ACTIVATED")) {
                 var option1 = document.createElement("option");
                 option1.setAttribute("selected", "selected");
                 option1.setAttribute("value", "/api/csr/orders/new/suspend");
@@ -468,7 +550,7 @@ function loadOrderAaimsInModal() {
                 option2.setAttribute("value", "/api/csr/orders/new/deactivate");
                 option2.appendChild(document.createTextNode("DEACTIVATE"));
                 options.append(option2);
-            } else if (data.categoryName.localeCompare("SUSPENDED")) {
+            } else if (data.productStatus.categoryName.localeCompare("SUSPENDED")) {
                 var option = document.createElement("option");
                 option.setAttribute("selected", "selected");
                 option.setAttribute("value", "/api/csr/orders/new/activate");
@@ -479,7 +561,8 @@ function loadOrderAaimsInModal() {
                 $("#new-order-aim").attr("disabled", "true");
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> Incorrect state of the instance!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
-                $("#create-new-order-from-modal-button").attr("hidden", "true");
+                $("#create-new-order-from-modal-button").attr("disabled", "true");
+
             }
 
         },

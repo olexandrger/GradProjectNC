@@ -215,6 +215,10 @@ public class OrdersServiceImpl implements OrdersService {
     public List<ProductOrder> getOrdersByProductInstance(long id, long size, long offset) {
         return orderDao.findByProductInstanceId(id, size, offset);
     }
+    @Override
+    public Collection<ProductOrder> getOpenInstanceOrders(long instanceId, long size, long offset) {
+        return orderDao.findOpenOrdersByInstanseId(instanceId, size, offset);
+    }
 
     @Override
     public ProductOrder updateOrderInfo(long orderId, long domainId, long productId) {

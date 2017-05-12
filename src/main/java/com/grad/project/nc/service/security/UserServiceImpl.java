@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User findByEMail(String eMail) {
-        return userDao.findByEmail(eMail).get();
+        return userDao.findByEmail(eMail).orElseGet(()->null);
     }
 
     /**
