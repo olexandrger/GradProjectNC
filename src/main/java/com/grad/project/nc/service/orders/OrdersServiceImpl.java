@@ -69,19 +69,30 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     private ProductOrder newOrder(long instanceId, long userId, long aimId) {
-        ProductOrder order = new ProductOrder();
+        ProductInstance instance = productInstanceDao.find(instanceId);
+        Category canceled = categoryDao.find(ORDER_STATUS_CANCELLED);
+        Category completed = categoryDao.find(ORDER_STATUS_COMPLETED);
+        boolean canCreate = instance.getProductOrders().stream()
+                .allMatch((order) -> order.getStatus().equals(canceled) || order.getStatus().equals(completed));
 
-        order.setOpenDate(OffsetDateTime.now());
-        order.setOrderAim(categoryDao.find(aimId));
-        order.setProductInstance(productInstanceDao.find(instanceId));
-        order.setUser(userDao.find(userId));
-        order.setStatus(categoryDao.find(ORDER_STATUS_CREATED));
+        if (!canCreate) {
+            return null;
+        } else {
 
-        order = orderDao.add(order);
+            ProductOrder order = new ProductOrder();
 
-        emailService.sendNewOrderEmail(order);
+            order.setOpenDate(OffsetDateTime.now());
+            order.setOrderAim(categoryDao.find(aimId));
+            order.setProductInstance(instance);
+            order.setUser(userDao.find(userId));
+            order.setStatus(categoryDao.find(ORDER_STATUS_CREATED));
 
-        return order;
+            order = orderDao.add(order);
+
+            emailService.sendNewOrderEmail(order);
+
+            return order;
+        }
     }
 
     @Override
