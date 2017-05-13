@@ -8,65 +8,116 @@ var numberOfAdded = 0;
 var selected = -1;
 function registerByAdmin() {
     var form = $("#registration-form1");
+    var form2 = $("#product-type-values2");
     var firstName = form.find('input[name="firstName"]').val();
     var lastName = form.find('input[name="lastName"]').val();
     var email = form.find('input[name="email"]').val();
     var password = form.find('input[name="password"]').val();
     var phone = form.find('input[name="phone"]').val();
-    var address = form.find('input[name="address"]').val();
-    var aptNumber = form.find('input[name="aptNumber"]').val();
+    var address = form2.find('input[name="domain-address-input2"]').val();
+    var aptNumber = form2.find('input[name="domain-address-apt-input2"]').val();
+    var domainName = form2.find('input[name="domain-name-input2"]').val();
+    var domainType = form2.find('input[name="domain-type-input2"]').val();
     var roles = [];
-    $("#roles-values-register").find(".product-characteristic-input").each(function (element) {
-        roles.push({
-            roleId: $(this).find("select").val(),
-            roleName: userRoleData[$(this).find("select").val()],
-        });
+    var domains = [];
 
 
-    });
+    for (var characteristic in userRoleData) {
+        console.log("adding property " + characteristic);
+        if($("#adminchbx").is(':checked') && characteristic == 1){
+            roles.push({roleId: characteristic, roleName: userRoleData[characteristic]});
+        }
+        if($("#client").is(':checked') && characteristic == 2 ){
+            console.log(characteristic );
+            roles.push({roleId: characteristic, roleName: userRoleData[characteristic]});
+        }
+        if($("#csrchbx").is(':checked') && characteristic == 3){
+            console.log(characteristic );
+            roles.push({roleId: characteristic, roleName: userRoleData[characteristic]});
+        }
+        if($("#pmgchbx").is(':checked') && characteristic == 4){
+            console.log(characteristic );
+            roles.push({roleId: characteristic, roleName: userRoleData[characteristic]});
+        }
+    }
+
+    console.log(JSON.stringify($("#client").is(':checked')));
+
+    //user-roles-checkboxes
     var _csrf = $('meta[name=_csrf]').attr("content");
 
-    $.ajax({
-        type: 'POST',
-        url: '/api/admin/users/register',
-        headers: {
 
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-        },
-        processData: false,
-        contentType: 'application/json',
-        data: JSON.stringify({
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            password: password,
-            phoneNumber: phone,
-            address: address,
-            aptNumber: aptNumber,
-            roles: roles
-        }),
-        success: function (data) {
-            var alert;
-            if (data.status == 'success') {
-                console.log("Registration success! " + JSON.stringify(data));
-                alert = $('<div id="registration-header-alert1" class="alert alert-success" role="alert">' +
-                    "User registered successfully" + "</div>");
-            } else {
-                console.log("Registration error! " + JSON.stringify(data));
-                alert = $('<div id="registration-header-alert1" class="alert alert-danger" role="alert">' +
-                    data.message + '</div>');
+
+    $.ajax({
+            type: 'GET',
+            url: '/api/admin/domains/addDomain?address='+address+'&aptNum='+aptNumber+'&type='+domainType+'&name='+domainName,
+            headers: {
+
+                'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+            },
+
+            //data: (address: address,aptNum:aptNumber,type:domainType,name:domainName),
+            dataType: 'json',
+
+            success: function (data) {
+                domains.push(data);
+                console.log(JSON.stringify(data));
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/admin/users/register',
+                    headers: {
+
+                        'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+                    },
+                    processData: false,
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        password: password,
+                        phoneNumber: phone,
+                        address: address,
+                        aptNumber: aptNumber,
+                        roles: roles,
+                        domains: domains
+                    }),
+                    success: function (data) {
+                        var alert;
+                        if (data.status == 'success') {
+                            console.log("Registration success! " + JSON.stringify(data));
+                            alert = $('<div id="registration-header-alert1" class="alert alert-success" role="alert">' +
+                                "User registered successfully" + "</div>");
+                        } else {
+                            console.log("Registration error! " + JSON.stringify(data));
+                            alert = $('<div id="registration-header-alert1" class="alert alert-danger" role="alert">' +
+                                data.message + '</div>');
+                        }
+
+                        $("#registration-header-alert1").replaceWith(alert);
+
+                    },
+                    error: function (data) {
+                        console.error("Registration error! " + JSON.stringify(data));
+                        var alert = $('<div id="registration-header-alert1" class="alert alert-danger" role="alert">' +
+                            "Registration failed</div>");
+                        $("#registration-header-alert1").replaceWith(alert);
+                    }
+                });
+
+
+            },
+            error: function (data) {
+
+
             }
 
-            $("#registration-header-alert1").replaceWith(alert);
-
-        },
-        error: function (data) {
-            console.error("Registration error! " + JSON.stringify(data));
-            var alert = $('<div id="registration-header-alert1" class="alert alert-danger" role="alert">' +
-                "Registration failed</div>");
-            $("#registration-header-alert1").replaceWith(alert);
         }
-    });
+    );
+
+
 
 }
 
@@ -95,6 +146,11 @@ function getUser() {
             dataType: 'json',
 
             success: function (data) {
+
+                clearFields();
+
+
+
                 userData = data;
 
                 console.log("User found! " + data.email);
@@ -110,12 +166,27 @@ function getUser() {
 
                 for (var characteristic in userData.roles) {
                     console.log("adding property " + characteristic);
-                    addUserRole(
-                        node,
-                        userData.roles[characteristic].roleId,
-                        userData.roles[characteristic].roleName,
-                        userData.roles[characteristic].roleId
-                    );
+
+                    if( userData.roles[characteristic].roleId == 1){
+                        $("#adminM").attr('checked', true);
+
+                    }
+                    if(userData.roles[characteristic].roleId == 2 ){
+                        console.log(characteristic.roleId );
+                        $("#clientM").attr('checked', true);
+
+                    }
+                    if(userData.roles[characteristic].roleId == 3){
+
+                        $("#csrM").attr('checked', true);
+                        //$("#pmgM").attr('checked', true);
+
+                    }
+                    if(userData.roles[characteristic].roleId == 4){
+                        console.log(characteristic );
+                        $("#pmgM").attr('checked', true);
+
+                    }
                 }
                 for (var characteristic in userData.domains) {
                     console.log("adding domains " + characteristic);
@@ -139,10 +210,11 @@ function getUser() {
 
         }
     );
-
-
-
+    
 }
+
+
+
 function saveUser() {
     var userData1 = {};
     userData1.roles = [];
@@ -165,16 +237,26 @@ function saveUser() {
 
     var _csrf = $('meta[name=_csrf]').attr("content");
 
-    $("#roles-values").find(".product-characteristic-input").each(function (element) {
-        userData1.roles.push({
 
-            roleId: $(this).find("select").val(),
-            roleName: userRoleData[$(this).find("select").val()],
 
-        });
-
-        tmp.push($(this).find("select").val())
-    });
+    for (var characteristic in userRoleData) {
+        console.log();
+        if($("#adminM").is(':checked') && characteristic == 1){
+            userData1.roles.push({roleId: characteristic, roleName: userRoleData[characteristic]});
+        }
+        if($("#clientM").is(':checked') && characteristic == 2 ){
+            console.log(characteristic );
+            userData1.roles.push({roleId: characteristic, roleName: userRoleData[characteristic]});
+        }
+        if($("#csrM").is(':checked') && characteristic == 3){
+            console.log(characteristic );
+            userData1.roles.push({roleId: characteristic, roleName: userRoleData[characteristic]});
+        }
+        if($("#pmgM").is(':checked') && characteristic == 4){
+            console.log(characteristic );
+            userData1.roles.push({roleId: characteristic, roleName: userRoleData[characteristic]});
+        }
+    }
 
     $.ajax({
         type: 'POST',
@@ -190,25 +272,27 @@ function saveUser() {
             var alert;
             if (data.status == 'success') {
                 console.log("Update success! " + JSON.stringify(tmp));
-                alert = $('<div id="update-alert" class="alert alert-success" role="alert">' +
+                alert = $('<div id="search-alert" class="alert alert-success" role="alert">' +
                     "User " + userData1.email+" updated!" + "</div>");
             } else {
                 console.log("Update error! " + JSON.stringify(data));
-                alert = $('<div id="update-alert" class="alert alert-danger" role="alert">' +
+                alert = $('<div id="search-alert" class="alert alert-danger" role="alert">' +
                     data.message + '</div>');
             }
-            clearFields();
 
-            $("#update-alert").replaceWith(alert);
+
+            $("#search-alert").replaceWith(alert);
         },
         error: function (data) {
             console.error("Update error! " + JSON.stringify(data));
-            var alert = $('<div id="update-alert" class="alert alert-danger" role="alert">' +
+            var alert = $('<div id="search-alert" class="alert alert-danger" role="alert">' +
                 "Update failed</div>");
-            $("#update-alert").replaceWith(alert);
+            $("#search-alert").replaceWith(alert);
         }
     });
     userData = {};
+
+    clearFields();
 
 
 }
@@ -217,7 +301,7 @@ function clearFields() {
     $("#roles-values").empty();
     $("#searchAlert").empty();
     $("#list1").empty();
-    $("#update-alert").empty();
+    //$("#update-alert").empty();
     $("#mf1").val("");
     $("#mf2").val("");
     $("#mf3").val("");
@@ -226,48 +310,38 @@ function clearFields() {
     $("#mf6").val("");
     $("#mf7").val("");
 
+
+    document.getElementById("user-roles-checkboxesM").reset();
+
     $("#domain-editor").addClass("hidden");
 
+    $("#adminM").removeAttr('checked');
+
+    $("#clientM").removeAttr('checked');
+
+    $("#csrM").removeAttr('checked');
+
+    $("#pmgM").removeAttr('checked');
+
+
+
+}
+
+function addNewDomain() {
+
+    var node =$("#list2");
+    $("#domain-editor2").removeClass("hidden");
+
+
+    ///var html =
+      ///  '<a href="#" class="list-group-item"'+' name="'+id+'"'+  ' >'+name+ '<input type="checkbox" class="pull-right"></a>';
+
+    ///node.append($(html));
+
 
 }
 
 
-function addUserRole(node,id, name, dataType) {
-
-    var options = "";
-
-    for (var dataTypeId in userRoleData) {
-        if (userRoleData.hasOwnProperty(dataTypeId)) {
-            options += '<option value="' + dataTypeId + '"';
-
-            if (dataTypeId == dataType) {
-                options += " selected ";
-            }
-            options += '>' + userRoleData[dataTypeId] + '</option>';
-        }
-    }
-
-    if (name == undefined) name = "";
-
-    if (dataType == undefined) dataType = "";
-    if (id == undefined) id = -1;
-
-    var html =
-        '<div class="input-group product-characteristic-input">' +
-        '<input type="hidden" name="characteristic-id" value="' + id + '"/>' +
-        '<span class="input-group-addon">Role</span>' +
-        '<select class="form-control" name="characteristic-dataTypeId">' +
-        options +
-        '</select>' +
-        '<span class="input-group-addon" style="background-color: #d9534f; cursor: pointer" onclick="removeRole(this)">' +
-        '<span class="glyphicon glyphicon-remove bg-danger" style="color: white; background-color: #d9534f; cursor: pointer"></span>' +
-        '</span>' +
-        '</div>';
-
-    //$("#roles-values").append($(html));
-
-    node.append($(html));
-}
 function addUserDomain(node,id, name, city) {
 
     if (name == undefined) name = "";
@@ -277,8 +351,8 @@ function addUserDomain(node,id, name, city) {
 
     node.append($(html));
 
-
 }
+
 function displayDomain(element) {
     $("#domain-editor").removeClass("hidden");
     for (var characteristic in userData.domains) {
@@ -297,11 +371,8 @@ function displayDomain(element) {
 
         }
     }
-
-
-
+    
 }
-
 
 
 
@@ -320,6 +391,8 @@ function loadInfo() {
     $.ajax({
         url: "/api/admin/users/userRoles",
         success: function (data) {
+
+            console.log(JSON.stringify(data));
             userRoleData = data;
             // loadProductTypes();
         },

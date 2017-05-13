@@ -1,6 +1,8 @@
 package com.grad.project.nc.controller.api.client;
 
 
+import com.grad.project.nc.controller.api.data.RegistrationResponseHolder;
+import com.grad.project.nc.controller.api.dto.FrontendAddress;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
 import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.model.User;
@@ -10,12 +12,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,6 +37,19 @@ public class DomainsController {
     public FrontendDomain getDomain(@PathVariable Long id) {
         return FrontendDomain.fromEntity(domainDao.find(id));
     }
+
+    @RequestMapping(path = "/getDomainsByAddress", method = RequestMethod.GET)
+    @ResponseBody
+    public List<FrontendDomain> getDomainsByAddress(@RequestParam("address") String address,@RequestParam("aptNum") String aptNum) {
+
+        //TODO rework after domains will be finished
+        List<FrontendDomain> list = new ArrayList<>();
+        list.add(FrontendDomain.builder().domainId((long) 1).domainName("Mock domain for: "+ address + aptNum). build());
+
+
+        return list;
+    }
+
 
 //    @Data
 //    @NoArgsConstructor

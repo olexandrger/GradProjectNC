@@ -55,20 +55,28 @@
                                         <input type="password" class="form-control" name="password"
                                                placeholder="Password">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="address">Address</label>
-                                        <input type="text" class="form-control" name="address" placeholder="Address">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="aptNumber">Apartment number</label>
-                                        <input type="text" class="form-control" name="aptNumber"
-                                               placeholder="Apartment number">
-                                    </div>
 
                                     <div class="form-group">
                                         <label for="phone">Phone</label>
                                         <input type="text" class="form-control" name="phone" placeholder="Phone">
                                     </div>
+                                </form>
+
+
+                                <p>Roles assigned to user:</p>
+                                <form id = user-roles-checkboxes>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="adminchbx">Admin
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="client" checked>Client
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="csrchbx">CSR
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="pmgchbx">PMG
+                                    </label>
                                 </form>
 
                                 <div class="row">
@@ -86,19 +94,67 @@
 
 
                             <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label>User roles</label>
-                                    <a class="btn btn-default" onclick="addUserRoleRegister()">
-                                        <span class="glyphicon glyphicon-plus"></span>Add
-                                    </a>
-                                </div>
-                                <div class="col-sm-6" id="roles-values-register">
+
+
+                                <div class="list-group" id="list2">
 
                                 </div>
+
+                            <#--<div class="form-group">
+                                <a class="btn btn-success" onclick="addNewDomain()">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span>Add domain
+                                </a>
+                            </div>
+                            <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
+                                <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
+                                <#--</a>-->
+
+
+                                <p>User domain info:</p>
+                                <div  id="domain-editor2">
+
+                                    <div class="row">
+                                        <div class="col-sm-12" id="product-type-values2">
+
+                                            <div class="form-group">
+                                                <label for="domain-name">Name</label>
+                                                <input type="text" class="form-control" name="domain-name-input2" placeholder="Domain name" id="domain-name-input2" >
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="domain-type">Type</label>
+                                                <input type="text" class="form-control" name="domain-type-input2" placeholder="Domain type" id="domain-type-input2" >
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="domain-address">Address</label>
+                                                <input type="text" class="form-control" name="domain-address-input2" placeholder="Domain address" id="domain-address-input2" >
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="domain-address-apt">Apartment number</label>
+                                                <input type="text" class="form-control" name="domain-address-apt-input2" placeholder="Address" id="domain-address-apt-input2" >
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                         <div class="col-xs-12 text-center">
+                                             <div class="form-group">
+
+                                             <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
+                                                <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
+                                                <#--</a>-->
+                                            </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
-                    </div>
+                            </div></div></div>
                     <div class="tab-pane" id="tab2">
                         <h3>Edit existing user</h3>
                         <div class="row">
@@ -118,26 +174,25 @@
 
                                 </form>
 
-                                <div class="row" id="row2">
-                                    <p id="userinfo">
-                                    </p>
+                                <label for="user-roles-checkboxesM">User roles</label>
+                                <form id = user-roles-checkboxesM>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="adminM">Admin
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="clientM">Client
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="csrM">CSR
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="pmgM">PMG
+                                    </label>
+                                </form>
+                                <div></div>
+                                <div class="row"></div>
 
-                                </div>
-
-
-                                    <div class="form-group">
-                                        <label>User roles</label>
-                                        <a class="btn btn-default" onclick="addUserRoleModify()">
-                                            <span class="glyphicon glyphicon-plus"></span>Add
-                                        </a>
-                                    </div>
-                                    <div class="col-sm-12" id="roles-values">
-
-                                    </div>
-
-                            </div>
-                            <div class="col-sm-4">
-                                <div id="update-alert"></div>
+                                <label for="userData" >User info</label>
                                 <form id="userData">
 
                                     <div class="form-group">
@@ -160,16 +215,16 @@
                                         <input type="password" id="mf4" class="form-control" name="password"
                                                placeholder="Password">
                                     </div>
-                                    <#--<div class="form-group">
-                                        <label for="address">Address</label>
-                                        <input type="text" id="mf5" class="form-control" name="address"
-                                               placeholder="Address">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="aptNumber">Apartment number</label>
-                                        <input type="text" id="mf6" class="form-control" name="aptNumber"
-                                               placeholder="Apartment number">
-                                    </div>-->
+                                <#--<div class="form-group">
+                                    <label for="address">Address</label>
+                                    <input type="text" id="mf5" class="form-control" name="address"
+                                           placeholder="Address">
+                                </div>
+                                <div class="form-group">
+                                    <label for="aptNumber">Apartment number</label>
+                                    <input type="text" id="mf6" class="form-control" name="aptNumber"
+                                           placeholder="Apartment number">
+                                </div>-->
 
                                     <div class="form-group">
                                         <label for="phone">Phone</label>
@@ -192,9 +247,8 @@
                                     </div>
                                 </div>
 
-
                             </div>
-                            <div class="col-sm-4 ">
+                            <div class="col-sm-4">
                                 <div class="list-group" id="list1">
 
                                 </div>
@@ -205,30 +259,30 @@
                                         <div class="col-sm-12" id="product-type-values">
                                             <div class="form-group hidden">
                                                 <label for="domain-id">Id</label>
-                                                <input type="text" class="form-control" name="domain-id" placeholder="Id" id="domain-id-input">
+                                                <input type="text" class="form-control" name="domain-id" placeholder="Id" id="domain-id-input" disabled>
                                             </div>
                                             <div class="form-group">
                                                 <label for="domain-name">Name</label>
-                                                <input type="text" class="form-control" name="domain-name" placeholder="Domain name" id="domain-name-input">
+                                                <input type="text" class="form-control" name="domain-name" placeholder="Domain name" id="domain-name-input" >
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="domain-type">Type</label>
-                                                <input type="text" class="form-control" name="domain-type" placeholder="Domain type" id="domain-type-input">
+                                                <input type="text" class="form-control" name="domain-type" placeholder="Domain type" id="domain-type-input" disabled>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="domain-region">Region id</label>
-                                                <input type="text" class="form-control" name="domain-region" placeholder="Domain region" id="domain-region-input">
+                                                <input type="text" class="form-control" name="domain-region" placeholder="Domain region" id="domain-region-input" disabled>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="domain-address">Address</label>
-                                                <input type="text" class="form-control" name="domain-address" placeholder="Domain address" id="domain-address-input">
+                                                <input type="text" class="form-control" name="domain-address" placeholder="Domain address" id="domain-address-input" disabled>
                                             </div>
                                             <div class="form-group">
                                                 <label for="domain-address-apt">Apartment number</label>
-                                                <input type="text" class="form-control" name="domain-address-apt" placeholder="Address" id="domain-address-apt-input">
+                                                <input type="text" class="form-control" name="domain-address-apt" placeholder="Address" id="domain-address-apt-input" disabled>
                                             </div>
 
 
@@ -236,21 +290,25 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-12" style="margin-top: 10px;">
-                                           <#-- <div class="col-xs-12 text-center">
-                                                <div class="form-group">
-                                                    <a class="btn btn-success" onclick="saveSelectedDomain()">
-                                                        <span class="glyphicon glyphicon-floppy-disk"></span>Save as new Domain
-                                                    </a>
+                                        <#-- <div class="col-xs-12 text-center">
+                                             <div class="form-group">
+                                                 <a class="btn btn-success" onclick="saveSelectedDomain()">
+                                                     <span class="glyphicon glyphicon-floppy-disk"></span>Save as new Domain
+                                                 </a>
 
-                                                <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
+                                             <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
                                                 <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
                                                 <#--</a>-->
 
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
+
+
+                            </div>
+                            <div class="col-sm-4 ">
+
                             </div>
 
                         </div>
