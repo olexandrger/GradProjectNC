@@ -11,8 +11,8 @@
 <body>
 
 <div class="container">
+<#include "../resources/navbar.ftl"/>
     <div class="row">
-
         <div class="row">
             <div class="col-sm-10 col-sm-offset-1">
                 <div id="new-domain-alert-place">
@@ -57,8 +57,8 @@
                             </div>
                             <div class="input-group region-input">
                                 <span class="input-group-addon">City</span>
-                                <input type="text" class="form-control" name="city" placeholder="City"
-                                       id="domain-city-input">
+                                <input type="text" class="form-control" name="info" placeholder="City"
+                                       id="domain-info-input">
                             </div>
                             <div class="input-group region-input">
                                 <span class="input-group-addon">Street</span>
@@ -78,32 +78,46 @@
                         </div>
                         <div class="form-group hidden" id="user-editor">
                             <label>Users</label>
-                            <select class="form-control" id="user-selector">
-                            </select>
+                            <input type="text" class="form-control" name="user-email" placeholder="E-mail"
+                                   id="user-email-input">
                             <a class="btn btn-default" onclick="addUser()">
                                 <span class="glyphicon glyphicon-plus"></span>Add
                             </a>
+                            <div class="table-responsive" id="user-table">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>E-mail</th>
+                                        <th>First name</th>
+                                        <th>Last name</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="list-group" id="user-list"></div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-12" style="margin-top: 10px;">
-                        <div class="col-xs-12 text-center">
-                            <div class="form-group">
-                                <a class="btn btn-success" onclick="saveSelected()">
-                                    <span class="glyphicon glyphicon-floppy-disk"></span>Save
-                                </a>
-                                <a class="btn btn-danger" onclick="deleteSelected()">
-                                    <span class="glyphicon glyphicon-remove "></span>Delete
-                                </a>
-                            </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12" style="margin-top: 10px;">
+                    <div class="col-xs-12 text-center">
+                        <div class="form-group">
+                            <a class="btn btn-success" onclick="saveDomain()">
+                                <span class="glyphicon glyphicon-floppy-disk"></span>Save
+                            </a>
+                            <a class="btn btn-danger" onclick="deleteDomain()">
+                                <span class="glyphicon glyphicon-remove "></span>Delete
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 
 </div>
@@ -133,15 +147,17 @@
             $domain.className = "list-group-item";
             var index = domains.length;
             $domain.onclick = function () {
-                selectItem(index);
+                selectItem(getIndexOfDomainByName(domainName));
             };
             $list.append($domain);
+
+
             domains.push({
                 id: id,
                 name: domainName,
                 type: "",
                 region: "",
-                city: "",
+                info: "",
                 street: "",
                 building: "",
                 apartment: "",
@@ -153,50 +169,83 @@
     }
 
     function addUser() {
-        var id = $("#user-selector").val();
-        var user = getUserById(id);
-        $addUser(user);
-        domains[selected].users.push(user);
+        var $userEmailInput = $("#user-email-input");
+        var email = $userEmailInput.val();
+        $userEmailInput.val("");
+        var user = getUserByEmail(email);
+        $("#new-user-alert").remove();
+        if (user != null) {
+            $addUser(user);
+            domains[selected].users.push(user);
+        } else {
+            $('<div id="new-user-alert" class="alert alert-danger" role="alert">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                    'Can not find user with this e-mail </div>').insertBefore($('table'));
+        }
     }
 
     function $addUser(user) {
-        var $userList = $("#user-list");
-        var id = user.id;
-        var fullName = user.firstName + user.lastName;
-        var $userItem = $(
-                '<div class="form-inline user-container">\n\
-                        <div class="form-group"><input type="text" class="form-control" placeholder="Id"\n\
-                                           name="user-id" value="' + id + '"></div>\n\
-                         <div class="form-group full-width"><input type="text" class="form-control full-width" placeholder="Full Name"\n\
-                                                      name="user-full-name" value="' + fullName + '"></div>\n\
-                        <div class="form-group"><a class="btn btn-danger" onclick="deleteUser(this)"><span\n\
-                    class="glyphicon glyphicon-remove "></span></a></div>\n\
-                    </div>');
-        $userList.append($userItem);
+        var $userTableBody = $("#user-table>table>tbody");
+        $userTableBody.append($('<tr class="user-info">\n\
+                                    <td class="email" value="' + user.email + '">' + user.email + '</td>\n\
+                                    <td>' + user.firstName + '</td>\n\
+                                    <td>' + user.lastName + '</td>\n\
+                                    <td><div class="from-group"><a class="btn btn-danger" onclick="removeUser(this)">\n\
+                                        <span class="glyphicon glyphicon-remove "></span>Remove user\n\
+                                    </a></div></td>\n\
+                                </tr>'));
     }
 
-    function deleteUser(element) {
-        element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
-        var id = element.parentNode.parentNode.firstChild.firstChild.val();
-        for (var i = 0; i < domains[selected].users.length; i++) {
-            if (id == domains[selected].users[i]) {
+    function removeUser($element) {
+        var email = "satan";
+        email = $element.parentElement.parentElement.parentElement.firstElementChild.getAttribute("value");
+        $element.parentNode.parentNode.parentNode.remove();
+        domains[selected].users.forEach(function (user, i) {
+            if (email == user.email) {
                 domains[selected].users.splice(i, 1);
                 return;
             }
-        }
+        })
     }
 
-    function getUserById(id) {
-        for (var i = 0; i < allUsers.length; i++) {
-            if (id == allUsers[i].id) {
-                return allUsers[i];
+    function getUserByEmail(email) {
+        var user;
+        //for test
+//        allUsers.forEach(function (item, i) {
+//            if (email == item.email) {
+//                user = item;
+//            }
+//        });
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/client/domains/get/user",
+            dataType: 'json',
+            success: function (data) {
+                console.log("getUser() success");
+                user = data;
+            },
+            error: function (e) {
+                console.log("getUser() error");
+                user = null;
             }
-        }
+        });
+        return user;
     }
 
     function getIndexOf$Domain($domain) {
         var $list = $("#domain-list");
-        return list.index($domain);
+        return $list.index($domain);
+    }
+
+    function getIndexOfDomainByName(name) {
+        var index;
+        domains.forEach(function (domain, i) {
+            if (name == domain.name) {
+                index = i;
+            }
+        });
+        return index;
     }
 
     function get$DomainByIndex(index) {
@@ -211,39 +260,40 @@
     }
 
     function selectItem(index) {
-        console.log("Selected " + index);
+        console.log("Selected " + selected);
+        console.log("index" + index);
         if (selected == -1) {
             $("#domain-editor").removeClass("hidden");
         }
         if (index == -1) {
             $("#domain-editor").addClass("hidden");
         }
-        var $list = $("#domain-list");
+        $(".user-info").remove();
+
         var $domain = get$DomainByIndex(selected);
-        $domain.removeClass("active");
-
-        $domain = get$DomainByIndex(index);
-        $domain.addClass("active");
-
-        $(".user-container").remove();
-
-        //save prev active domain
-        if (selected != -1) {
-            domains[selected].name = $("#domain-name-input").val();
-            domains[selected].type = $("#domain-type-selector").val();
-            domains[selected].region = $("#domain-region-input").val();
-            domains[selected].city = $("#domain-city-input").val();
-            domains[selected].street = $("#domain-street-input").val();
-            domains[selected].building = $("#domain-building-input").val();
-            domains[selected].apartment = $("#domain-apartment-input").val();
-            saveUsers(selected);
+        console.log($domain != null);
+        if ($domain != null) {
+            $domain.removeClass("active");
+            $domain = get$DomainByIndex(index);
+            $domain.addClass("active");
+            //save prev active domain
+            if (selected != -1) {
+                domains[selected].name = $("#domain-name-input").val();
+                domains[selected].type = $("#domain-type-selector").val();
+                domains[selected].region = $("#domain-region-input").val();
+                domains[selected].info = $("#domain-info-input").val();
+                domains[selected].street = $("#domain-street-input").val();
+                domains[selected].building = $("#domain-building-input").val();
+                domains[selected].apartment = $("#domain-apartment-input").val();
+                saveUsers(selected);
+            }
         }
 
         //load new active domain
         $("#domain-name-input").val(domains[index].name);
         $("#domain-type-selector").val(domains[index].type);
         $("#domain-region-input").val(domains[index].region);
-        $("#domain-city-input").val(domains[index].city);
+        $("#domain-info-input").val(domains[index].info);
         $("#domain-street-input").val(domains[index].street);
         $("#domain-building-input").val(domains[index].building);
         $("#domain-apartment-input").val(domains[index].apartment);
@@ -265,21 +315,78 @@
     }
 
     function loadUsers(index) {
-        for (var i = 0; i < domains[index].users.length; i++) {
-            $addUser(domains[index].users[i]);
+        if (domains[index].users != undefined) {
+            for (var i = 0; i < domains[index].users.length; i++) {
+                $addUser(domains[index].users[i]);
+            }
         }
     }
 
-    //ajax
-    function saveSelected() {
-
+    function saveDomain() {
+        var domain = domains[selected];
+        var frontendDomain = {
+            domainId: domain.id,
+            domainName: domain.name,
+            regionId: domain.region,
+            address: {
+                info: domain.info,
+                street: domain.street,
+                building: domain.building,
+                apartment: domain.apartment
+            },
+            domainType: {
+                categoryId: 6,
+                categoryName: domain.type
+            },
+            users: domain.users
+        };
+        $.ajax({
+            type: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            contentType: "application/json",
+            url: "/api/client/domains/update",
+            data: JSON.stringify(frontendDomain),
+            dataType: 'json',
+            cache: false,
+            timeout: 600000,
+            success: function (data) {
+                console.log("saveDomain() succes");
+            },
+            error: function (e) {
+                console.log("saveDomain() error");
+            }
+        });
     }
-    //ajax
-    function deleteSelected() {
 
+    function deleteDomain() {
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/client/domains/delete",
+            data: JSON.stringify({id: domains[selected].id}),
+            dataType: 'json',
+            cache: false,
+            timeout: 600000,
+            success: function (data) {
+                delete$Domain();
+                console.log("deleteDomain() succes");
+            },
+            error: function (e) {
+                console.log("deleteDomain() error");
+            }
+        });
     }
 
-    //ajax
+    function delete$Domain() {
+        domains.splice(selected, 1);
+        $("#domain-list>.active").remove();
+        selected = -1;
+        selectItem(domains.length - 1);
+    }
+
     function loadUserDomains() {
         $.ajax({
             type: "GET",
@@ -288,17 +395,17 @@
             dataType: 'json',
             success: function (data) {
                 console.log("loadUserDomains() success");
-                alert("succes");
-                for (var i = 0; i < data.length; ++i) {
+                data.forEach(function (domain, i) {
                     domains.push({
-                        id: data[i].domainId,
-                        name: data[i].domainName,
-                        type: data[i].domainType.categoryName,
-                        region: data[i].regionId,
-                        city: data[i].address.city,
-                        street: data[i].address.street,
-                        building: data[i].address.building,
-                        apartment: data[i].address.apartment
+                        id: domain.domainId,
+                        name: domain.domainName,
+                        type: domain.domainType.categoryName,
+                        region: domain.regionId,
+                        info: domain.address.info,
+                        street: domain.address.street,
+                        building: domain.address.building,
+                        apartment: domain.address.apartment,
+                        users: domain.users != null ? domain.users : []
                     });
                     numberOfAdded++;
                     //add to html
@@ -306,49 +413,45 @@
                     //var domainName = $newDomainName.val();
                     var $list = $("#domain-list");
                     var $domain = document.createElement("a");
-                    $domain.appendChild(document.createTextNode(domains[i].name));
+                    //need get id from DB
+                    var id = -(++numberOfAdded);
+                    var domainName = domains[i].name;
+                    $domain.appendChild(document.createTextNode(domainName));
                     $domain.className = "list-group-item";
                     var index = domains.length;
                     $domain.onclick = function () {
-                        selectItem(index);
+                        selectItem(getIndexOfDomainByName(domainName));
                     };
                     $list.append($domain);
-                }
-
+                })
             },
             error: function (e) {
                 console.log("loadUserDomains() error");
-                alert("error");
             }
         });
     }
 
 
-    //ajax
+    //don't needmj only for tests
     function loadAllUsers() {
-        var $userSelector = $("#user-selector");
-
         allUsers.push({
             id: 29,
+            email: "melnyk@gmail.com",
             firstName: "andrey",
             lastName: "melnyk"
         });
-        var fullName = allUsers[0].firstName + " " + allUsers[0].lastName;
-        var id = allUsers[0].id;
-        $userSelector.append($("<option value=" + id + ">" + fullName + "</option>"));
+
         allUsers.push({
             id: 666,
+            email: "pupkin@gmail.com",
             firstName: "vasya",
             lastName: "pupkin"
         });
-        fullName = allUsers[1].firstName + " " + allUsers[1].lastName;
-        id = allUsers[1].id;
-        $userSelector.append($("<option value=" + id + ">" + fullName + "</option>"));
     }
 
     $(document).ready(function () {
         loadAllUsers();
-        //loadUserDomains();
+        loadUserDomains();
     });
 </script>
 </html>
