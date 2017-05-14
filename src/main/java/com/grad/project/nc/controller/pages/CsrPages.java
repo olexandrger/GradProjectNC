@@ -9,4 +9,9 @@ public class CsrPages {
     public String ordersPage() {
         return "/csr/orders";
     }
+
+    @RequestMapping("/csr/reports")
+    public String reportsPage() {
+        return "/admin/report";
+    }
 }

@@ -4,13 +4,21 @@ package com.grad.project.nc.service.reports;
 import com.grad.project.nc.model.Report;
 import com.grad.project.nc.persistence.ReportDao;
 import com.grad.project.nc.service.security.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class ReportServiceImpl implements ReportService {
 
@@ -23,8 +31,6 @@ public class ReportServiceImpl implements ReportService {
         this.reportDao = reportDao;
     }
 
-
-
     @Override
     public List<Report> getReports() {
         //TODO filter
@@ -36,8 +42,45 @@ public class ReportServiceImpl implements ReportService {
         //TODO check authorities
         Report report = reportDao.find(id);
 
-        return null;
+        String query = report.getReportScript();
+
+        Object[] params = new String[parameters.size()];
+        parameters.forEach((key, value) -> params[key] = value);
+
+        return jdbcTemplate.query(query, new ReportExtractor(), params);
     }
 
+    private static class ReportExtractor implements ResultSetExtractor<GeneratedReport> {
+
+        @Override
+        public GeneratedReport extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+
+            List<String> header = new LinkedList<>();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 1; i <= columnCount; i++) {
+                header.add(metaData.getColumnName(i));
+            }
+
+            GeneratedReport report = new GeneratedReport();
+            report.setHeader(header);
+            report.setData(new LinkedList<>());
+
+            while (resultSet.next()) {
+                List<String> row = new LinkedList<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    Object value = resultSet.getObject(i);
+                    if (value == null) {
+                        row.add("");
+                    } else {
+                        row.add(value.toString());
+                    }
+                }
+                report.getData().add(row);
+            }
+
+            return report;
+        }
+    }
 
 }
