@@ -14,6 +14,6 @@ public class ClientPages {
 
     @RequestMapping("/domains")
     public String getDomainsPage(){
-        return "client/domain";
+        return "client/domains";
     }
 }
