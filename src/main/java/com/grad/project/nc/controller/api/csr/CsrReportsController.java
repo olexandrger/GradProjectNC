@@ -6,7 +6,6 @@ import com.grad.project.nc.controller.api.dto.FrontendReportInfo;
 import com.grad.project.nc.service.reports.GeneratedReport;
 import com.grad.project.nc.service.reports.ReportService;
 import com.grad.project.nc.service.reports.XlsWorkbook;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +52,7 @@ public class CsrReportsController {
 
         XlsWorkbook report = reportService.generateXlsReport(id, parameters);
 
-        ByteOutputStream bytes = new ByteOutputStream();
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         report.writeToOutputStream(bytes);
 
         String filename = "report-" + System.currentTimeMillis() + ".xls";
@@ -62,6 +62,6 @@ public class CsrReportsController {
                 .contentLength(bytes.size())
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("content-disposition", "attachment; filename=\"" + filename +"\"")
-                .body(new InputStreamResource(new ByteArrayInputStream(bytes.getBytes())));
+                .body(new InputStreamResource(new ByteArrayInputStream(bytes.toByteArray())));
     }
 }
