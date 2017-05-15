@@ -8,4 +8,5 @@ import java.util.Map;
 public interface ReportService {
     List<Report> getReports();
     GeneratedReport generateReport(Long id, Map<Integer, String> parameters);
+    XlsWorkbook generateXlsReport(Long id, Map<Integer, String> parameters);
 }

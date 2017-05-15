@@ -54,6 +54,16 @@ function generateReport() {
     });
 }
 
+function generateXls() {
+    var data = {};
+
+    $(".report-value-div").each(function() {
+        data[$(this).find('[name="param-id"]').val()] = $(this).find('[name="param-value"]').val();
+    });
+
+    window.open("/api/csr/reports/generate/" + $("#report-select").val() + "/xls/" + btoa(JSON.stringify(data)));
+}
+
 function loadReportParams() {
     var reportId = $("#report-select").val();
     var report;
@@ -77,7 +87,7 @@ function loadReportParams() {
                 inputType = "datetime-local"
             }
 
-            var div = '<div class="report-value-div input-group">' +
+            var div = '<div class="report-value-div form-group input-group">' +
                 '<span class="input-group-addon">' + item.name + '</span>' +
                 '<input type="hidden" name="param-id" value="' + item.id + '"/>' +
                 '<input type="' + inputType + '" class="form-control" name="param-value">' +
@@ -105,6 +115,8 @@ function loadReports() {
                 option.value = data.id;
                 select.append(option);
             });
+
+            loadReportParams();
         },
         error: function (data) {
             console.error(data);

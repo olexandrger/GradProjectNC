@@ -35,6 +35,7 @@
             </div>
             <div class="form-group">
                 <button class="btn btn-primary" onclick="generateReport()">Generate</button>
+                <button class="btn btn-primary" onclick="generateXls()">Download</button>
             </div>
         </div>
         <div class="col-sm-8">

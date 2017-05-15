@@ -3,7 +3,6 @@ package com.grad.project.nc.service.reports;
 
 import com.grad.project.nc.model.Report;
 import com.grad.project.nc.persistence.ReportDao;
-import com.grad.project.nc.service.security.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -48,6 +47,25 @@ public class ReportServiceImpl implements ReportService {
         parameters.forEach((key, value) -> params[key] = value);
 
         return jdbcTemplate.query(query, new ReportExtractor(), params);
+    }
+
+    @Override
+    public XlsWorkbook generateXlsReport(Long id, Map<Integer, String> parameters) {
+        GeneratedReport report = generateReport(id, parameters);
+        XlsWorkbook workbook = new XlsWorkbook();
+        workbook.setCurrentSheet("report");
+
+        for (int i = 0; i < report.getHeader().size(); i++) {
+            workbook.writeCell(0, i, report.getHeader().get(i));
+        }
+
+        for (int i = 0; i < report.getData().size(); i++) {
+            for (int j = 0; j < report.getData().get(i).size(); j++) {
+                workbook.writeCell(i + 1, j, report.getData().get(i).get(j));
+            }
+        }
+
+        return workbook;
     }
 
     private static class ReportExtractor implements ResultSetExtractor<GeneratedReport> {
