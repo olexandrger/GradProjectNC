@@ -56,7 +56,9 @@ public class XlsWorkbook {
 
             int columnCount = 0;
             for (int rowIndex = 0; rowIndex < sheet.getLastRowNum(); rowIndex++) {
-                columnCount = Math.max(columnCount, sheet.getRow(rowIndex).getLastCellNum());
+                if (sheet.getRow(rowIndex) != null) {
+                    columnCount = Math.max(columnCount, sheet.getRow(rowIndex).getLastCellNum());
+                }
             }
 
             for (int colIndex = 0; colIndex < columnCount; colIndex++) {

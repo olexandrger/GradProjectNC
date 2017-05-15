@@ -1,6 +1,8 @@
 package com.grad.project.nc.service.reports;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grad.project.nc.model.Report;
 import com.grad.project.nc.persistence.ReportDao;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +12,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,17 +55,52 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public XlsWorkbook generateXlsReport(Long id, Map<Integer, String> parameters) {
-        GeneratedReport report = generateReport(id, parameters);
+        GeneratedReport generatedReport = generateReport(id, parameters);
         XlsWorkbook workbook = new XlsWorkbook();
         workbook.setCurrentSheet("report");
 
-        for (int i = 0; i < report.getHeader().size(); i++) {
-            workbook.writeCell(0, i, report.getHeader().get(i));
-        }
+        Report report = reportDao.find(id);
 
-        for (int i = 0; i < report.getData().size(); i++) {
-            for (int j = 0; j < report.getData().get(i).size(); j++) {
-                workbook.writeCell(i + 1, j, report.getData().get(i).get(j));
+        int heightOffset = 0;
+
+        workbook.writeCell(heightOffset, 0, "Report: ");
+        workbook.writeCell(heightOffset, 1, report.getReportName());
+        heightOffset++;
+
+        if (parameters.size() > 0) {
+            try {
+                workbook.writeCell(heightOffset, 0, "Parameters:");
+                heightOffset++;
+
+                ObjectMapper mapper = new ObjectMapper();
+                TypeReference<List<HashMap<String, String>>> ref = new TypeReference<List<HashMap<String, String>>>() {
+                };
+
+                List<Map<String, String>> paramsDescription = mapper.readValue(report.getParameters(), ref);
+
+                for (Map<String, String> param : paramsDescription) {
+                    int paramId = Integer.parseInt(param.get("id"));
+                    String paramName = param.get("name");
+                    String paramValue = parameters.get(paramId);
+                    workbook.writeCell(heightOffset, 0, paramName);
+                    workbook.writeCell(heightOffset, 1, paramValue);
+                    heightOffset++;
+                }
+
+            } catch (IOException | NumberFormatException e) {
+                log.error("Can not write parameters: ", e);
+            }
+        }
+        heightOffset++;
+
+        for (int i = 0; i < generatedReport.getHeader().size(); i++) {
+            workbook.writeCell(heightOffset, i, generatedReport.getHeader().get(i));
+        }
+        heightOffset++;
+
+        for (int i = 0; i < generatedReport.getData().size(); i++) {
+            for (int j = 0; j < generatedReport.getData().get(i).size(); j++) {
+                workbook.writeCell(i + heightOffset, j, generatedReport.getData().get(i).get(j));
             }
         }
 
