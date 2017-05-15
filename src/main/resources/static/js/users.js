@@ -3,9 +3,11 @@
  */
 
 var userData;
+var userData1 = {};
 var userRoleData;
 var numberOfAdded = 0;
 var selected = -1;
+var selectedDomain = -1;
 function registerByAdmin() {
     var form = $("#registration-form1");
     var form2 = $("#product-type-values2");
@@ -216,7 +218,7 @@ function getUser() {
 
 
 function saveUser() {
-    var userData1 = {};
+
     userData1.roles = [];
     userData1.userId = userData.userId;
     var tmp = [];
@@ -234,6 +236,7 @@ function saveUser() {
     userData1.address = $("#mf5").val();
     userData1.aptNumber = $("#mf6").val();
     userData1.phoneNumber = $("#mf7").val();
+    userData1.domains = userData.domains;
 
     var _csrf = $('meta[name=_csrf]').attr("content");
 
@@ -355,6 +358,9 @@ function addUserDomain(node,id, name, city) {
 
 function displayDomain(element) {
     $("#domain-editor").removeClass("hidden");
+    $("#domains-buttons").removeClass("hidden");
+    selectedDomain = element.name;
+    console.log("Domain" + selectedDomain);
     for (var characteristic in userData.domains) {
 
         if(userData.domains[characteristic].domainId == element.name){
@@ -372,6 +378,35 @@ function displayDomain(element) {
         }
     }
     
+}
+function deleteSelected() {
+    console.log(JSON.stringify(userData.domains));
+    var tmpArr = [];
+
+   // $('.all').prop("checked",false);
+    var items = $("#list1 input:checked:not('.all')");
+    items.each(function(idx,item){
+        var choice = $(item);
+        var deleteDomId = choice.parent().attr("name");
+
+
+        for (var characteristic in userData.domains) {
+
+            if(userData.domains[characteristic].domainId == deleteDomId){
+               // tmpArr.push(userData.domains[characteristic]);
+                userData.domains.splice(characteristic,1);
+                choice.parent().remove();
+
+                console.log(JSON.stringify(characteristic));
+
+            }
+        }
+
+    });
+
+    //userData.domains = tmpArr;
+    console.log(JSON.stringify(userData.domains));
+
 }
 
 
@@ -408,4 +443,10 @@ function removeRole(element) {
 
 $(document).ready(function () {
     loadInfo();
+
+
 });
+
+function redirectToDomains() {
+    location.href = "/client/domains";
+};
