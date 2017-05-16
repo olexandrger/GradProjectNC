@@ -3,7 +3,6 @@ package com.grad.project.nc.controller.api.admin;
 import com.grad.project.nc.controller.api.dto.FrontendProduct;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.service.product.ProductService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/products")
-@Slf4j
 public class AdminProductsController {
 
     private final ProductService productService;
@@ -28,7 +26,6 @@ public class AdminProductsController {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public Map<String, String> update(@RequestBody FrontendProduct frontendProduct) {
         Product product = frontendProduct.toModel();
-        log.info(product.toString());
         productService.update(product);
 
         return new HashMap<String, String>() {{

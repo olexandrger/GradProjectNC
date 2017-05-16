@@ -40,10 +40,7 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
     @Transactional
     public Product find(Long id) {
         Product product = productDao.find(id);
-        product.getProductType();
-        product.getProductCharacteristicValues();
-        product.getProductCharacteristics();
-        product.getPrices();
+        loadProductHelper(product);
 
         return product;
     }
@@ -52,12 +49,7 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
     @Transactional
     public List<Product> findAll() {
         List<Product> products = productDao.findAll();
-        products.forEach(p -> {
-            p.getProductType();
-            p.getProductCharacteristicValues();
-            p.getProductCharacteristics();
-            p.getPrices();
-        });
+        loadProductHelper(products);
 
         return products;
     }
@@ -68,15 +60,14 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
         productDao.add(product);
 
         product.getPrices()
-                .forEach(p -> p.setProduct(new Product(product.getProductId())));
+                .forEach(price -> price.setProduct(new Product(product.getProductId())));
 
         productRegionPriceDao.persistBatch(product.getPrices());
 
         product.getProductCharacteristicValues()
-                .forEach(v -> v.setProduct(new Product(product.getProductId())));
+                .forEach(value -> value.setProduct(new Product(product.getProductId())));
 
-        productCharacteristicValueDao.persistBatch(
-                product.getProductCharacteristicValues());
+        productCharacteristicValueDao.persistBatch(product.getProductCharacteristicValues());
 
         return product;
     }
@@ -110,9 +101,9 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
         );
 
         productCharacteristicValueDao.persistBatch(product.getProductCharacteristicValues()
-                        .stream()
-                        .filter(v -> v.getValueId() == null)
-                        .collect(Collectors.toList())
+                .stream()
+                .filter(v -> v.getValueId() == null)
+                .collect(Collectors.toList())
         );
     }
 
@@ -143,12 +134,7 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
     @Transactional
     public List<Product> findByProductTypeId(Long productTypeId) {
         List<Product> products = productDao.findByProductTypeId(productTypeId);
-        products.forEach(p -> {
-            p.getProductType();
-            p.getProductCharacteristicValues();
-            p.getProductCharacteristics();
-            p.getPrices();
-        });
+        loadProductHelper(products);
 
         return products;
     }
@@ -157,13 +143,24 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
     @Transactional
     public List<Product> findActiveProductsByRegionId(Long regionId) {
         List<Product> products = productDao.findActiveByRegionId(regionId);
+        loadProductHelper(products);
+
+        return products;
+    }
+
+    private void loadProductHelper(Product product) {
+        product.getProductType();
+        product.getProductCharacteristicValues();
+        product.getProductCharacteristics();
+        product.getPrices();
+    }
+
+    private void loadProductHelper(List<Product> products) {
         products.forEach(p -> {
             p.getProductType();
             p.getProductCharacteristicValues();
             p.getProductCharacteristics();
             p.getPrices();
         });
-
-        return products;
     }
 }
