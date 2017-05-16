@@ -199,6 +199,7 @@ function getUser() {
 
                     );
                 }
+                $("#domains-buttons").removeClass("hidden");
                 var alert = $('<div id="search-alert" class="alert alert-success" role="alert">User found</div>');
                 $("#search-alert").replaceWith(alert);
             },
@@ -358,7 +359,7 @@ function addUserDomain(node,id, name, city) {
 
 function displayDomain(element) {
     $("#domain-editor").removeClass("hidden");
-    $("#domains-buttons").removeClass("hidden");
+    $("#del-dom-btn").removeClass("hidden");
     selectedDomain = element.name;
     console.log("Domain" + selectedDomain);
     for (var characteristic in userData.domains) {

@@ -22,5 +22,15 @@ public class AdminPages {
         return "/admin/users";
     }
 
+    @RequestMapping("/admin/discounts")
+    public String discountsPage() {
+        return "/admin/discounts";
+    }
+
+    @RequestMapping("/admin/g")
+    public String g() {
+        return "/admin/g";
+    }
+
 
 }
