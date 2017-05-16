@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Products</title>
+    <title>Users</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -249,12 +249,7 @@
 
                             </div>
                             <div class="col-sm-6">
-                                <div class="list-group" id="list1">
-
-                                </div>
-
-
-
+                                <div class="list-group" id="list1"></div>
 
                                 <div class=" hidden" id="domain-editor">
 
@@ -293,20 +288,16 @@
                                     </div>
 
 
-                                    <div class="row">
-                                        <div class="col-sm-12" style="margin-top: 10px;">
-                                        <#-- <div class="col-xs-12 text-center">
-                                             <div class="form-group">
-                                                 <a class="btn btn-success" onclick="saveSelectedDomain()">
-                                                     <span class="glyphicon glyphicon-floppy-disk"></span>Save as new Domain
-                                                 </a>-->
 
-                                            <div id="domains-buttons" class="hidden">
-                                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelected()">Delete selected domains from user</button>
-                                                <button type="button" class="btn btn-default btn-sm" onclick="redirectToDomains()" id="add-domain-btn">Add user to existing domain</button>
-                                            </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12" style="margin-top: 10px;">
 
+                                        <div id="domains-buttons" class="hidden" >
+                                            <button type="button" class="btn btn-danger btn-sm hidden" onclick="deleteSelected()" id="del-dom-btn">Delete selected domains from user</button>
+                                            <button type="button" class="btn btn-default btn-sm" onclick="redirectToDomains()" id="add-domain-btn">Add user to existing domain</button>
                                         </div>
+
                                     </div>
                                 </div>
 

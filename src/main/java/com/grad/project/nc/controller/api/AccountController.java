@@ -47,7 +47,9 @@ public class AccountController {
             if (user.getRoles().contains(roleDao.findByName("ROLE_ADMIN"))) {
                 profileLinks.add(new Link("Edit product types", "/admin/productTypes"));
                 profileLinks.add(new Link("Edit products", "/admin/products"));
-                profileLinks.add(new Link("Edit users", "/admin/users"));
+                profileLinks.add(new Link("Users", "/admin/users"));
+                profileLinks.add(new Link("Discounts", "/admin/discounts"));
+
             }
 
             if (user.getRoles().contains(roleDao.findByName("ROLE_CSR"))) {
