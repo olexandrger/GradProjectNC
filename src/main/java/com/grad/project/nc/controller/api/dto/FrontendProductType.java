@@ -1,7 +1,5 @@
 package com.grad.project.nc.controller.api.dto;
 
-import com.grad.project.nc.model.Category;
-import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
 import lombok.Builder;
 import lombok.Data;
@@ -39,14 +37,9 @@ public class FrontendProductType {
                 .isActive(getIsActive())
                 .productCharacteristics(getProductCharacteristics()
                         .stream()
-                        .map(fc -> ProductCharacteristic.builder()
-                                .productType(new ProductType(getProductTypeId()))
-                                .productCharacteristicId(fc.getProductCharacteristicId())
-                                .characteristicName(fc.getCharacteristicName())
-                                .measure(fc.getMeasure())
-                                .dataType(Category.builder().categoryId(fc.getDataTypeId()).build())
-                                .build())
+                        .map(fc -> fc.toModel(getProductTypeId()))
                         .collect(Collectors.toList()))
                 .build();
+
     }
 }
