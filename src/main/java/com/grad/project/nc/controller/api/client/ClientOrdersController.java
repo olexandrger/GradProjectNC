@@ -31,9 +31,14 @@ public class ClientOrdersController {
         try {
             long instanceId = Long.parseLong(params.get("instanceId"));
             ProductOrder order = function.apply(instanceId);
-            result.put("status", "success");
-            result.put("message", "Order created");
-            result.put("id", order.getProductOrderId());
+            if (order == null) {
+                result.put("status", "error");
+                result.put("message", "Can not create order");
+            } else {
+                result.put("status", "success");
+                result.put("message", "Order created");
+                result.put("id", order.getProductOrderId());
+            }
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
             result.put("status", "error");

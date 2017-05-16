@@ -1,8 +1,12 @@
 package com.grad.project.nc.service.orders;
 
+import com.grad.project.nc.controller.api.dto.FrontendOrder;
 import com.grad.project.nc.service.exceptions.ServiceSecurityException;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
+import com.grad.project.nc.service.notifications.EmailService;
+import com.grad.project.nc.service.security.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,9 +18,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.function.Supplier;
 
-//TODO security
+//TODO security of states changing
 
 @Service
+@Slf4j
 public class OrdersServiceImpl implements OrdersService {
 
     private UserDao userDao;
@@ -26,6 +31,8 @@ public class OrdersServiceImpl implements OrdersService {
     private ProductInstanceDao productInstanceDao;
     private CategoryDao categoryDao;
     private ProductDao productDao;
+    private UserService userService;
+    private EmailService emailService;
 
     private static final long INSTANCE_STATUS_CREATED = 9L;
     private static final long INSTANCE_STATUS_ACTIVATED = 10L;
@@ -36,7 +43,7 @@ public class OrdersServiceImpl implements OrdersService {
     private static final long ORDER_AIM_SUSPEND = 14L;
     private static final long ORDER_AIM_DEACTIVATE = 15L;
     private static final long ORDER_AIM_RESUME = 25L;
-    private static final long ORDER_AIM_MODIFY = 26L;
+//    private static final long ORDER_AIM_MODIFY = 26L;
 
     private static final long ORDER_STATUS_CREATED = 1L;
     private static final long ORDER_STATUS_IN_PROGRESS = 2L;
@@ -46,7 +53,7 @@ public class OrdersServiceImpl implements OrdersService {
     @Autowired
     public OrdersServiceImpl(UserDao userDao, ProductOrderDao orderDao, ProductRegionPriceDao productRegionPriceDao,
                              DomainDao domainDao, ProductInstanceDao productInstanceDao, CategoryDao categoryDao,
-                             ProductDao productDao) {
+                             ProductDao productDao, UserService userService, EmailService emailService) {
         this.userDao = userDao;
         this.orderDao = orderDao;
         this.productRegionPriceDao = productRegionPriceDao;
@@ -54,28 +61,34 @@ public class OrdersServiceImpl implements OrdersService {
         this.productInstanceDao = productInstanceDao;
         this.categoryDao = categoryDao;
         this.productDao = productDao;
-    }
-
-    private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!(auth instanceof AnonymousAuthenticationToken)) {
-            String username = ((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-            return userDao.findByEmail(username).orElseThrow((Supplier<RuntimeException>) () -> new ServiceSecurityException("User must be authorised to use this"));
-        } else {
-            throw new ServiceSecurityException("User must be authorised to use this");
-        }
+        this.userService = userService;
+        this.emailService = emailService;
     }
 
     private ProductOrder newOrder(long instanceId, long userId, long aimId) {
-        ProductOrder order = new ProductOrder();
+        ProductInstance instance = productInstanceDao.find(instanceId);
+        Category canceled = categoryDao.find(ORDER_STATUS_CANCELLED);
+        Category completed = categoryDao.find(ORDER_STATUS_COMPLETED);
+        boolean canCreate = instance.getProductOrders().stream()
+                .allMatch((order) -> order.getStatus().equals(canceled) || order.getStatus().equals(completed));
+        if (!canCreate) {
+            return null;
+        } else {
 
-        order.setOpenDate(OffsetDateTime.now());
-        order.setOrderAim(categoryDao.find(aimId));
-        order.setProductInstance(productInstanceDao.find(instanceId));
-        order.setUser(userDao.find(userId));
-        order.setStatus(categoryDao.find(ORDER_STATUS_CREATED));
+            ProductOrder order = new ProductOrder();
 
-        return orderDao.add(order);
+            order.setOpenDate(OffsetDateTime.now());
+            order.setOrderAim(categoryDao.find(aimId));
+            order.setProductInstance(instance);
+            order.setUser(userDao.find(userId));
+            order.setStatus(categoryDao.find(ORDER_STATUS_CREATED));
+
+            order = orderDao.add(order);
+
+            emailService.sendNewOrderEmail(order);
+
+            return order;
+        }
     }
 
     @Override
@@ -98,12 +111,23 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public ProductOrder newSuspensionOrder(long instanceId, long userId) {
-        return newOrder(instanceId, userId, ORDER_AIM_SUSPEND);
+        ProductOrder order = newOrder(instanceId, userId, ORDER_AIM_SUSPEND);
+        if (order != null) {
+            completeOrder(order.getProductOrderId());
+        }
+
+        return order;
     }
 
     @Override
     public ProductOrder newContinueOrder(long instanceId, long userId) {
-        return newOrder(instanceId, userId, ORDER_AIM_RESUME);
+        ProductOrder order = newOrder(instanceId, userId, ORDER_AIM_RESUME);
+        if (order != null) {
+            completeOrder(order.getProductOrderId());
+            log.info("Completing too");
+        }
+
+        return order;
     }
 
     @Override
@@ -113,23 +137,23 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public ProductOrder newCreationOrder(long productId, long domainId) {
-        return newCreationOrder(productId, domainId, getCurrentUser().getUserId());
+        return newCreationOrder(productId, domainId, userService.getCurrentUser().getUserId());
     }
 
     @Override
     public ProductOrder newSuspensionOrder(long instanceId) {
-        return newSuspensionOrder(instanceId, getCurrentUser().getUserId());
+        return newSuspensionOrder(instanceId, userService.getCurrentUser().getUserId());
 
     }
 
     @Override
     public ProductOrder newDeactivationOrder(long instanceId) {
-        return newDeactivationOrder(instanceId, getCurrentUser().getUserId());
+        return newDeactivationOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
     @Override
     public ProductOrder newContinueOrder(long instanceId) {
-        return newContinueOrder(instanceId, getCurrentUser().getUserId());
+        return newContinueOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
     @Override
@@ -137,7 +161,7 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = orderDao.find(orderId);
 
         order.setStatus(categoryDao.find(ORDER_STATUS_IN_PROGRESS));
-        order.setResponsible(getCurrentUser());
+        order.setResponsible(userService.getCurrentUser());
         orderDao.update(order);
     }
 
@@ -175,11 +199,13 @@ public class OrdersServiceImpl implements OrdersService {
 
         productInstanceDao.update(order.getProductInstance());
         orderDao.update(order);
+
+        emailService.sendInstanceStatusChangedEmail(order.getProductInstance());
     }
 
     @Override
     public List<ProductOrder> getUserOrders(long size, long offset) {
-        return orderDao.findByUserId(getCurrentUser().getUserId(), size, offset);
+        return orderDao.findByUserId(userService.getCurrentUser().getUserId(), size, offset);
     }
 
     @Override
@@ -195,6 +221,10 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     public List<ProductOrder> getOrdersByProductInstance(long id, long size, long offset) {
         return orderDao.findByProductInstanceId(id, size, offset);
+    }
+    @Override
+    public Collection<ProductOrder> getOpenInstanceOrders(long instanceId, long size, long offset) {
+        return orderDao.findOpenOrdersByInstanseId(instanceId, size, offset);
     }
 
     @Override

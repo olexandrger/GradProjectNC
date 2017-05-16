@@ -91,6 +91,14 @@ public class RegionDaoImpl extends AbstractDao implements RegionDao {
         return findOne(query, new RegionRowMapper(), productRegionPriceId);
     }
 
+    @Override
+    public Region findByName(String regionName) {
+        String query = "SELECT \"region_id\", \"region_name\" "+
+                "FROM \"region\" " +
+                "WHERE \"region_name\" = ?";
+        return findOne(query, new RegionRowMapper(), regionName);
+    }
+
     private class RegionRowMapper implements RowMapper<Region> {
 
         @Override

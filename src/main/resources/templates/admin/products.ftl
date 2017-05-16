@@ -37,6 +37,9 @@
         <div class="row">
             <div class="col-sm-3 col-sm-offset-1">
                 <div class="list-group" id="products-list"></div>
+                <span class="input-group-btn">
+                <button type="button" onclick="this.style.visibility='hidden'; loadAllProducts();" class="btn btn-info btn-block"> show all</button>
+                    </span>
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="New product" id="new-product-name">
                     <span class="input-group-btn">

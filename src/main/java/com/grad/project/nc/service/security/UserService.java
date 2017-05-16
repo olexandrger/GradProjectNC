@@ -8,5 +8,10 @@ import java.util.List;
 
 public interface UserService extends UserDetailsService {
     User createUser(String fistName, String lastName, String email, String password, String phone, List<String> roles);
+
+    User getCurrentUser();
+
     User findByEMail(String eMail);
+
+    Boolean update(User user);
 }

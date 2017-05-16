@@ -4,6 +4,7 @@ import com.grad.project.nc.model.*;
 import com.grad.project.nc.model.proxy.UserProxy;
 import com.grad.project.nc.persistence.AbstractDao;
 import com.grad.project.nc.persistence.UserDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Slf4j
 public class UserDaoImpl extends AbstractDao implements UserDao {
 
     private static final String PK_COLUMN_NAME = "user_id";
@@ -44,12 +46,39 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     }
 
     @Override
+    @Transactional
     public User update(User user) {
         String updateQuery = "UPDATE \"user\" SET \"email\" = ?, \"password\" = ?, " +
                 "\"first_name\" = ?, \"last_name\" = ?, \"phone_number\" = ? WHERE \"user_id\" = ?";
 
         executeUpdate(updateQuery, user.getEmail(), user.getPassword(),
                 user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getUserId());
+
+        deleteUserRoles(user.getUserId());
+        persistUserRoles(user);
+
+        deleteUserDomains(user.getUserId());
+        persistUserDomains(user);
+
+
+        return user;
+    }
+    @Transactional
+    public User updateWithoutPassword(User user) {
+        String updateQuery = "UPDATE \"user\" SET \"email\" = ? ," +
+                "\"first_name\" = ?, \"last_name\" = ?, \"phone_number\" = ? WHERE \"user_id\" = ?";
+
+        log.info("Updating user with email: " + user.getEmail() + ", First name: " + user.getFirstName() + ", Phone: "
+                + user.getPhoneNumber() + ", ID= " + user.getUserId());
+
+        executeUpdate(updateQuery, user.getEmail(),
+                user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getUserId());
+
+        deleteUserRoles(user.getUserId());
+        persistUserRoles(user);
+
+        deleteUserDomains(user.getUserId());
+        persistUserDomains(user);
 
         return user;
     }
@@ -97,6 +126,14 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     }
 
     @Override
+    public void deleteUserDomains(Long userId) {
+        String deleteQuery = "DELETE FROM \"user_domain\" WHERE \"user_id\" = ?";
+
+        executeUpdate(deleteQuery, userId);
+    }
+
+
+    @Override
     @Transactional
     public void persistUserRoles(User user) {
         String insertQuery = "INSERT INTO \"user_role\" (\"user_id\", \"role_id\") VALUES(?, ?)";
@@ -107,6 +144,19 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
         }
 
         batchUpdate(insertQuery, batchArgs);
+    }
+
+    @Override
+    public void persistUserDomains(User user) {
+        String insertQuery = "INSERT INTO \"user_domain\" (\"user_id\", \"domain_id\") VALUES(?, ?)";
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        for (Domain domain : user.getDomains()) {
+            batchArgs.add(new Object[]{user.getUserId(), domain.getDomainId()});
+        }
+
+        batchUpdate(insertQuery, batchArgs);
+
     }
 
     @Override
@@ -180,6 +230,23 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
 
         executeUpdate(deleteQuery, userId, roleId);
     }
+
+    @Override
+    public void addUserDomain(Long userId, Long domainId) {
+        String insertQuery = "INSERT INTO \"user_domain\" (\"user_id\", \"domain_id\") VALUES(?, ?)";
+
+        executeUpdate(insertQuery, userId, domainId);
+
+    }
+
+    @Override
+    public void deleteUserDomain(Long userId, Long domainId) {
+        String deleteQuery = "DELETE FROM \"user_domain\" WHERE \"user_id\" = ? AND \"domain_id\" = ?";
+
+        executeUpdate(deleteQuery, userId, domainId);
+
+    }
+
 
     private class UserRowMapper implements RowMapper<User> {
 

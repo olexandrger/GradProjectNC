@@ -23,6 +23,11 @@ public class InstanceServiceImpl implements InstanceService {
     }
 
     @Override
+    public boolean isInstanceOwnedBy(long instanceId, long userId) {
+        return productInstanceDao.find(instanceId).getDomain().getUsers().stream().anyMatch(user -> user.getUserId() == userId);
+    }
+
+    @Override
     public Collection<ProductInstance> getByDomainId(Long domainId) {
         return productInstanceDao.findByDomainId(domainId);
     }
