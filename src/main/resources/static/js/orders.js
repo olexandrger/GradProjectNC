@@ -333,7 +333,7 @@ function createNewOrderFromModal() {
         data: JSON.stringify({
             instanceId: $("#new-order-instanse").val(),
             domainId: $("#new-order-domain").val(),
-            userId:selectUserId
+            userId: selectUserId
         }),
         success: function (data) {
             loadOrders();
@@ -348,9 +348,9 @@ function createNewOrderFromModal() {
 
 function getUserIdByMail(email) {
     $.ajax({
-        url: "/api/csr/users/find/"+email+"/",
+        url: "/api/csr/users/find/" + email + "/",
         success: function (data) {
-           selectUserId = data.userId;
+            selectUserId = data.userId;
         },
         error: function () {
             console.error(email)
@@ -384,7 +384,7 @@ function createNewOrderFromModal() {
         data: JSON.stringify({
             instanceId: $("#new-order-instanse").val(),
             domainId: $("#new-order-domain").val(),
-            userId:selectUserId
+            userId: selectUserId
         }),
         success: function (data) {
             loadOrders();
@@ -411,7 +411,7 @@ function loadDomainsInModal(keyCode) {
     $.ajax({
         url: "/api/csr/domains/find/" + $("#new-order-user-email").val() + "/",
         success: function (data) {
-            if(data.status == "not found"){
+            if (data.status == "not found") {
                 $("#new-order-modal-error-msg").html("<strong>Error! </strong> E-mail not found!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
                 $("#new-order-domain").empty();
@@ -431,7 +431,7 @@ function loadDomainsInModal(keyCode) {
                 var options = $("#new-order-domain");
                 data.domains.forEach(function (item, i) {
                     var option = document.createElement("option");
-                    if(i==0){
+                    if (i == 0) {
                         option.setAttribute("selected", "selected");
                     }
                     option.setAttribute("value", item.domainId);
@@ -489,7 +489,7 @@ function loadProductInstancesInModal() {
                 data.forEach(function (item, i) {
                     var option = document.createElement("option");
                     option.setAttribute("value", item.instanceId);
-                    if(i==0){
+                    if (i == 0) {
                         option.setAttribute("selected", "selected");
                     }
                     option.appendChild(document.createTextNode(item.product.productName));
@@ -523,7 +523,7 @@ function loadOrderAaimsInModal() {
     $.ajax({
         url: "/api/csr/category/getstatus/frominstance/" + $("#new-order-instanse").val() + "/",
         success: function (data) {
-            if(data.openOrders == "true"){
+            if (data.openOrders == "true") {
                 $("#new-order-aim").empty();
                 $("#new-order-aim").attr("disabled", "true");
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> The instance has at least one open order!");
