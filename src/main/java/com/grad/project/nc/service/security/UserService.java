@@ -4,6 +4,7 @@ import com.grad.project.nc.model.User;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface UserService extends UserDetailsService {
@@ -14,4 +15,9 @@ public interface UserService extends UserDetailsService {
     User findByEMail(String eMail);
 
     Boolean update(User user);
-}
+
+    public List<User> findAllUsers();
+
+    public List<User> findUsersByRegionId(int id);
+
+    }

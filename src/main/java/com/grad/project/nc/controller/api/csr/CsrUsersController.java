@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by DeniG on 10.05.2017.
@@ -29,5 +30,16 @@ public class CsrUsersController {
     @RequestMapping(value = "/find/{mail}", method = RequestMethod.GET)
     FrontendUser findUserByEmail(@PathVariable String mail){
         return FrontendUser.fromEntity(userService.findByEMail(mail));
+    }
+
+
+    @RequestMapping(value = "/find/all", method = RequestMethod.GET)
+    Collection<FrontendUser> findAllUsers(){
+        return userService.findAllUsers().stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/find/all/region/{region}/", method = RequestMethod.GET)
+    Collection<FrontendUser> findUsersByRegion(@PathVariable int region){
+        return userService.findUsersByRegionId(region).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
     }
 }

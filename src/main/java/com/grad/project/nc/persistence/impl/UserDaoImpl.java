@@ -100,6 +100,17 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     }
 
     @Override
+    public List<User> findUsersByRegionId(int id) {
+        String findAllQuery = "select user_id, email, password, first_name, last_name, phone_number from \"user\" where user_id in (\n" +
+                "select user_id from user_domain where domain_id in\n" +
+                "\t(select domain_id from domain where address_id in \n" +
+                "\t\t(SELECT address_id from address where location_id in \n" +
+                "\t\t\t(select location_id from location where region_id = " + id + "))));";
+
+        return findMultiple(findAllQuery, new UserRowMapper());
+    }
+
+    @Override
     public List<User> findByDomainId(Long domainId) {
         String query = "SELECT u.\"user_id\", u.\"email\", u.\"password\", u.\"first_name\", " +
                 "u.\"last_name\", u.\"phone_number\" " +

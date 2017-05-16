@@ -29,6 +29,7 @@
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#tab1" data-toggle="tab">Create new user</a></li>
                     <li><a href="#tab2" data-toggle="tab">Edit existing user</a></li>
+                    <li><a href="#tab3" data-toggle="tab" onclick="loadRegions(); hideUserInfo()">Users</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab1">
@@ -164,7 +165,7 @@
 
                                     <div class="form-group html-editor-align-right">
                                         <label for="email">Load user</label>
-                                        <input type="email" class="form-control" name="email" placeholder="Email">
+                                        <input type="email" class="form-control" id="tab2-email" name="email" placeholder="Email">
                                         <div class="form-group">
                                             <a class="btn btn-success"  onclick="getUser()">
                                                 Load
@@ -311,6 +312,54 @@
                         </div>
 
 
+                    </div>
+                    <div class="tab-pane" id="tab3">
+                        <h3>Users</h3>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="new-region">Region</label>
+                                    <select class="form-control" name="new-region" id="new-region"
+                                            onchange="loadUsers()">
+                                    </select>
+                                </div>
+                                <div class="list-group" id="csr-users-list">
+
+                                </div>
+                            </div>
+                            <div class="col-sm-8" id="user-info">
+                                <div id="registration-header-alert1"></div>
+                                <form id="user-info-form">
+                                    <div class="form-group">
+                                        <label for="userFirstName">First name</label>
+                                        <input type="text" class="form-control" id="userFirstName" name="userFirstName" placeholder="First name" disabled="disabled">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="userLastName">Last name</label>
+                                        <input type="text" class="form-control" id="userLastName" name="userLastName" placeholder="Last name" disabled="disabled">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="userEmail">Email</label>
+                                        <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Email" disabled="disabled">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="userPhone">Phone</label>
+                                        <input type="text" class="form-control" id="userPhone" name="userPhone" placeholder="Phone" disabled="disabled">
+                                    </div>
+                                </form>
+                                <div class="row">
+                                    <div class="col-sm-12" style="margin-top: 10px;">
+                                        <div class="col-xs-12 text-center">
+                                            <div class="form-group">
+                                                <a class="btn btn-success" onclick="editUser()">
+                                                    Edit user
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
