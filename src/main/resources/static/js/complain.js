@@ -3,14 +3,25 @@
  */
 
 var selectedComplain = -1;
-var orderListSize = 10;
-var orderListCurrentPage = 0;
+var complaintListSize = 10;
+var complaintListCurrentPage = 0;
 
-function loadComplains() {
+function loadComplaints() {
+$("#complain-list").empty();
+$("#no-complain-selected-alert").removeAttr("hidden");
+    $.ajax({
+        url: "/api/pmg/complaint/get/all/size/"+(complaintListSize+1)+"/offset/"+complaintListSize*complaintListCurrentPage,
+        success:function () {
+
+        },
+        error:{
+
+        }
+    });
 
 }
 
 
 $(document).ready(function () {
-    loadComplains();
+    loadComplaints();
 });

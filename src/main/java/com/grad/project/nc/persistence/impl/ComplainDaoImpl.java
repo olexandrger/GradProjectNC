@@ -81,6 +81,14 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
     }
 
     @Override
+    public List<Complain> findAll(long size, long offset) {
+        String findAllQuery = "SELECT \"complain_id\", \"user_id\", \"product_instance_id\", " +
+                "\"complain_title\", \"content\", \"status_id\", \"responsible_id\", \"response\", " +
+                "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\"";
+        return findMultiplePage(findAllQuery, new ComplainRowMapper(), size, offset);
+    }
+
+    @Override
     public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"complain\" WHERE \"complain_id\" = ?";
 

@@ -16,8 +16,4 @@ public class CsrPages {
         return "/admin/report";
     }
 
-    @RequestMapping("/csr/complains")
-    public  String complainspage(){
-        return ("/csr/complains");
-    }
 }

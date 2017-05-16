@@ -53,9 +53,12 @@ public class AccountController {
             if (user.getRoles().contains(roleDao.findByName("ROLE_CSR"))) {
                 profileLinks.add(new Link("Orders", "/csr/orders"));
                 profileLinks.add(new Link("Reports", "/csr/reports"));
-                profileLinks.add(new Link("Complains", "/csr/complains"));
+               // profileLinks.add(new Link("Complains", "/csr/complains"));
             }
 
+            if (user.getRoles().contains(roleDao.findByName("ROLE_PMG"))) {
+                profileLinks.add(new Link("Complains", "/pmg/complains"));
+            }
             result.put("profileLinks", profileLinks);
         } else {
             result.put("authenticated", "false");

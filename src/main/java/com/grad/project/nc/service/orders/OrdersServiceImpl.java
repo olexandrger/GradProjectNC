@@ -74,7 +74,6 @@ public class OrdersServiceImpl implements OrdersService {
         Category completed = categoryDao.find(ORDER_STATUS_COMPLETED);
         boolean canCreate = instance.getProductOrders().stream()
                 .allMatch((order) -> order.getStatus().equals(canceled) || order.getStatus().equals(completed));
-
         if (!canCreate) {
             return null;
         } else {
