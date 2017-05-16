@@ -41,8 +41,11 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
     @Transactional
     public ProductType add(ProductType productType) {
         productTypeDao.add(productType);
-        productCharacteristicDao.persistBatch(productType.getProductCharacteristics()
-        );
+
+        productType.getProductCharacteristics()
+                .forEach(c -> c.setProductType(new ProductType(productType.getProductTypeId())));
+
+        productCharacteristicDao.persistBatch(productType.getProductCharacteristics());
 
         return productType;
     }
