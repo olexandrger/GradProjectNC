@@ -36,6 +36,10 @@
     padding-left: 1em;
 }
 
+#ambiguous-regional-price-alert {
+    margin-top: 5px;
+}
+
 span.orders-list {
     margin-left: 10px;
 }

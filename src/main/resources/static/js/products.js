@@ -99,41 +99,38 @@ function constructNumberOrStringInputElement(measure, value) {
 }
 
 function selectProduct(index) {
-    var productList = $("#products-list");
+    console.log("selecting product with id" + productsCache[index].productId);
 
+    var productList = $("#products-list");
     if (currentSelected == -1) {
         $("#products-editor").removeClass("hidden");
     } else {
         productList.find("a").removeClass("active");
     }
-
-    currentSelected = index;
     productList.find("a:nth-child(" + (index + 1) + ")").addClass("active");
+    currentSelected = index;
 
-    $("#product-name-input").val(productsCache[currentSelected].productName);
     $("#product-characteristics").empty();
     $(".cities-container").remove();
 
-    $("#product-description-input").val("");
-    $("input:radio[name=product-status]")
-        .filter("[value=true]").prop('checked', true);
-
     var typeSelector = $("#product-type-selector");
-    typeSelector.val([]);
     typeSelector.prop("disabled", false);
-    console.log("selecting product with id" + productsCache[currentSelected].productId);
+
+    $("#product-name-input").val(productsCache[currentSelected].productName);
+    $("#product-description-input").val(productsCache[currentSelected].productDescription);
+    $('input:radio[name=product-status]').filter('[value=' + productsCache[currentSelected].isActive + ']')
+        .prop('checked', true);
+
     if (productsCache[currentSelected].productId != null) {
         typeSelector.val(productsCache[currentSelected].productTypeId);
-        typeSelector.prop("disabled", productsCache[currentSelected].productId);
+        typeSelector.prop("disabled", true);
+
         displayCharacteristics();
-        $("#product-description-input").val(productsCache[currentSelected].productDescription);
+
         productsCache[currentSelected].prices.forEach(function (prp) {
             console.log(JSON.stringify(prp));
             addRegionalPrice(prp.priceId, prp.regionId, prp.price);
         });
-
-        $('input:radio[name=product-status]').filter('[value=' + productsCache[currentSelected].isActive + ']')
-            .prop('checked', true);
     }
 }
 
@@ -151,13 +148,10 @@ function saveSelectedProduct() {
     newProduct.isActive = ($('input[name=product-status]:checked').val() == 'true');
 
     newProduct.prices = [];
-    $(".cities-container").each(function () {
-        newProduct.prices.push({
-            priceId: $(this).find('input[name="priceId"]').val(),
-            regionId: $(this).find('select[name="regionId"]').val(),
-            price: $(this).find('input[name="region-price"]').val()
-        });
-    });
+    var resultOfExtracting = extractPrices(newProduct.prices);
+    if (!resultOfExtracting) {
+        return;
+    }
 
     newProduct.productCharacteristicValues = [];
     $("#product-characteristics").find(".product-characteristic-value-input").each(function () {
@@ -177,9 +171,9 @@ function saveSelectedProduct() {
                 break;
         }
         newProduct.productCharacteristicValues.push(value);
-
-        console.log("Object to be sent from client: " + JSON.stringify(newProduct));
     });
+
+    console.log("Object to be sent from client: " + JSON.stringify(newProduct));
 
     $.ajax({
         type: 'POST',
@@ -243,6 +237,39 @@ function saveSelectedProduct() {
     });
 }
 
+function extractPrices(prices) {
+    var citiesContainer = $(".cities-container");
+
+    for (var i = 0; i < citiesContainer.length; i++) {
+
+        if (prices.some(function (p) {
+                return +p.regionId == +$(citiesContainer[i]).find('select[name="regionId"]').val();
+            })) {
+            $("#ambiguous-regional-price-alert").remove();
+            console.error("Error: Ambiguous regional price");
+
+            $('<div id="ambiguous-regional-price-alert" class="alert alert-danger" role="alert">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                "Ambiguous regional price. Please, specify only one price per region for product</div>")
+                .delay(4000)
+                .fadeOut(function () {
+                    $(this).remove();
+                })
+                .insertAfter($("#product-general-editor .cities-container:last-child"));
+
+            return false;
+        }
+
+        prices.push({
+            priceId: $(citiesContainer[i]).find('input[name="priceId"]').val(),
+            regionId: $(citiesContainer[i]).find('select[name="regionId"]').val(),
+            price: +$(citiesContainer[i]).find('input[name="region-price"]').val()
+        });
+    }
+
+    return true;
+}
+
 function addRegionalPrice(priceId, regionId, price) {
     priceId = priceId != undefined ? priceId : null;
     price = price != undefined ? price : '';
@@ -295,7 +322,7 @@ function addProduct() {
             productId: null,
             productName: productName,
             productDescription: null,
-            isActive: null,
+            isActive: false,
             productTypeId: null,
             productCharacteristicValues: [],
             prices: []
@@ -304,7 +331,8 @@ function addProduct() {
         selectProduct(index);
     }
     else {
-        // $("#new-product-alert").remove();
+         $("#new-product-alert").remove();
+
         var alertDiv = $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
             '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
             'Please, enter product name</div>');
