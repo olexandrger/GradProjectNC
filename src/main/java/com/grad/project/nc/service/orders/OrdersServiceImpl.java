@@ -1,25 +1,16 @@
 package com.grad.project.nc.service.orders;
 
-import com.grad.project.nc.controller.api.dto.FrontendOrder;
-import com.grad.project.nc.service.exceptions.ServiceSecurityException;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 
 //TODO security of states changing
 
@@ -74,7 +65,6 @@ public class OrdersServiceImpl implements OrdersService {
         Category completed = categoryDao.find(ORDER_STATUS_COMPLETED);
         boolean canCreate = instance.getProductOrders().stream()
                 .allMatch((order) -> order.getStatus().equals(canceled) || order.getStatus().equals(completed));
-
         if (!canCreate) {
             return null;
         } else {
@@ -105,7 +95,7 @@ public class OrdersServiceImpl implements OrdersService {
 
         instance.setDomain(domain);
         instance.setStatus(category);
-        instance.setPrice(productRegionPriceDao.findByRegionIdAndProductId(
+        instance.setPrice(productRegionPriceDao.find(
                 domain.getAddress().getLocation().getRegion().getRegionId(), productId));
 
         instance = productInstanceDao.add(instance);
@@ -235,7 +225,7 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = orderDao.find(orderId);
         Domain domain = domainDao.find(domainId);
 
-        ProductRegionPrice price = productRegionPriceDao.findByRegionIdAndProductId(
+        ProductRegionPrice price = productRegionPriceDao.find(
                 domain.getAddress().getLocation().getRegion().getRegionId(), productId);
 
         if (price == null) {

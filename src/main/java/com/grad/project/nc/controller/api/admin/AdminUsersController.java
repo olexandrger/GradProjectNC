@@ -106,7 +106,9 @@ public class AdminUsersController {
         user.setPassword(frontUser.getPassword());
         user.setPhoneNumber(frontUser.getPhoneNumber());
         user.setRoles(frontUser.getRoles());
-        //user.setDomains(frontUser.getDomains());
+        user.setDomains(frontUser.getDomains().stream()
+                .map(frontendDomain -> Domain.builder().domainId(frontendDomain.getDomainId()).build())
+                .collect(Collectors.toList()));
 
         return user;
     }

@@ -1,7 +1,6 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.ProductCharacteristic;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -11,9 +10,11 @@ public interface ProductCharacteristicDao extends CrudDao<ProductCharacteristic>
 
     List<ProductCharacteristic> findByDataTypeId(Long dataTypeId);
 
-    @Transactional
-    void persistProductTypeProductCharacteristics(Long productTypeId,
-                                                  List<ProductCharacteristic> productCharacteristics);
+    void updateBatch(List<ProductCharacteristic> productCharacteristics);
+
+    void deleteBatch(List<ProductCharacteristic> productCharacteristics);
+
+    void persistBatch(List<ProductCharacteristic> productCharacteristics);
 
     void deleteByProductTypeId(Long productTypeId);
 }

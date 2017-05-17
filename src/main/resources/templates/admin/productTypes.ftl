@@ -35,9 +35,9 @@
     <div class="row">
         <div class=" col-sm-3 col-sm-offset-1">
             <div class="list-group" id="product-types-list"></div>
-            <span class="input-group-btn">
-                <button type="button" onclick="this.style.visibility='hidden'; loadAllProductTypes();" class="btn btn-info btn-block"> show all</button>
-                    </span>
+            <#--<span class="input-group-btn">-->
+                <#--<button type="button" onclick="this.style.visibility='hidden'; loadAllProductTypes();" class="btn btn-info btn-block"> show all</button>-->
+                    <#--</span>-->
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="New type" id="new-product-type-name">
                 <span class="input-group-btn">
@@ -69,7 +69,7 @@
                     </div>
                     <div class="form-group">
                         <label>Characteristics</label>
-                        <a class="btn btn-default" onclick="addProductValue()">
+                        <a class="btn btn-default" onclick="addProductCharacteristic()">
                             <span class="glyphicon glyphicon-plus"></span>Add
                         </a>
                     </div>
@@ -79,14 +79,9 @@
                 <div class="col-sm-12" style="margin-top: 10px;">
                     <div class="col-xs-12 text-center">
                         <div class="form-group">
-                            <a class="btn btn-success" onclick="saveSelected()">
+                            <a class="btn btn-success" onclick="saveSelectedProductType()">
                                 <span class="glyphicon glyphicon-floppy-disk"></span>Save
                             </a>
-
-                            <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
-                                <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
-                            <#--</a>-->
-
                         </div>
                     </div>
                 </div>

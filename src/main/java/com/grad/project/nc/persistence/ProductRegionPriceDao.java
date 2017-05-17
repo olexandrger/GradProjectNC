@@ -1,7 +1,6 @@
 package com.grad.project.nc.persistence;
 
 import com.grad.project.nc.model.ProductRegionPrice;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -11,11 +10,13 @@ public interface ProductRegionPriceDao extends CrudDao<ProductRegionPrice> {
 
     void deleteDiscounts(Long productRegionPriceId);
 
-    @Transactional
     void persistDiscounts(ProductRegionPrice productRegionPrice);
 
-    @Transactional
-    void persistBatch(Long productId, List<ProductRegionPrice> prices);
+    void persistBatch(List<ProductRegionPrice> prices);
+
+    void updateBatch(List<ProductRegionPrice> prices);
+
+    void deleteBatch(List<ProductRegionPrice> prices);
 
     void deleteByProductId(Long productId);
 
@@ -23,5 +24,5 @@ public interface ProductRegionPriceDao extends CrudDao<ProductRegionPrice> {
 
     List<ProductRegionPrice> findByRegionId(Long regionId);
 
-    ProductRegionPrice findByRegionIdAndProductId(Long regionId, Long priceId);
+    ProductRegionPrice find(Long regionId, Long priceId);
 }

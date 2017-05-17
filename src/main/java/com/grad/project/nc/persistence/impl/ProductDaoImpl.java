@@ -105,6 +105,17 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
     }
 
     @Override
+    public List<Product> findActiveByRegionId(Long regionId) {
+        String query = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
+                "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
+                "JOIN \"product_region_price\" prp " +
+                "ON p.\"product_id\" = prp.\"product_id\" " +
+                "WHERE prp.\"region_id\" =? AND p.\"is_active\" = true";
+
+        return findMultiple(query, new ProductRowMapper(), regionId);
+    }
+
+    @Override
     public Product findByName(String productName) {
         String query = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\" WHERE \"product_name\"=?";

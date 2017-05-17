@@ -1,188 +1,183 @@
 var currentSelected = -1;
-var numberOfAdded = 0;
 
-var productTypesData;
-var productsData;
+var productTypesCache;
+var productsCache;
 
-var regionsData;
 var regionsHtml;
 
-function getProductTypeData(id) {
-    var result;
-
-    productTypesData.forEach(function (item) {
-       if (item.id == id) {
-           result = item;
-       }
+function getProductType(productTypeId) {
+    return productTypesCache.find(function (productType) {
+        return productType.productTypeId == productTypeId;
     });
-
-    return result;
 }
 
-function getCharacteristicValue(id) {
-    var result;
-    productsData[currentSelected].productCharacteristicValues.forEach(function (item) {
-        if (item.productCharacteristicId == id) {
-            result = item;
+function getProductCharacteristicValue(productCharacteristicId) {
+    return productsCache[currentSelected].productCharacteristicValues.find(function (value) {
+        return value.productCharacteristicId == productCharacteristicId;
+    });
+}
+
+function displayCharacteristics() {
+    var productType = getProductType($("#product-type-selector").val());
+    var ProductCharacteristicValueList = $("#product-characteristics");
+    ProductCharacteristicValueList.empty();
+
+    productType.productCharacteristics.forEach(function (productCharacteristic) {
+        var value = null;
+        var value_id = null;
+        var productCharacteristicValue = getProductCharacteristicValue(productCharacteristic.productCharacteristicId);
+        if (productCharacteristicValue != undefined) {
+            value_id = productCharacteristicValue.valueId;
+            switch (productCharacteristic.dataType.categoryName) {
+                case 'NUMBER':
+                    value = productCharacteristicValue.numberValue;
+                    break;
+                case 'STRING':
+                    value = productCharacteristicValue.stringValue;
+                    break;
+                case 'DATE':
+                    value = productCharacteristicValue.dateValue;
+            }
+        }
+
+        var valueInput = (productCharacteristic.dataType.categoryName =='DATE') ?
+            constructDateInputElement() :
+            constructNumberOrStringInputElement(productCharacteristic.measure, value != null ? value : '');
+
+        var html =
+            '<div class="product-characteristic-value-input col-sm-12">' +
+                '<label>' + productCharacteristic.characteristicName + '</label>' +
+                '<div class="input-group col-sm-12">' +
+                    '<input type="hidden" name="value-id" value="' + value_id + '"/>' +
+                    '<input type="hidden" name="characteristic-id" value="' + productCharacteristic.productCharacteristicId + '"/>' +
+                    '<input type="hidden" name="data-type" value="' + productCharacteristic.dataType.categoryName + '"/>' +
+                    valueInput +
+                '</div>' +
+            '</div>';
+
+        ProductCharacteristicValueList.append($(html));
+
+        if (productCharacteristic.dataType.categoryName == 'DATE') {
+            setDateTimePicker(value);
         }
     });
-
-    return result;
 }
 
-function javaToJsDate(date) {
-    function addNumber(number) {
-        var result = "";
-        if (number < 10)
-            result += '0';
-        result += number;
-        return result;
+function setDateTimePicker(dateValue) {
+    $('.product-characteristic-value-input .container:last-child .date').datetimepicker();
+    if (dateValue != null) {
+        $('.product-characteristic-value-input .container:last-child .date').data("DateTimePicker").date(moment.unix(dateValue));
     }
-    var value = date[0] + '-' + addNumber(date[1]) + '-' + addNumber(date[2]) + 'T' + addNumber(date[3]) + ':' + addNumber(date[4]) + ':' + addNumber(date[5]);
-    return value;
 }
 
-function changeCharacteristics() {
-    var data = getProductTypeData($("#product-type-selector").val());
+function constructDateInputElement() {
+    return '<div class="container col-sm-12">' +
+            '<div class="row">' +
+                // '<div class="col-sm-6">' +
+                    '<div class="form-group">' +
+                        '<div class="input-group date">' +
+                            '<input type="text" class="form-control " name="characteristic-value"/>' +
+                            '<span class="input-group-addon">' +
+                                '<span class="glyphicon glyphicon-calendar">' +
+                                '</span>' +
+                            '</span>' +
+                        '</div>' +
+                    '</div>' +
+                // '</div>' +
+            '</div>' +
+        '</div>';
+}
 
-    var list = $("#product-characteristics");
-    list.empty();
-    if (data != undefined) {
-        data.characteristics.forEach(function (item) {
+function constructNumberOrStringInputElement(measure, value) {
+    var measureHtml = '';
+    if (measure != undefined && measure != "") {
+        measureHtml = '<span class="input-group-addon characteristic-measure-span text-left">' +
+            measure + '</span>';
+    }
 
-            var measureHtml = "";
+    return '<input type="text" class="form-control" placeholder="value" value="'
+        + value + '" name="characteristic-value">' + measureHtml;
+}
 
-            if (item.measure != undefined && item.measure != "") {
-                measureHtml = '<span class="input-group-addon characteristic-measure-span text-left">' + item.measure + '</span>';
-            }
+function selectProduct(index) {
+    console.log("selecting product with id" + productsCache[index].productId);
 
+    var productList = $("#products-list");
+    if (currentSelected == -1) {
+        $("#products-editor").removeClass("hidden");
+    } else {
+        productList.find("a").removeClass("active");
+    }
+    productList.find("a:nth-child(" + (index + 1) + ")").addClass("active");
+    currentSelected = index;
 
-            var inputType = "text";
-            if (item.dataTypeId == 23)
-                inputType = "datetime-local";
+    $("#product-characteristics").empty();
+    $(".cities-container").remove();
 
-            var value = "";
-            var characteristicValue = getCharacteristicValue(item.id);
-            // console.log(characteristicValue);
-            if (characteristicValue != undefined) {
-                if (item.dataTypeId == 1) {
-                    value = characteristicValue.numberValue;
-                } else if (item.dataTypeId == 2) {
-                    value = javaToJsDate(characteristicValue.dateValue);
-                } else if (item.dataTypeId) {
-                    value = characteristicValue.stringValue;
-                }
-            }
+    var typeSelector = $("#product-type-selector");
+    typeSelector.val([]);
+    typeSelector.prop("disabled", false);
 
-            var html =
-                '<div class="product-characteristic-value-input col-sm-12">' +
-                '<label>' + item.name + '</label>' +
-                '<div class="input-group col-sm-12">' +
-                '<input type="hidden" name="characteristic-id" value="' + item.id + '"/>' +
-                '<input type="' + inputType + '" class="form-control" placeholder="value" value="'+ value +  '" name="characteristic-value">' +
-                measureHtml +
-                '</div>' +
-                '</div>';
+    $("#product-name-input").val(productsCache[currentSelected].productName);
+    $("#product-description-input").val(productsCache[currentSelected].productDescription);
+    $('input:radio[name=product-status]').filter('[value=' + productsCache[currentSelected].isActive + ']')
+        .prop('checked', true);
 
-            list.append($(html));
+    if (productsCache[currentSelected].productId != null) {
+        typeSelector.val(productsCache[currentSelected].productTypeId);
+        typeSelector.prop("disabled", true);
+
+        displayCharacteristics();
+
+        productsCache[currentSelected].prices.forEach(function (prp) {
+            console.log(JSON.stringify(prp));
+            addRegionalPrice(prp.priceId, prp.regionId, prp.price);
         });
     }
 }
 
-function selectProduct(x) {
-
-    if (x == undefined) {
-        x = productsData.length - 1;
-    }
-
-    if (currentSelected == -1) {
-        $("#products-editor").removeClass("hidden");
-    }
-    if (x == -1) {
-        $("#products-editor").addClass("hidden");
-    }
-
-    currentSelected = x;
-
-    var list = $("#products-list");
-    list.find("a").removeClass("active");
-    list.find("a:nth-child(" + (x+1) + ")").addClass("active");
-
-    var typeSelector = $("#product-type-selector");
-
-    $("#product-name-input").val("");
-    typeSelector.val([]);
-    $("#product-characteristics").empty();
-    $(".cities-container").empty();
-    $("#product-description-input").val("");
-    $('input:radio[name=product-status]').filter('[value=true]').prop('checked', true);
-    typeSelector.prop( "disabled", false);
-
-
-    if (currentSelected != -1) {
-        $("#product-name-input").val(productsData[currentSelected].productName);
-
-        if (productsData[currentSelected].productType != undefined) {
-            typeSelector.val(productsData[currentSelected].productType.productTypeId);
-            typeSelector.prop("disabled", productsData[currentSelected].productId > 0);
-            changeCharacteristics();
-        }
-        if (productsData[currentSelected].productDescription != undefined) {
-            $("#product-description-input").val(productsData[currentSelected].productDescription);
-        }
-
-        if (productsData[currentSelected].prices != undefined) {
-            productsData[currentSelected].prices.forEach(function (item) {
-                addRegionalPrice(item.regionId, item.price);
-            });
-        }
-
-        var $radios = $('input:radio[name=product-status]');
-        $radios.filter('[value=' + productsData[currentSelected].isActive + ']').prop('checked', true);
-    }
-
-}
-
 function deleteRegionalPrice(element) {
-    element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
+    $(element).remove();
 }
 
-function saveSelected() {
-    var data = {};
+function saveSelectedProduct() {
+    var newProduct = {};
 
-    data.id = productsData[currentSelected].productId;
-    data.name = $("#product-name-input").val();
-    data.productTypeId = $("#product-type-selector").val();
-    data.description = $("#product-description-input").val();
-    data.isActive = ($('input[name=product-status]:checked').val() == 'true');
+    newProduct.productId = productsCache[currentSelected].productId;
+    newProduct.productName = $("#product-name-input").val();
+    newProduct.productDescription = $("#product-description-input").val();
+    newProduct.isActive = ($('input[name=product-status]:checked').val() == 'true');
 
-    data.prices = {};
-    $(".cities-container").each(function (item) {
-        data.prices[$(this).find('select[name=regionId]').val()] = $(this).find('input[productName=region-price]').val();
-    });
+    var productTypeId = extractProductTypeId();
+    if (productTypeId == null) {
+        return;
+    }
+    newProduct.productTypeId = productTypeId;
 
-    data.characteristicValues = {};
-    $("#product-characteristics").find(".product-characteristic-value-input").each(function(item) {
-        data.characteristicValues[$(this).find('input[name=characteristic-id]').val()] =
-            $(this).find('input[name=characteristic-value]').val();
-    });
+    newProduct.prices = [];
+    var resultOfExtracting = extractPrices(newProduct.prices);
+    if (!resultOfExtracting) {
+        return;
+    }
 
-    var listSaveId = currentSelected;
+    newProduct.productCharacteristicValues = extractProductCharacteristicValues();
+
+    console.log("Object to be sent from client: " + JSON.stringify(newProduct));
 
     $.ajax({
         type: 'POST',
-        url: '/api/admin/products/' + (data.id < 0 ? "add" : "update"),
+        url: '/api/admin/products/' + (newProduct.productId == null ? "add" : "update"),
         headers: {
             'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
         },
         processData: false,
         contentType: 'application/json',
-        data: JSON.stringify(data),
+        data: JSON.stringify(newProduct),
         success: function (data) {
             var alert;
             $("#new-product-alert").remove();
             if (data.status == 'success') {
-                console.log("Product update success! " + JSON.stringify(data));
+                console.log("Product update success! Data from server " + JSON.stringify(data));
 
                 alert = $('<div class="alert alert-success" role="alert" id="new-product-alert">' +
                     '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
@@ -192,10 +187,11 @@ function saveSelected() {
                     type: 'GET',
                     url: '/api/user/products/get/' + data.id,
                     success: function (data) {
-                        // console.log("Update after saving successful");
-                        // console.log("Set name " + data.name);
-                        $("#products-list").find("a:nth-child(" + (listSaveId+1) + ")").html(data.name);
-                        productsData[listSaveId] = data;
+                        console.log("result of GET request to server: " + JSON.stringify(data));
+
+                        $("#products-list").find("a:nth-child(" + (currentSelected + 1) + ")")
+                            .html(data.productName);
+                        productsCache[currentSelected] = data;
                     },
                     error: function (data) {
                         console.log("Update after saving errored: " + data)
@@ -209,6 +205,10 @@ function saveSelected() {
                     data.message + '</div>');
             }
 
+            alert.delay(2000)
+                .fadeOut(function () {
+                    alert.remove();
+                });
             alert.insertAfter($("#new-product-alert-place"));
         },
         error: function (data) {
@@ -216,116 +216,209 @@ function saveSelected() {
             console.error("Product update error! " + JSON.stringify(data));
             $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                "Product changes failed</div>").insertAfter($("#new-product-alert-place"));
+                "Product changes failed</div>")
+                .delay(2000)
+                .fadeOut(function () {
+                    $(this).remove();
+                })
+                .insertAfter($("#new-product-alert-place"));
         }
     });
-
 }
 
-function addRegionalPrice(regionId, price) {
+function extractProductTypeId() {
+    var productTypeSelector =  $("#product-type-selector");
+    var productTypeId = productTypeSelector.val();
+    if (productTypeId == null) {
+        $("#select-no-product-type-alert").remove();
+        console.error("Error: Product type of product isn`t selected");
 
-    // var selectedRegion = "";
-    // console.error(regionId);
-    // if (regionId != undefined)
-    //     selectedRegion=' selected="' + regionId + '" ';
+        $('<div id="select-no-product-type-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            "Please, specify product type for new product before persisting data</div>")
+            .delay(4000)
+            .fadeOut(function () {
+                $(this).remove();
+            })
+            .insertAfter(productTypeSelector);
 
-    var selectedPrice = "";
-    if (price != undefined)
-        selectedPrice =' value="' + price + '" ';
+        return null;
+    }
 
-    var html =
+    return productTypeId;
+}
+
+function extractProductCharacteristicValues() {
+    var productCharacteristicValues = [];
+
+    $("#product-characteristics").find(".product-characteristic-value-input").each(function () {
+        var value = {
+            valueId: $(this).find('input[name=value-id]').val(),
+            productCharacteristicId: $(this).find('input[name=characteristic-id]').val()
+        };
+
+        var data;
+        switch ($(this).find('input[name=data-type]').val()) {
+            case 'NUMBER':
+                data = $(this).find('input[name=characteristic-value]').val();
+                if (data === '') {
+                    return;
+                }
+                value.numberValue = +data;
+                break;
+            case 'DATE':
+                data = $(this).find('.date').data("DateTimePicker").date();
+                if (data == null) {
+                    return;
+                }
+                value.dateValue = date;
+                break;
+            case 'STRING':
+                data = $(this).find('input[name=characteristic-value]').val();
+                if (data === '') {
+                    return;
+                }
+                value.stringValue = str;
+                break;
+        }
+        productCharacteristicValues.push(value);
+    });
+
+    return productCharacteristicValues;
+}
+
+function extractPrices(prices) {
+    var citiesContainer = $(".cities-container");
+
+    for (var i = 0; i < citiesContainer.length; i++) {
+
+        if (prices.some(function (p) {
+                return +p.regionId == +$(citiesContainer[i]).find('select[name="regionId"]').val();
+            })) {
+            $("#ambiguous-regional-price-alert").remove();
+            console.error("Error: Ambiguous regional price");
+
+            $('<div id="ambiguous-regional-price-alert" class="alert alert-danger" role="alert">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                "Ambiguous regional price. Please, specify only one price per region for product</div>")
+                .delay(4000)
+                .fadeOut(function () {
+                    $(this).remove();
+                })
+                .insertAfter($("#product-general-editor .cities-container:last-child"));
+
+            return false;
+        }
+
+        prices.push({
+            priceId: $(citiesContainer[i]).find('input[name="priceId"]').val(),
+            regionId: $(citiesContainer[i]).find('select[name="regionId"]').val(),
+            price: +$(citiesContainer[i]).find('input[name="region-price"]').val()
+        });
+    }
+
+    return true;
+}
+
+function addRegionalPrice(priceId, regionId, price) {
+    priceId = priceId != undefined ? priceId : null;
+    price = price != undefined ? price : '';
+
+    var regionalPriceHtml =
         '<div class="form-inline cities-container">' +
-            '<div class="form-group">'+
-                '<select class="form-control" name="regionId">'+
-                    regionsHtml +
-                '</select>'+
-            '</div>'+
-            '<div class="form-group full-width">'+
-                '<input type="text" class="form-control full-width" placeholder="Price" name="region-price"' + selectedPrice + '>'+
-            '</div>'+
-            '<div class="form-group">'+
-                '<a class="btn btn-danger" onclick="deleteRegionalPrice(this)">'+
-                    '<span class="glyphicon glyphicon-remove "></span>'+
-                '</a>'+
-            '</div>'+
+            '<input type="hidden" value="' + priceId + '" name="priceId">' +
+            '<div class="form-group">' +
+                '<select class="form-control" name="regionId">' +
+                regionsHtml +
+                '</select>' +
+            '</div>' +
+            '<div class="form-group full-width">' +
+                '<input type="text" class="form-control full-width" placeholder="Price" name="region-price" ' +
+                'value="' + price + '"' + '>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<a class="btn btn-danger" onclick="deleteRegionalPrice($(this).parent().parent())">' +
+                    '<span class="glyphicon glyphicon-remove "></span>' +
+                '</a>' +
+            '</div>' +
         '</div>';
 
-
-    var element = $(html);
+    var element = $(regionalPriceHtml);
     $("#product-general-editor").append(element);
 
     if (regionId != undefined) {
-        element.find('select').val(regionId);
+        element.find('select[name="regionId"]').val(regionId);
     }
-
 }
 
-function addProduct(name, index) {
-    var list = $("#products-list");
-    var id = -(++numberOfAdded);
-    if (name == undefined) {
-        var nameField = $("#new-product-name");
+function addProduct() {
+    var productList = $("#products-list");
+    var productNameInput = $("#new-product-name");
+    var productName = productNameInput.val();
+    productNameInput.val("");
 
-        name = nameField.val();
-        nameField.val("");
-        productsData.push({productId: id, productName: name, productCharacteristicValues: []});
-    }
-
-    if (name != "") {
+    if (productName != "") {
         var ref = document.createElement("a");
-        ref.appendChild(document.createTextNode(name));
+        ref.appendChild(document.createTextNode(productName));
         ref.className = "list-group-item";
         ref.href = "#";
-        if (index == undefined)
-            index = productsData.length - 1;
+        var index = productsCache.length;
+        ref.onclick = function () {
+            selectProduct(index);
+        };
+        productList.append(ref);
 
+        productsCache.push({
+            productId: null,
+            productName: productName,
+            productDescription: null,
+            isActive: false,
+            productTypeId: null,
+            productCharacteristicValues: [],
+            prices: []
+        });
+
+        selectProduct(index);
+    }
+    else {
+         $("#new-product-alert").remove();
+
+        var alertDiv = $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'Please, enter product name</div>');
+        alertDiv.delay(2000)
+            .fadeOut(function () {
+                alertDiv.remove();
+            });
+
+        alertDiv.insertAfter(productList);
+    }
+}
+
+function displayLoadedProducts() {
+    productsCache.forEach(function (product, index) {
+        var productList = $("#products-list");
+
+        var ref = document.createElement("a");
+        ref.appendChild(document.createTextNode(product.productName));
+        ref.className = "list-group-item";
+        ref.href = "#";
         ref.onclick = function () {
             selectProduct(index);
         };
 
-        list.append(ref);
-
-    } else {
-        $("#new-product-alert").remove();
-
-        $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
-            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-            'Can not add empty name </div>').insertAfter(list);
-    }
-}
-
-function addLoadedProducts(k) {
-    productsData.forEach(function (product, i) {
-        console.log("addLoadedProducts");
-        if (i < k){}else {
-            addProduct(product.productName, i );
-        }
+        productList.append(ref);
     });
 }
 
 function loadProducts() {
     console.log("loadProducts");
     $.ajax({
-        url: "/api/user/products/firstn",
-        success: function (data) {
-            productsData = data;
-            addLoadedProducts(0);
-        },
-        error: function () {
-            console.error("Cannot load products");
-        }
-    });
-}
+        url: "/api/user/products/all",
+        success: function (products) {
+            productsCache = products;
 
-function loadAllProducts() {
-    console.log("loadAllProducts");
-    $.ajax({
-        url: "/api/user/products/lastn",
-        success: function (data) {
-            data.forEach(function (product) {
-                productsData.push(product);
-            })
-            addLoadedProducts(5);
+            displayLoadedProducts();
         },
         error: function () {
             console.error("Cannot load products");
@@ -334,21 +427,18 @@ function loadAllProducts() {
 }
 
 function loadProductTypes() {
-    console.log("loadProductTypes");
     $.ajax({
         url: "/api/user/productTypes/all",
-        success: function (data) {
-            var sel = $("#product-type-selector");
+        success: function (productTypes) {
+            var productTypeSelector = $("#product-type-selector");
 
-            data.forEach(function(item, i) {
-                // console.log("adding " + item.name);
+            productTypes.forEach(function (productType) {
                 var option = document.createElement("option");
-                option.text = item.name;
-                option.value = item.id;
-                sel.append(option);
+                option.text = productType.productTypeName;
+                option.value = productType.productTypeId;
+                productTypeSelector.append(option);
             });
-
-            productTypesData = data;
+            productTypesCache = productTypes;
 
             loadProducts();
         },
@@ -358,18 +448,19 @@ function loadProductTypes() {
     });
 }
 
+function createRegionsHtml(regions) {
+    var regionsHtml = '';
+    regions.forEach(function (region) {
+        regionsHtml += '<option value="' + region.regionId + '">' + region.regionName + '</option>';
+    });
+    return regionsHtml;
+}
+
 function loadRegions() {
     $.ajax({
         url: "/api/user/regions/all",
-        success: function(data) {
-
-            regionsData = data;
-
-            regionsHtml = "";
-            data.forEach(function(item) {
-                regionsHtml += '<option value="' + item.regionId + '">' + item.regionName + '</option>'
-            });
-
+        success: function (regions) {
+            regionsHtml = createRegionsHtml(regions);
             loadProductTypes();
         },
         error: function () {
@@ -378,10 +469,6 @@ function loadRegions() {
     });
 }
 
-function loadData() {
-    loadRegions();
-}
-
 $(document).ready(function () {
-    loadData();
+    loadRegions();
 });

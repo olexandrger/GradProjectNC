@@ -101,6 +101,7 @@ public class UserServiceImpl implements UserService{
             } else {
                 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
                 user.getRoles();
+                user.getDomains();
                 userDao.update(user);
             }
         }
@@ -110,5 +111,15 @@ public class UserServiceImpl implements UserService{
         }
 
         return true;
+    }
+
+    @Override
+    public List<User> findAllUsers(){
+        return userDao.findAll();
+    }
+
+    @Override
+    public List<User> findUsersByRegionId(int id){
+        return userDao.findUsersByRegionId(id);
     }
 }

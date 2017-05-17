@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -98,6 +99,7 @@ public class ProductRegionPriceDaoImpl extends AbstractDao implements ProductReg
     }
 
     @Override
+    @Transactional
     public void persistDiscounts(ProductRegionPrice productRegionPrice) {
         String insertQuery = "INSERT INTO \"discount_price\" (\"discount_id\", \"price_id\") VALUES (?, ?)";
 
@@ -109,16 +111,41 @@ public class ProductRegionPriceDaoImpl extends AbstractDao implements ProductReg
     }
 
     @Override
-    public void persistBatch(Long productId, List<ProductRegionPrice> prices) {
+    @Transactional
+    public void persistBatch(List<ProductRegionPrice> prices) {
         String insertQuery = "INSERT INTO \"product_region_price\" (\"product_id\", \"region_id\", \"price\") " +
                 "VALUES(?, ?, ?)";
 
         List<Object[]> batchArgs = new ArrayList<>();
         for (ProductRegionPrice price : prices) {
-            batchArgs.add(new Object[]{productId,
+            batchArgs.add(new Object[]{price.getProduct().getProductId(),
                     price.getRegion().getRegionId(), price.getPrice()});
         }
         batchUpdate(insertQuery, batchArgs);
+    }
+
+    @Override
+    @Transactional
+    public void updateBatch(List<ProductRegionPrice> prices) {
+        String updateQuery = "UPDATE \"product_region_price\" SET \"price\"=? WHERE \"price_id\"=?";
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        for (ProductRegionPrice price : prices) {
+            batchArgs.add(new Object[]{price.getPrice(), price.getPriceId()});
+        }
+        batchUpdate(updateQuery, batchArgs);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBatch(List<ProductRegionPrice> prices) {
+        String deleteQuery = "DELETE FROM \"product_region_price\" WHERE \"price_id\"=?";
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        for (ProductRegionPrice price : prices) {
+            batchArgs.add(new Object[]{price.getPriceId()});
+        }
+        batchUpdate(deleteQuery, batchArgs);
     }
 
     @Override
@@ -146,7 +173,7 @@ public class ProductRegionPriceDaoImpl extends AbstractDao implements ProductReg
     }
 
     @Override
-    public ProductRegionPrice findByRegionIdAndProductId(Long regionId, Long priceId) {
+    public ProductRegionPrice find(Long regionId, Long priceId) {
         String query = "SELECT prp.\"price_id\", prp.\"product_id\", prp.\"region_id\", prp.\"price\" " +
                 "FROM \"product_region_price\" prp " +
                 "WHERE prp.\"region_id\"=? AND prp.\"product_id\" = ?";

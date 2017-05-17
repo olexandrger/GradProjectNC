@@ -47,14 +47,20 @@ public class AccountController {
             if (user.getRoles().contains(roleDao.findByName("ROLE_ADMIN"))) {
                 profileLinks.add(new Link("Edit product types", "/admin/productTypes"));
                 profileLinks.add(new Link("Edit products", "/admin/products"));
-                profileLinks.add(new Link("Edit users", "/admin/users"));
+                profileLinks.add(new Link("Users", "/admin/users"));
+                profileLinks.add(new Link("Discounts", "/admin/discounts"));
+
             }
 
             if (user.getRoles().contains(roleDao.findByName("ROLE_CSR"))) {
                 profileLinks.add(new Link("Orders", "/csr/orders"));
                 profileLinks.add(new Link("Reports", "/csr/reports"));
+               // profileLinks.add(new Link("Complains", "/csr/complains"));
             }
 
+            if (user.getRoles().contains(roleDao.findByName("ROLE_PMG"))) {
+                profileLinks.add(new Link("Complains", "/pmg/complains"));
+            }
             result.put("profileLinks", profileLinks);
         } else {
             result.put("authenticated", "false");

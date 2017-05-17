@@ -16,4 +16,11 @@ public class FrontendRegion {
                 .regionName(region.getRegionName())
                 .build();
     }
+
+    public Region toModel() {
+        return Region.builder()
+                .regionId(getRegionId())
+                .regionName(getRegionName())
+                .build();
+    }
 }

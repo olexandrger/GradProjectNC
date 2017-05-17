@@ -7,6 +7,8 @@ import java.util.List;
 public interface ProductDao extends CrudDao<Product> {
     List<Product> findByRegionId(Long regionId);
 
+    List<Product> findActiveByRegionId(Long regionId);
+
     Product findByName(String productName);
 
     List<Product> findFirstN(int n);

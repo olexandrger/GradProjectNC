@@ -1,11 +1,14 @@
 /**
  * Created by Alex on 5/8/2017.
  */
-
+var regions;
+var usersDataList;
 var userData;
+var userData1 = {};
 var userRoleData;
 var numberOfAdded = 0;
 var selected = -1;
+var selectedDomain = -1;
 function registerByAdmin() {
     var form = $("#registration-form1");
     var form2 = $("#product-type-values2");
@@ -197,6 +200,7 @@ function getUser() {
 
                     );
                 }
+                $("#domains-buttons").removeClass("hidden");
                 var alert = $('<div id="search-alert" class="alert alert-success" role="alert">User found</div>');
                 $("#search-alert").replaceWith(alert);
             },
@@ -216,7 +220,7 @@ function getUser() {
 
 
 function saveUser() {
-    var userData1 = {};
+
     userData1.roles = [];
     userData1.userId = userData.userId;
     var tmp = [];
@@ -234,6 +238,7 @@ function saveUser() {
     userData1.address = $("#mf5").val();
     userData1.aptNumber = $("#mf6").val();
     userData1.phoneNumber = $("#mf7").val();
+    userData1.domains = userData.domains;
 
     var _csrf = $('meta[name=_csrf]').attr("content");
 
@@ -355,6 +360,9 @@ function addUserDomain(node,id, name, city) {
 
 function displayDomain(element) {
     $("#domain-editor").removeClass("hidden");
+    $("#del-dom-btn").removeClass("hidden");
+    selectedDomain = element.name;
+    console.log("Domain" + selectedDomain);
     for (var characteristic in userData.domains) {
 
         if(userData.domains[characteristic].domainId == element.name){
@@ -372,6 +380,35 @@ function displayDomain(element) {
         }
     }
     
+}
+function deleteSelected() {
+    console.log(JSON.stringify(userData.domains));
+    var tmpArr = [];
+
+   // $('.all').prop("checked",false);
+    var items = $("#list1 input:checked:not('.all')");
+    items.each(function(idx,item){
+        var choice = $(item);
+        var deleteDomId = choice.parent().attr("name");
+
+
+        for (var characteristic in userData.domains) {
+
+            if(userData.domains[characteristic].domainId == deleteDomId){
+               // tmpArr.push(userData.domains[characteristic]);
+                userData.domains.splice(characteristic,1);
+                choice.parent().remove();
+
+                console.log(JSON.stringify(characteristic));
+
+            }
+        }
+
+    });
+
+    //userData.domains = tmpArr;
+    console.log(JSON.stringify(userData.domains));
+
 }
 
 
@@ -408,4 +445,121 @@ function removeRole(element) {
 
 $(document).ready(function () {
     loadInfo();
+
+
 });
+
+function redirectToDomains() {
+    location.href = "/client/domains";
+};
+
+
+function selectRegion(region) {
+    var selectedRegion = $('#region-selected');
+    selectedRegion.text(region.regionName);
+    selectedRegion.append($("<span class='caret'></span>"));
+    console.log(region.regionName + " selected")
+    //localStorage.setItem("regionId", region.regionId);
+
+    // console.log("region changed");
+    //$(document).trigger("region-changed");
+}
+
+
+// $(document).on("region-changed", function() {console.log("Same file works")});
+
+function loadRegions() {
+    console.log('yee');
+    $.ajax({
+        url: "/api/user/regions/all",
+        success: function(data) {
+
+            $("#new-region").empty();
+            var options = $("#new-region");
+
+            regions = data;
+            regions.forEach(function(item, i) {
+                 console.log(item + " loaded");
+                console.log(item);
+                console.log(item.regionName);
+
+
+                var option = document.createElement("option");
+                if(i==0){
+                    option.setAttribute("selected", "selected");
+                }
+                option.setAttribute("value", item.regionId);
+                option.appendChild(document.createTextNode(item.regionName));
+                options.append(option);
+            });
+            loadUsers();
+        },
+        error: function () {
+            console.error("Cannot load list of regions");
+        }
+    });
+}
+
+function loadUsers() {
+    hideUserInfo();
+    var regionId = $("#new-region").val();
+    console.log("Users Loaded ")
+    console.log(regionId);
+
+    $.ajax({
+        url: "/api/csr/users/find/all/region/" + regionId + "/",
+        success: function(data) {
+
+            var list = $("#csr-users-list");
+            list.empty();
+
+            usersDataList = data;
+            data.forEach(function(item, i) {
+                console.log(item);
+                var ref = document.createElement("a");
+                var orderName = item.email;
+                ref.appendChild(document.createTextNode(orderName));
+                ref.className = "list-group-item";
+                ref.href = "#";
+                ref.onclick = function () {
+                    selectUser(i);
+                };
+                list.append(ref);
+
+            });
+        },
+        error: function () {
+            console.error("Cannot load list of users");
+        }
+    });
+
+}
+
+function selectUser(i){
+    unhideaUserInfo();
+    selectedUser = usersDataList[i];
+    console.log('yee ' + i);
+    console.log(selectedUser);
+    $("#userFirstName").val(selectedUser.firstName);
+    $("#userLastName").val(selectedUser.lastName);
+    $("#userEmail").val(selectedUser.email);
+    $("#userPhone").val(selectedUser.phoneNumber);
+
+/*    $("#mf5").val(userData.address);
+    $("#mf6").val(userData.aptNumber);*/
+
+}
+
+function editUser(){
+    $('a[href$=tab2]').click();
+    $("#tab2-email").val($("#userEmail").val());
+    getUser()
+}
+
+function hideUserInfo(){
+    $("#user-info").attr("hidden", "true");
+}
+
+function unhideaUserInfo(){
+    $("#user-info").removeAttr("hidden");
+}

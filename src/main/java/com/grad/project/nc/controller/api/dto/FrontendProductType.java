@@ -4,6 +4,9 @@ import com.grad.project.nc.model.ProductType;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @Builder
 public class FrontendProductType {
@@ -11,6 +14,7 @@ public class FrontendProductType {
     private String productTypeName;
     private String productTypeDescription;
     private Boolean isActive;
+    private List<FrontendCharacteristic> productCharacteristics;
 
     public static FrontendProductType fromEntity(ProductType productType) {
         return FrontendProductType.builder()
@@ -18,6 +22,24 @@ public class FrontendProductType {
                 .productTypeName(productType.getProductTypeName())
                 .productTypeDescription(productType.getProductTypeDescription())
                 .isActive(productType.getIsActive())
+                .productCharacteristics(productType.getProductCharacteristics()
+                        .stream()
+                        .map(FrontendCharacteristic::fromEntity)
+                        .collect(Collectors.toList()))
                 .build();
+    }
+
+    public ProductType toModel() {
+        return ProductType.builder()
+                .productTypeId(getProductTypeId())
+                .productTypeName(getProductTypeName())
+                .productTypeDescription(getProductTypeDescription())
+                .isActive(getIsActive())
+                .productCharacteristics(getProductCharacteristics()
+                        .stream()
+                        .map(fc -> fc.toModel(getProductTypeId()))
+                        .collect(Collectors.toList()))
+                .build();
+
     }
 }

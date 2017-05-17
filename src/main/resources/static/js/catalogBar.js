@@ -3,24 +3,24 @@ function loadCategories() {
         url: "/api/user/productTypes/all",
         success: function (data) {
             console.log("Product types loaded");
-            var list = $("#catalog-product-types-list");
+            var productTypeList = $("#catalog-product-types-list");
 
-            data.forEach(function (item, i) {
+            data.forEach(function (productType, i) {
 
                 var li = document.createElement("li");
-                li.setAttribute("id", "catalog-link-" + item.id);
+                li.setAttribute("id", "catalog-link-" + productType.productTypeId);
 
-                if (item.name == decodeURIComponent(window.location.search.substr(1))) {
+                if (productType.productTypeId == decodeURIComponent(window.location.search.substr(1))) {
                     li.className += "active";
                 }
 
                 var ref = document.createElement("a");
-                ref.appendChild(document.createTextNode(item.name));
-                ref.href = "/catalog?" + item.name;
+                ref.appendChild(document.createTextNode(productType.productTypeName));
+                ref.href = "/catalog?" + productType.productTypeId;
 
                 li.appendChild(ref);
 
-                list.append(li);
+                productTypeList.append(li);
             });
 
         },

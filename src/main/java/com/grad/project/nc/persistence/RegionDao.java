@@ -7,4 +7,6 @@ public interface RegionDao extends CrudDao<Region> {
     Region findLocationRegionById(Long locationId);
 
     Region findByProductRegionPriceId(Long productRegionPriceId);
+
+    Region findByName(String name);
 }

@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class RegistrationService {
-    private final String INVALID_EMAIL = "Invalid email address";
+    private final String INVALID_EMAIL = "Incorrect email address";
+    private final String INCORRECT_PASSWORD = "Incorrect password";
+    private final String INCORRECT_PHONE = "Incorrect phone number";
     private final String EMAIL_ALREADY_EXISTS = "Email already exists";
     private final String FIRST_NAME_IS_EMPTY = "First name is empty";
     private final String LAST_NAME_IS_EMPTY = "Last name is empty";
@@ -59,9 +61,19 @@ public class RegistrationService {
             messageError = PASSWORD_IS_EMPTY;
             return false;
         }
+        if (!isPasswordValid(user.getPassword())) {
+            status = ERROR;
+            messageError = INCORRECT_PASSWORD;
+            return false;
+        }
         if (user.getPhoneNumber().isEmpty()) {
             status = ERROR;
             messageError = PHONE_IS_EMPTY;
+            return false;
+        }
+        if (!isPhoneNumberValid(user.getPhoneNumber())) {
+            status = ERROR;
+            messageError = INCORRECT_PHONE;
             return false;
         }
         if (!isEmailValid(user.getEmail())) {
@@ -84,6 +96,22 @@ public class RegistrationService {
         final String regex = "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`\\{|\\}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
         java.util.regex.Pattern p = java.util.regex.Pattern.compile(regex);
         java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
+    }
+
+    private boolean isPasswordValid(String password) {
+        if (password.length() < 8 || password.length() > 20)
+            return false;
+        final String regex = "^[a-zA-Z0-9!@#$%^&*()_+|~\\-=\\/‘\\{\\}\\[\\]:\";’<>?,./]+$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(regex);
+        java.util.regex.Matcher m = p.matcher(password);
+        return m.matches();
+    }
+
+    private boolean isPhoneNumberValid(String phone) {
+        final String regex = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(regex);
+        java.util.regex.Matcher m = p.matcher(phone);
         return m.matches();
     }
 

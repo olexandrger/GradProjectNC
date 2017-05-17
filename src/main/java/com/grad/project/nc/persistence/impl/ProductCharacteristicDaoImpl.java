@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -102,16 +103,44 @@ public class ProductCharacteristicDaoImpl extends AbstractDao implements Product
     }
 
     @Override
-    public void persistProductTypeProductCharacteristics(Long productTypeId,
-                                                         List<ProductCharacteristic> productCharacteristics) {
+    @Transactional
+    public void updateBatch(List<ProductCharacteristic> productCharacteristics) {
+        String updateQuery = "UPDATE \"product_characteristic\" SET \"characteristic_name\"=?, \"measure\"=?, " +
+                "\"data_type_id\"=? WHERE \"product_characteristic_id\" = ?";
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        for (ProductCharacteristic characteristic : productCharacteristics) {
+            batchArgs.add(new Object[]{characteristic.getCharacteristicName(),
+                    characteristic.getMeasure(), characteristic.getDataType().getCategoryId(),
+                    characteristic.getProductCharacteristicId()});
+        }
+        batchUpdate(updateQuery, batchArgs);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBatch(List<ProductCharacteristic> productCharacteristics) {
+        String deleteQuery = "DELETE FROM \"product_characteristic\" WHERE \"product_characteristic_id\" = ?";
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        for (ProductCharacteristic characteristic : productCharacteristics) {
+            batchArgs.add(new Object[]{characteristic.getProductCharacteristicId()});
+        }
+        batchUpdate(deleteQuery, batchArgs);
+    }
+
+    @Override
+    @Transactional
+    public void persistBatch(List<ProductCharacteristic> productCharacteristics) {
         String insertQuery = "INSERT INTO \"product_characteristic\" (\"product_type_id\", " +
                 "\"characteristic_name\", \"measure\", \"data_type_id\") " +
                 "VALUES (?, ?, ?, ?)";
 
         List<Object[]> batchArgs = new ArrayList<>();
         for (ProductCharacteristic characteristic : productCharacteristics) {
-            batchArgs.add(new Object[]{productTypeId, characteristic.getCharacteristicName(),
-            characteristic.getMeasure(), characteristic.getDataType().getCategoryId()});
+            batchArgs.add(new Object[]{characteristic.getProductType().getProductTypeId(),
+                    characteristic.getCharacteristicName(), characteristic.getMeasure(),
+                    characteristic.getDataType().getCategoryId()});
         }
         batchUpdate(insertQuery, batchArgs);
     }

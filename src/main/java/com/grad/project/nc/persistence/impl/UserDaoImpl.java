@@ -57,6 +57,10 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
         deleteUserRoles(user.getUserId());
         persistUserRoles(user);
 
+        deleteUserDomains(user.getUserId());
+        persistUserDomains(user);
+
+
         return user;
     }
     @Transactional
@@ -73,6 +77,9 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
         deleteUserRoles(user.getUserId());
         persistUserRoles(user);
 
+        deleteUserDomains(user.getUserId());
+        persistUserDomains(user);
+
         return user;
     }
 
@@ -88,6 +95,17 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     public List<User> findAll() {
         String findAllQuery = "SELECT \"user_id\", \"email\", \"password\", \"first_name\", " +
                 "\"last_name\", \"phone_number\" FROM \"user\"";
+
+        return findMultiple(findAllQuery, new UserRowMapper());
+    }
+
+    @Override
+    public List<User> findUsersByRegionId(int id) {
+        String findAllQuery = "select user_id, email, password, first_name, last_name, phone_number from \"user\" where user_id in (\n" +
+                "select user_id from user_domain where domain_id in\n" +
+                "\t(select domain_id from domain where address_id in \n" +
+                "\t\t(SELECT address_id from address where location_id in \n" +
+                "\t\t\t(select location_id from location where region_id = " + id + "))));";
 
         return findMultiple(findAllQuery, new UserRowMapper());
     }
@@ -119,6 +137,15 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     }
 
     @Override
+    public void deleteUserDomains(Long userId) {
+        String deleteQuery = "DELETE FROM \"user_domain\" WHERE \"user_id\" = ?";
+
+        executeUpdate(deleteQuery, userId);
+    }
+
+
+    @Override
+    @Transactional
     public void persistUserRoles(User user) {
         String insertQuery = "INSERT INTO \"user_role\" (\"user_id\", \"role_id\") VALUES(?, ?)";
 
@@ -128,6 +155,19 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
         }
 
         batchUpdate(insertQuery, batchArgs);
+    }
+
+    @Override
+    public void persistUserDomains(User user) {
+        String insertQuery = "INSERT INTO \"user_domain\" (\"user_id\", \"domain_id\") VALUES(?, ?)";
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        for (Domain domain : user.getDomains()) {
+            batchArgs.add(new Object[]{user.getUserId(), domain.getDomainId()});
+        }
+
+        batchUpdate(insertQuery, batchArgs);
+
     }
 
     @Override
@@ -201,6 +241,23 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
 
         executeUpdate(deleteQuery, userId, roleId);
     }
+
+    @Override
+    public void addUserDomain(Long userId, Long domainId) {
+        String insertQuery = "INSERT INTO \"user_domain\" (\"user_id\", \"domain_id\") VALUES(?, ?)";
+
+        executeUpdate(insertQuery, userId, domainId);
+
+    }
+
+    @Override
+    public void deleteUserDomain(Long userId, Long domainId) {
+        String deleteQuery = "DELETE FROM \"user_domain\" WHERE \"user_id\" = ? AND \"domain_id\" = ?";
+
+        executeUpdate(deleteQuery, userId, domainId);
+
+    }
+
 
     private class UserRowMapper implements RowMapper<User> {
 
