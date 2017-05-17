@@ -10,4 +10,5 @@ import java.util.Collection;
  */
 public interface ComplainService {
     Collection<Complain> getAllComplains(long size, long offset);
+    Complain newComplain(long userId, long instanceId, long reasonId, String title, String content);
 }

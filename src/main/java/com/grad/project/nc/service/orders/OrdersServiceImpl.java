@@ -118,7 +118,6 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = newOrder(instanceId, userId, ORDER_AIM_RESUME);
         if (order != null) {
             completeOrder(order.getProductOrderId());
-            log.info("Completing too");
         }
 
         return order;

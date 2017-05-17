@@ -24,22 +24,79 @@
 
 <div class="container">
 <#include "../resources/navbar.ftl"/>
+<#--new complaint modal-->
+    <div id="new-complaint-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">New complaint:</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" id="new-complaint-modal-error-msg">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new-complaint-user-email">Email</label>
+                        <input type="email" class="form-control" name="new-complaint-user-email" placeholder="Email"
+                               id="new-complaint-user-email" onblur="loadDomainsInModal(13)" ,
+                               onkeypress="loadDomainsInModal(event.keyCode)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new-complaint-domain">Domain</label>
+                        <select class="form-control" name="new-complaint-domain" id="new-complaint-domain"
+                                onchange="loadProductInstancesInModal()">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-complaint-instanse">Product instance</label>
+                        <select class="form-control" name="new-complaint-instanse" id="new-complaint-instanse" >
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-complaint-reason">Compleint reason:</label>
+                        <select class="form-control" name="new-complaint-reason" id="new-complaint-reason">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-complaint-subject">Subject:</label>
+                        <input type="text" class="form-control" name="new-complaint-subject" placeholder="Subject"
+                               id="new-complaint-subject">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-complaint-content">Content:</label>
+                        <textarea class="form-control " name="new-complaint-content" rows="5"
+                                  placeholder="Content"
+                                  maxlength="240"
+                                  id="new-complaint-content" resize ="none"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" id = "create-complaint-ftom-modal-btn"
+                            onclick="createNewComplaintFromModal()">Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-heading" id="complain-list-panel-heading">Complains</div>
                 <div class="panel-body" id="complain-list-panel-body">
-                    <ul class="list-group" id="complain-list">
-                        <a class="list-group-item" href="#">Complain 1</a>
-                        <a class="list-group-item" href="#">Complain 2 </a>
-                        <a class="list-group-item" href="#">Complain 3</a>
-                    </ul>
+                    <ul class="list-group" id="complain-list"></ul>
                 </div>
                 <div class="panel-footer" id="complain-list-panel-footer">
-                    <button type="button" class="btn"> &larr; Prev.</button>
-                    <button type="button" class="btn"> Next &rarr;</button>
-                    <button type="button" class="btn btn-success">New</button>
+                    <button type="button" class="btn" id="complaint-btn-prev"> &larr; Prev.</button>
+                    <button type="button" class="btn" id="complaint-btn-next"> Next &rarr;</button>
+                    <button type="button" class="btn btn-success" data-toggle="modal"
+                            data-target="#new-complaint-modal" onclick="openNewComplaintModal()">
+                        New
+                    </button>
                 </div>
             </div>
         </div>
@@ -47,7 +104,7 @@
             <div class="alert alert-warning" id="no-complain-selected-alert">
                 <strong>Warning!</strong> Select a complaint to view information.
             </div>
-            <div class="panel panel-default" id="complain-info-panel">
+            <div class="panel panel-default hidden" id="complain-info-panel">
                 <div class="panel-heading" id="complain-content-panel-heading">Complain content:</div>
                 <div class="panel-body" id="complain-content-panel-body">
                 <#--user-->
@@ -86,7 +143,7 @@
                         <form>
                             <div class="form-group">
                                 <div class="col-sm-4">
-                                    <label for="complain-responsible-email">User email:</label>
+                                    <label for="complain-responsible-email">Responsible email:</label>
                                 </div>
                                 <div class="col-sm-4">
                                     <input type="email" class="form-control" id="complain-responsible-email"
@@ -194,11 +251,11 @@
                             </div>
                             <div class="row">
                                 <div class="form-group">
-                                    <label for="selected-complain-content">Complain content:</label>
-                                    <textarea class="form-control" name="complain-content" rows="5"
+                                    <label for="selected-complain-content ">Complain content:</label>
+                                    <textarea class="form-control " name="complain-content" rows="5"
                                               placeholder="Content"
-                                              id="selected-complain-content">
-                                </textarea>
+                                              id="selected-complain-content"
+                                              resize ="none" readonly></textarea>
                                 </div>
                             </div>
                             <div class="row">
@@ -206,8 +263,8 @@
                                     <label for="omplain-response">Complain Responce:</label>
                                     <textarea class="form-control" name="complain-response" rows="5"
                                               placeholder="Responce"
-                                              id="selected-complain-responce">
-                                </textarea>
+                                              id="selected-complain-responce"
+                                              resize ="none"></textarea>
                                 </div>
                             </div>
                         </form>

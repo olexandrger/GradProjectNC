@@ -22,7 +22,11 @@
 <div class="container">
 
 <#include "../resources/navbar.ftl"/>
+    <div class="row">
+        <div class="col-sm-12" id="report-alert-place">
 
+        </div>
+    </div>
     <div class="row">
         <div class="col-sm-4">
             <div class="form-group">

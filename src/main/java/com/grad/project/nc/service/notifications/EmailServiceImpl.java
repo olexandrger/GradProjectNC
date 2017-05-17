@@ -1,10 +1,9 @@
 package com.grad.project.nc.service.notifications;
 
+import com.grad.project.nc.model.Complain;
 import com.grad.project.nc.model.ProductInstance;
 import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.model.User;
-import freemarker.cache.ClassTemplateLoader;
-import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -14,10 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -26,8 +22,6 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -84,6 +78,16 @@ public class EmailServiceImpl implements EmailService {
         instance.getDomain().getUsers().forEach((user) -> {
             sendEmail(new Mail(user.getEmail(), new InstanceStatusChangedMailContent(user, instance)));
         });
+    }
+
+    @Override
+    public void sendNewComplainEmail(Complain complain) {
+        //TODO email sending
+    }
+
+    @Override
+    public void sendComplainStatusChangedEmail(Complain complain) {
+        //TODO email sending
     }
 
     @Data

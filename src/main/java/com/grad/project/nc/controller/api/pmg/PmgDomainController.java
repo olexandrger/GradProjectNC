@@ -1,4 +1,4 @@
-package com.grad.project.nc.controller.api.csr;
+package com.grad.project.nc.controller.api.pmg;
 
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
 import com.grad.project.nc.model.User;
@@ -16,22 +16,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Created by DeniG on 10.05.2017.
+ * Created by DeniG on 17.05.2017.
  */
 @RestController
-@RequestMapping("/api/csr/domains")
-public class CsrDomainContoller {
-
+@RequestMapping("/api/pmg/domains")
+public class PmgDomainController {
     DomainService domainService;
-
     UserService userService;
     @Autowired
-    public CsrDomainContoller(DomainService domainService, UserService userService) {
+    public PmgDomainController(DomainService domainService, UserService userService) {
         this.domainService = domainService;
         this.userService = userService;
     }
-
-    @RequestMapping(value = "/find/{email}", method = RequestMethod.GET)
+    @RequestMapping(value = "/find/bymail/{email}", method = RequestMethod.GET)
     Map<String, Object> findByUserEMail(@PathVariable String email) {
         Map<String, Object> result = new HashMap<>();
         User user = userService.findByEMail(email);
@@ -50,5 +47,4 @@ public class CsrDomainContoller {
         return result;
 
     }
-
 }

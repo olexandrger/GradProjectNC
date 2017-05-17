@@ -10,7 +10,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -34,10 +35,18 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
                 "\"content\", \"status_id\", \"responsible_id\", \"response\", \"open_date\", \"close_date\", " +
                 "\"complain_reason_id\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        Long complainId = executeInsertWithId(insertQuery, PK_COLUMN_NAME, complain.getUser().getUserId(),
-                complain.getProductInstance().getInstanceId(), complain.getComplainTitle(),
-                complain.getContent(), complain.getStatus().getCategoryId(), complain.getResponsible().getUserId(),
-                complain.getResponse(), complain.getOpenDate(), complain.getCloseDate(),
+        Long complainId = executeInsertWithId(
+                insertQuery,
+                PK_COLUMN_NAME,
+                complain.getUser().getUserId(),
+                complain.getProductInstance().getInstanceId(),
+                complain.getComplainTitle(),
+                complain.getContent(),
+                complain.getStatus().getCategoryId(),
+                (complain.getResponsible() == null) ? (null) : (complain.getResponsible().getUserId()),
+                complain.getResponse(),
+                complain.getOpenDate(),
+                complain.getCloseDate(),
                 complain.getComplainReason().getCategoryId());
 
         complain.setComplainId(complainId);
@@ -75,7 +84,8 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
     public List<Complain> findAll() {
         String findAllQuery = "SELECT \"complain_id\", \"user_id\", \"product_instance_id\", " +
                 "\"complain_title\", \"content\", \"status_id\", \"responsible_id\", \"response\", " +
-                "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\"";
+                "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\"" +
+                "ORDER BY close_date DESC NULL FIRST, open_date DESC";
 
         return findMultiple(findAllQuery, new ComplainRowMapper());
     }
