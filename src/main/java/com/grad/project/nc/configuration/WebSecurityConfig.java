@@ -45,21 +45,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                    .antMatchers("/*", "/css/*", "/js/*", "/api/user/**").permitAll()
-                    .antMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
-                    .antMatchers("/csr/**", "/api/csr/**").hasRole("CSR")
-                    .antMatchers("/client/**", "/api/client/**").hasRole("CLIENT")
+                .antMatchers("/*", "/css/*", "/js/*", "/api/user/**").permitAll()
+                .antMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/csr/**", "/api/csr/**").hasRole("CSR")
+                .antMatchers("/client/**", "/api/client/**").hasRole("CLIENT")
+                .antMatchers("/pmg/**", "/api/pmg/**").hasRole("PMG")
 //                    .antMatchers("/api/**").authenticated()
                 .and()
-                    .formLogin()
-                        .loginPage("/login")
-                        .usernameParameter("email")
-                        .successForwardUrl("/login/success")
-                        .failureForwardUrl("/login/failed")
+                .formLogin()
+                .loginPage("/login")
+                .usernameParameter("email")
+                .successForwardUrl("/login/success")
+                .failureForwardUrl("/login/failed")
                 .and()
-                    .logout()
-                        .logoutSuccessUrl("/login/logout")
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
+                .logout()
+                .logoutSuccessUrl("/login/logout")
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
     }
 
 
