@@ -256,6 +256,6 @@ function loadNavbarRegions() {
 
 
 $(document).ready(function () {
-        getAccountInformation();
-        loadNavbarRegions();
+    getAccountInformation();
+    loadNavbarRegions();
 });

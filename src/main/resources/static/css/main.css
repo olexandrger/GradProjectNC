@@ -36,7 +36,7 @@
     padding-left: 1em;
 }
 
-#ambiguous-regional-price-alert {
+#ambiguous-regional-price-alert, #select-no-product-type-alert {
     margin-top: 5px;
 }
 

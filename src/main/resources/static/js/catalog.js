@@ -1,5 +1,7 @@
-var catalogProducts;
-var catalogSelectedItem = -1;
+console.log("catalog js");
+
+var catalogProductsCache;
+var currentSelected = -1;
 
 var catalogSelectedCategory = decodeURIComponent(window.location.search.substr(1));
 // var catalogCharacteristics = {};
@@ -21,8 +23,8 @@ function getCharacteristicStringValue(characteristic, dataType) {
 
 function getRegionalPrice(regionId) {
     var price = "";
-    catalogProducts[catalogSelectedItem].prices.forEach(function(item) {
-        if (item.region.regionId == regionId)
+    catalogProductsCache[currentSelected].prices.forEach(function(item) {
+        if (item.regionId == regionId)
             price = item.price;
     });
 
@@ -32,7 +34,7 @@ function getRegionalPrice(regionId) {
 function selectCatalogProduct(index, positionInList) {
     $("#catalog-main-info").removeClass("hidden");
 
-    catalogSelectedItem = index;
+    currentSelected = index;
 
     var list = $("#catalog-products-list");
     list.find("a").removeClass("active");
@@ -40,25 +42,26 @@ function selectCatalogProduct(index, positionInList) {
 
     $(".table-row").remove();
 
-    $("#catalog-product-name").text(catalogProducts[index].productName);
-    $("#catalog-product-description").text(catalogProducts[index].productDescription);
+    $("#catalog-product-name").text(catalogProductsCache[index].productName);
+    $("#catalog-product-description").text(catalogProductsCache[index].productDescription);
 
     var table = $("#catalog-table-details");
-    catalogProducts[index].productCharacteristicValues.forEach(function (item) {
-           var html = '<tr class="table-row"><td>' +
-                   item.productCharacteristic.characteristicName +
-            '</td>' +
-            '<td>' +
-                   getCharacteristicStringValue(item, item.productCharacteristic.dataType.categoryName) +
-                   item.productCharacteristic.measure +
-            '</td></tr>';
+    catalogProductsCache[index].productCharacteristicValues.forEach(function (item) {
+        var html =
+            '<tr class="table-row"><td>' + item.productCharacteristic.characteristicName + '</td>' +
+                '<td>' + getCharacteristicStringValue(item, item.productCharacteristic.dataType.categoryName) + '</td>' +
+                '<td>' + item.productCharacteristic.measure + '</td>' +
+            '</tr>';
 
         table.append($(html));
     });
 
-    var html = '<tr class="table-row"><td>Price</td><td>' +
-                    getRegionalPrice(localStorage.getItem("regionId")) +
-                '</td></tr>';
+    var html =
+        '<tr class="table-row">' +
+            '<td>Price</td>' +
+            '<td colspan="2">' + getRegionalPrice(localStorage.getItem("regionId")) + '</td>' +
+        '</tr>';
+
     table.append($(html));
 }
 
@@ -69,8 +72,8 @@ function updateCatalog() {
     $("#catalog-main-info").addClass("hidden");
 
     var positionInList = 1;
-    catalogProducts.forEach(function(item, index) {
-        if (item.productType.productTypeName == catalogSelectedCategory) {
+    catalogProductsCache.forEach(function(item, index) {
+        if (item.productTypeId == catalogSelectedCategory) {
             var ref = document.createElement("a");
             ref.appendChild(document.createTextNode(item.productName));
             ref.className = "list-group-item";
@@ -89,7 +92,7 @@ function loadCatalogData() {
     $.ajax({
         url: "/api/user/products/byRegion/" + localStorage.getItem("regionId"),
         success: function(data) {
-            catalogProducts = data;
+            catalogProductsCache = data;
             updateCatalog();
         },
         error: function () {
@@ -151,7 +154,7 @@ function catalogSubmitOrder() {
         },
         contentType: 'application/json',
         data: JSON.stringify({
-            productId: catalogProducts[catalogSelectedItem].productId,
+            productId: catalogProductsCache[currentSelected].productId,
             domainId: catalogDomains[selectedDomainIndex].domainId
         }),
         success: function(data) {

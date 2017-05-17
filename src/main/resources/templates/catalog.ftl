@@ -43,7 +43,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <table class="table table-bordered" id="catalog-table-details">
-                        <tr><th colspan="2">Details</th></tr>
+                        <tr><th colspan="3">Details</th></tr>
                     </table>
                 </div>
             </div>
