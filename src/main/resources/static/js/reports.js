@@ -1,67 +1,94 @@
 var reportData;
 
-function generateReport() {
+function showErrorMessage(message) {
+    console.log(message);
+
+    var alert = $('<div class="alert alert-danger" role="alert">' +
+        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+        message + "</div>");
+
+    alert.delay(2000)
+        .fadeOut(function () {
+            alert.remove();
+        });
+
+    $("#report-alert-place").append(alert);
+}
+
+function getEncodedParams() {
     var data = {};
 
+    var isEmptyField = false;
+
     $(".report-value-div").each(function() {
-        data[$(this).find('[name="param-id"]').val()] = $(this).find('[name="param-value"]').val();
+        var value = $(this).find('[name="param-value"]').val();
+        if (value == "") {
+            isEmptyField = true;
+        }
+        data[$(this).find('[name="param-id"]').val()] = value;
     });
 
-    // console.log(data);
+    if (isEmptyField) {
+        return null;
+    } else {
+        return btoa(JSON.stringify(data));
+    }
+}
 
-    $.ajax({
-        url: "/api/csr/reports/generate/" + $("#report-select").val() + "/json/" + btoa(JSON.stringify(data)),
-        method: "GET",
-        // headers: {
-        //     'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-        // },
-        // contentType: 'application/json',
-        // data: JSON.stringify(data),
-        success: function (report) {
-            var table = document.createElement("table");
-            // table.empty();
-            table.setAttribute("id", "report-table");
-            table.setAttribute("class", "table table-bordered");
-            var tableBody = document.createElement("tbody");
-            table.appendChild(tableBody);
+function generateReport() {
 
-            var currentRow = document.createElement("tr");
-            report.header.forEach(function(item) {
-                var th = document.createElement("th");
-                th.appendChild(document.createTextNode(item));
-                currentRow.appendChild(th);
-            });
+    var params = getEncodedParams();
 
-            tableBody.appendChild(currentRow);
+    if (params == null) {
+        showErrorMessage("You can not send empty fields");
+    } else {
+        $.ajax({
+            url: "/api/csr/reports/generate/" + $("#report-select").val() + "/json/" + params,
+            method: "GET",
+            success: function (report) {
+                var table = document.createElement("table");
+                table.setAttribute("id", "report-table");
+                table.setAttribute("class", "table table-bordered");
+                var tableBody = document.createElement("tbody");
+                table.appendChild(tableBody);
 
-            report.data.forEach(function(row) {
-                currentRow = document.createElement("tr");
-
-                row.forEach(function (value) {
-                    var td = document.createElement("td");
-                    td.appendChild(document.createTextNode(value));
-                    currentRow.appendChild(td);
+                var currentRow = document.createElement("tr");
+                report.header.forEach(function (item) {
+                    var th = document.createElement("th");
+                    th.appendChild(document.createTextNode(item));
+                    currentRow.appendChild(th);
                 });
 
                 tableBody.appendChild(currentRow);
-            });
 
-            $("#report-table").replaceWith(table);
-        },
-        error: function (data) {
-            console.error(data);
-        }
-    });
+                report.data.forEach(function (row) {
+                    currentRow = document.createElement("tr");
+
+                    row.forEach(function (value) {
+                        var td = document.createElement("td");
+                        td.appendChild(document.createTextNode(value));
+                        currentRow.appendChild(td);
+                    });
+
+                    tableBody.appendChild(currentRow);
+                });
+
+                $("#report-table").replaceWith(table);
+            },
+            error: function (data) {
+                console.error(data);
+            }
+        });
+    }
 }
 
 function generateXls() {
-    var data = {};
-
-    $(".report-value-div").each(function() {
-        data[$(this).find('[name="param-id"]').val()] = $(this).find('[name="param-value"]').val();
-    });
-
-    window.open("/api/csr/reports/generate/" + $("#report-select").val() + "/xls/" + btoa(JSON.stringify(data)));
+    var params = getEncodedParams();
+    if (params == null) {
+        showErrorMessage("You can not send empty fields");
+    } else {
+        window.open("/api/csr/reports/generate/" + $("#report-select").val() + "/xls/" + params);
+    }
 }
 
 function loadReportParams() {
@@ -78,7 +105,6 @@ function loadReportParams() {
     paramsPlace.empty();
     if (report != undefined) {
         report.params.forEach(function(item) {
-            // console.log("add param");
             var inputType = "text";
             if (item.type == "DATE") {
                 inputType = "date";
@@ -86,11 +112,14 @@ function loadReportParams() {
             if (item.type == "DATETIME") {
                 inputType = "datetime-local"
             }
+            if (item.type == "NUMBER") {
+                inputType = "number";
+            }
 
             var div = '<div class="report-value-div form-group input-group">' +
                 '<span class="input-group-addon">' + item.name + '</span>' +
                 '<input type="hidden" name="param-id" value="' + item.id + '"/>' +
-                '<input type="' + inputType + '" class="form-control" name="param-value">' +
+                '<input type="' + inputType + '" class="form-control" name="param-value" required>' +
                 '</div>';
 
             paramsPlace.append($(div));
