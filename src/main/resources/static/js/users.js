@@ -1,7 +1,8 @@
 /**
  * Created by Alex on 5/8/2017.
  */
-
+var regions;
+var usersDataList;
 var userData;
 var userData1 = {};
 var userRoleData;
@@ -451,3 +452,114 @@ $(document).ready(function () {
 function redirectToDomains() {
     location.href = "/client/domains";
 };
+
+
+function selectRegion(region) {
+    var selectedRegion = $('#region-selected');
+    selectedRegion.text(region.regionName);
+    selectedRegion.append($("<span class='caret'></span>"));
+    console.log(region.regionName + " selected")
+    //localStorage.setItem("regionId", region.regionId);
+
+    // console.log("region changed");
+    //$(document).trigger("region-changed");
+}
+
+
+// $(document).on("region-changed", function() {console.log("Same file works")});
+
+function loadRegions() {
+    console.log('yee');
+    $.ajax({
+        url: "/api/user/regions/all",
+        success: function(data) {
+
+            $("#new-region").empty();
+            var options = $("#new-region");
+
+            regions = data;
+            regions.forEach(function(item, i) {
+                 console.log(item + " loaded");
+                console.log(item);
+                console.log(item.regionName);
+
+
+                var option = document.createElement("option");
+                if(i==0){
+                    option.setAttribute("selected", "selected");
+                }
+                option.setAttribute("value", item.regionId);
+                option.appendChild(document.createTextNode(item.regionName));
+                options.append(option);
+            });
+            loadUsers();
+        },
+        error: function () {
+            console.error("Cannot load list of regions");
+        }
+    });
+}
+
+function loadUsers() {
+    hideUserInfo();
+    var regionId = $("#new-region").val();
+    console.log("Users Loaded ")
+    console.log(regionId);
+
+    $.ajax({
+        url: "/api/csr/users/find/all/region/" + regionId + "/",
+        success: function(data) {
+
+            var list = $("#csr-users-list");
+            list.empty();
+
+            usersDataList = data;
+            data.forEach(function(item, i) {
+                console.log(item);
+                var ref = document.createElement("a");
+                var orderName = item.email;
+                ref.appendChild(document.createTextNode(orderName));
+                ref.className = "list-group-item";
+                ref.href = "#";
+                ref.onclick = function () {
+                    selectUser(i);
+                };
+                list.append(ref);
+
+            });
+        },
+        error: function () {
+            console.error("Cannot load list of users");
+        }
+    });
+
+}
+
+function selectUser(i){
+    unhideaUserInfo();
+    selectedUser = usersDataList[i];
+    console.log('yee ' + i);
+    console.log(selectedUser);
+    $("#userFirstName").val(selectedUser.firstName);
+    $("#userLastName").val(selectedUser.lastName);
+    $("#userEmail").val(selectedUser.email);
+    $("#userPhone").val(selectedUser.phoneNumber);
+
+/*    $("#mf5").val(userData.address);
+    $("#mf6").val(userData.aptNumber);*/
+
+}
+
+function editUser(){
+    $('a[href$=tab2]').click();
+    $("#tab2-email").val($("#userEmail").val());
+    getUser()
+}
+
+function hideUserInfo(){
+    $("#user-info").attr("hidden", "true");
+}
+
+function unhideaUserInfo(){
+    $("#user-info").removeAttr("hidden");
+}

@@ -25,6 +25,8 @@ public interface UserDao extends CrudDao<User> {
 
     User findUserByComplainId(Long complainId);
 
+    List<User> findUsersByRegionId(int id);
+
     User findResponsibleByComplainId(Long complainId);
 
     User updateWithoutPassword(User user);
