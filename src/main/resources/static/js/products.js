@@ -20,6 +20,7 @@ function getProductCharacteristicValue(productCharacteristicId) {
 function displayCharacteristics() {
     var productType = getProductType($("#product-type-selector").val());
     var ProductCharacteristicValueList = $("#product-characteristics");
+    ProductCharacteristicValueList.empty();
 
     productType.productCharacteristics.forEach(function (productCharacteristic) {
         var value = null;
@@ -114,6 +115,7 @@ function selectProduct(index) {
     $(".cities-container").remove();
 
     var typeSelector = $("#product-type-selector");
+    typeSelector.val([]);
     typeSelector.prop("disabled", false);
 
     $("#product-name-input").val(productsCache[currentSelected].productName);
@@ -143,9 +145,14 @@ function saveSelectedProduct() {
 
     newProduct.productId = productsCache[currentSelected].productId;
     newProduct.productName = $("#product-name-input").val();
-    newProduct.productTypeId = $("#product-type-selector").val();
     newProduct.productDescription = $("#product-description-input").val();
     newProduct.isActive = ($('input[name=product-status]:checked').val() == 'true');
+
+    var productTypeId = extractProductTypeId();
+    if (productTypeId == null) {
+        return;
+    }
+    newProduct.productTypeId = productTypeId;
 
     newProduct.prices = [];
     var resultOfExtracting = extractPrices(newProduct.prices);
@@ -153,25 +160,7 @@ function saveSelectedProduct() {
         return;
     }
 
-    newProduct.productCharacteristicValues = [];
-    $("#product-characteristics").find(".product-characteristic-value-input").each(function () {
-        var value = {
-            valueId: $(this).find('input[name=value-id]').val(),
-            productCharacteristicId: $(this).find('input[name=characteristic-id]').val()
-        };
-        switch ($(this).find('input[name=data-type]').val()) {
-            case 'NUMBER':
-                value.numberValue = +$(this).find('input[name=characteristic-value]').val();
-                break;
-            case 'DATE':
-                value.dateValue = $(this).find('.date').data("DateTimePicker").date();
-                break;
-            case 'STRING':
-                value.stringValue = $(this).find('input[name=characteristic-value]').val();
-                break;
-        }
-        newProduct.productCharacteristicValues.push(value);
-    });
+    newProduct.productCharacteristicValues = extractProductCharacteristicValues();
 
     console.log("Object to be sent from client: " + JSON.stringify(newProduct));
 
@@ -235,6 +224,67 @@ function saveSelectedProduct() {
                 .insertAfter($("#new-product-alert-place"));
         }
     });
+}
+
+function extractProductTypeId() {
+    var productTypeSelector =  $("#product-type-selector");
+    var productTypeId = productTypeSelector.val();
+    if (productTypeId == null) {
+        $("#select-no-product-type-alert").remove();
+        console.error("Error: Product type of product isn`t selected");
+
+        $('<div id="select-no-product-type-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            "Please, specify product type for new product before persisting data</div>")
+            .delay(4000)
+            .fadeOut(function () {
+                $(this).remove();
+            })
+            .insertAfter(productTypeSelector);
+
+        return null;
+    }
+
+    return productTypeId;
+}
+
+function extractProductCharacteristicValues() {
+    var productCharacteristicValues = [];
+
+    $("#product-characteristics").find(".product-characteristic-value-input").each(function () {
+        var value = {
+            valueId: $(this).find('input[name=value-id]').val(),
+            productCharacteristicId: $(this).find('input[name=characteristic-id]').val()
+        };
+
+        var data;
+        switch ($(this).find('input[name=data-type]').val()) {
+            case 'NUMBER':
+                data = $(this).find('input[name=characteristic-value]').val();
+                if (data === '') {
+                    return;
+                }
+                value.numberValue = +data;
+                break;
+            case 'DATE':
+                data = $(this).find('.date').data("DateTimePicker").date();
+                if (data == null) {
+                    return;
+                }
+                value.dateValue = date;
+                break;
+            case 'STRING':
+                data = $(this).find('input[name=characteristic-value]').val();
+                if (data === '') {
+                    return;
+                }
+                value.stringValue = str;
+                break;
+        }
+        productCharacteristicValues.push(value);
+    });
+
+    return productCharacteristicValues;
 }
 
 function extractPrices(prices) {
