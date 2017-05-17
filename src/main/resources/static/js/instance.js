@@ -7,6 +7,9 @@ function buttonsToDown() {
 }
 
 function suspendInstance() {
+    var path = window.location.pathname.split("/");
+    var instanceId = path[path.length - 1];
+
     $.ajax({
         url: "/api/client/orders/new/suspend",
         method: 'POST',
@@ -15,7 +18,7 @@ function suspendInstance() {
         },
         processData: false,
         contentType: 'application/json',
-        data: JSON.stringify({instanceId: JSON.parse(window.name).selectedInstanceId}),
+        data: JSON.stringify({instanceId: instanceId}),
         success: function (data) {
             loadInstance();
         },
@@ -26,6 +29,9 @@ function suspendInstance() {
 }
 
 function continueInstance() {
+    var path = window.location.pathname.split("/");
+    var instanceId = path[path.length - 1];
+
     $.ajax({
         url: "/api/client/orders/new/continue",
         method: 'POST',
@@ -34,7 +40,7 @@ function continueInstance() {
         },
         processData: false,
         contentType: 'application/json',
-        data: JSON.stringify({instanceId: JSON.parse(window.name).selectedInstanceId}),
+        data: JSON.stringify({instanceId: instanceId}),
         success: function (data) {
             loadInstance();
         },
@@ -45,6 +51,9 @@ function continueInstance() {
 }
 
 function deactivateInstance() {
+    var path = window.location.pathname.split("/");
+    var instanceId = path[path.length - 1];
+
     $.ajax({
         url: "/api/client/orders/new/deactivate",
         method: 'POST',
@@ -53,7 +62,7 @@ function deactivateInstance() {
         },
         processData: false,
         contentType: 'application/json',
-        data: JSON.stringify({instanceId: JSON.parse(window.name).selectedInstanceId}),
+        data: JSON.stringify({instanceId: instanceId}),
         success: function (data) {
             loadInstance();
         },
@@ -81,7 +90,6 @@ function cancelOrder(orderId) {
 }
 
 function loadInstance() {
-    // var instanceId = JSON.parse(window.name).selectedInstanceId;
     var path = window.location.pathname.split("/");
     var instanceId = path[path.length - 1];
 
@@ -116,7 +124,7 @@ function loadInstance() {
             //     $("#instance-continue-button").addClass("hidden");
             //     $("#instance-deactivate-button").addClass("hidden");
             } else {
-                console.error("Unknown instasnce status: " + data.status.categoryName);
+                // console.error("Unknown instasnce status: " + data.status.categoryName);
             }
 
             var ordersTable = $("#instance-orders-table");

@@ -10,13 +10,13 @@ function generateReport() {
     // console.log(data);
 
     $.ajax({
-        url: "/api/csr/reports/generate/" + $("#report-select").val(),
-        method: "POST",
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-        },
-        contentType: 'application/json',
-        data: JSON.stringify(data),
+        url: "/api/csr/reports/generate/" + $("#report-select").val() + "/json/" + btoa(JSON.stringify(data)),
+        method: "GET",
+        // headers: {
+        //     'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        // },
+        // contentType: 'application/json',
+        // data: JSON.stringify(data),
         success: function (report) {
             var table = document.createElement("table");
             // table.empty();
