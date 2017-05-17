@@ -1,5 +1,6 @@
 package com.grad.project.nc.controller.api;
 
+import com.grad.project.nc.controller.api.dto.catalog.FrontendCatalogProduct;
 import com.grad.project.nc.controller.api.dto.FrontendProduct;
 import com.grad.project.nc.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,16 @@ public class ProductsController {
         return FrontendProduct.fromEntity(productService.find(id));
     }
 
+    //restful endpoint for product catalog
     @RequestMapping(value = "/byRegion/{id}", method = RequestMethod.GET)
-    public Collection<FrontendProduct> getByRegion(@PathVariable("id") Long id) {
+    public Collection<FrontendCatalogProduct> getByRegion(@PathVariable("id") Long id) {
         return productService.findActiveProductsByRegionId(id)
                 .stream()
-                .map(FrontendProduct::fromEntity)
+                .map(FrontendCatalogProduct::fromEntity)
                 .collect(Collectors.toList());
     }
 
+    //restful endpoint created to obtain products for editing (performed by admin)
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public Collection<FrontendProduct> getAll() {
         return productService.findAll()

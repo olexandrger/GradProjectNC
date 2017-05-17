@@ -1,6 +1,6 @@
 package com.grad.project.nc.controller.api.client;
 
-import com.grad.project.nc.controller.api.dto.FrontendInstance;
+import com.grad.project.nc.controller.api.dto.instance.FrontendInstance;
 import com.grad.project.nc.model.User;
 import com.grad.project.nc.service.instances.InstanceService;
 import com.grad.project.nc.service.security.UserService;

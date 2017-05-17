@@ -1,22 +1,16 @@
 package com.grad.project.nc.service.orders;
 
-import com.grad.project.nc.controller.api.dto.FrontendOrder;
-import com.grad.project.nc.service.exceptions.ServiceSecurityException;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 //TODO security of states changing
 

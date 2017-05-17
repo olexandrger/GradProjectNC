@@ -1,7 +1,6 @@
 package com.grad.project.nc.controller.api.csr;
 
-import com.grad.project.nc.controller.api.dto.FrontendInstance;
-import com.grad.project.nc.model.ProductInstance;
+import com.grad.project.nc.controller.api.dto.instance.FrontendInstance;
 import com.grad.project.nc.service.instances.InstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
