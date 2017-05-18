@@ -626,8 +626,6 @@ function loadUsers() {
             if (data.length > usersListSize) {
                 nextPage.removeClass("hidden");
             }
-
-
         },
         error: function () {
             console.error("Cannot load list of users");

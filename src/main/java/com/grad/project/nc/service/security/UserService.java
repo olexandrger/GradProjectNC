@@ -28,4 +28,8 @@ public interface UserService extends UserDetailsService {
 
     public List<User> findUsersByRegionIdSorted(int id, String sort, Long size, Long offset);
 
+    public String getStatus();
+
+    public String getMessageError();
+
     }

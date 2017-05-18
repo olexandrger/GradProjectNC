@@ -28,6 +28,21 @@ public class UserServiceImpl implements UserService{
     private RoleDao roleDao;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private RegistrationService registrationService;
+
+    private String status;
+    private String messageError;
+    private final String SUCCESS = "success";
+    private final String ERROR = "error";
+    private final String INVALID_EMAIL = "Incorrect email address";
+    private final String INCORRECT_PASSWORD = "Incorrect password. Minimum length - 8 symbols";
+    private final String INCORRECT_PHONE = "Incorrect phone number";
+    private final String FIRST_NAME_IS_EMPTY = "First name is empty";
+    private final String LAST_NAME_IS_EMPTY = "Last name is empty";
+    private final String EMAIL_IS_EMPTY = "Email is empty";
+    private final String PASSWORD_IS_EMPTY = "Password is empty";
+    private final String PHONE_IS_EMPTY = "Phone is empty";
 
    // @Autowired
     //public UserServiceImpl(/*UserDao userDao, RoleDao roleDao,*/ BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -92,6 +107,37 @@ public class UserServiceImpl implements UserService{
     @Override
     public Boolean update(User user) {
 
+        if (user.getFirstName().isEmpty()) {
+            status = ERROR;
+            messageError = FIRST_NAME_IS_EMPTY;
+            return false;
+        }
+        if (user.getLastName().isEmpty()) {
+            status = ERROR;
+            messageError = LAST_NAME_IS_EMPTY;
+            return false;
+        }
+        if (user.getEmail().isEmpty()) {
+            status = ERROR;
+            messageError = EMAIL_IS_EMPTY;
+            return false;
+        }
+        if (user.getPhoneNumber().isEmpty()) {
+            status = ERROR;
+            messageError = PHONE_IS_EMPTY;
+            return false;
+        }
+        if (!registrationService.isPhoneNumberValid(user.getPhoneNumber())) {
+            status = ERROR;
+            messageError = INCORRECT_PHONE;
+            return false;
+        }
+        if (!registrationService.isEmailValid(user.getEmail())) {
+            status = ERROR;
+            messageError = INVALID_EMAIL;
+            return false;
+        }
+
         try {
 
             if (user.getPassword() == null) {
@@ -99,6 +145,16 @@ public class UserServiceImpl implements UserService{
                 user.getDomains();
                 userDao.updateWithoutPassword(user);
             } else {
+                if (user.getPassword().isEmpty()) {
+                    status = ERROR;
+                    messageError = PASSWORD_IS_EMPTY;
+                    return false;
+                }
+                if (!registrationService.isPasswordValid(user.getPassword())) {
+                    status = ERROR;
+                    messageError = INCORRECT_PASSWORD;
+                    return false;
+                }
                 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
                 user.getRoles();
                 user.getDomains();
@@ -165,5 +221,13 @@ public class UserServiceImpl implements UserService{
             sql += "user_id desc";
         }
         return sql;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getMessageError() {
+        return messageError;
     }
 }

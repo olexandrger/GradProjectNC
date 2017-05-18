@@ -66,8 +66,8 @@ public class AdminUsersController {
         log.info("Updating by admin " + frontUser.getFirstName());
 
         if (!userService.update(user)){
-            updateResponse.setMessage("User update error! ");
-            updateResponse.setStatus("error");
+            updateResponse.setMessage(userService.getMessageError());
+            updateResponse.setStatus(userService.getStatus());
         }
         else {
             updateResponse.setMessage("User updated ");

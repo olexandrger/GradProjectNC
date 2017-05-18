@@ -142,7 +142,7 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
                 "select user_id from user_domain where domain_id in\n" +
                 "\t(select domain_id from domain where address_id in \n" +
                 "\t\t(SELECT address_id from address where location_id in \n" +
-                "\t\t\t(select location_id from location where region_id = "+ id + " )))) " + sort + ";";
+                "\t\t\t(select location_id from location where region_id = "+ id + " )))) " + sort + "";
 
         return findMultiplePage(findAllQuery, new UserRowMapper(), size, offset);
     }
