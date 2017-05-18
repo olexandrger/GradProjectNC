@@ -22,8 +22,9 @@
 
 <body>
 
-<div class="container">
+<div class="container" id="min-container">
 <#include "../resources/navbar.ftl"/>
+    <div class="col-sm-12" id = "alerts-bar"></div>
 <#--new complaint modal-->
     <div id="new-complaint-modal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -53,7 +54,7 @@
                     </div>
                     <div class="form-group">
                         <label for="new-complaint-instanse">Product instance</label>
-                        <select class="form-control" name="new-complaint-instanse" id="new-complaint-instanse" >
+                        <select class="form-control" name="new-complaint-instanse" id="new-complaint-instanse">
                         </select>
                     </div>
                     <div class="form-group">
@@ -71,11 +72,12 @@
                         <textarea class="form-control " name="new-complaint-content" rows="5"
                                   placeholder="Content"
                                   maxlength="240"
-                                  id="new-complaint-content" resize ="none"></textarea>
+                                  id="new-complaint-content" resize="none"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-dismiss="modal" id = "create-complaint-ftom-modal-btn"
+                    <button type="button" class="btn btn-success" data-dismiss="modal"
+                            id="create-complaint-ftom-modal-btn"
                             onclick="createNewComplaintFromModal()">Create
                     </button>
                 </div>
@@ -91,8 +93,10 @@
                     <ul class="list-group" id="complain-list"></ul>
                 </div>
                 <div class="panel-footer" id="complain-list-panel-footer">
-                    <button type="button" class="btn" id="complaint-btn-prev"> &larr; Prev.</button>
-                    <button type="button" class="btn" id="complaint-btn-next"> Next &rarr;</button>
+                    <button type="button" class="btn" id="complaint-btn-prev" onclick="getPrevPage()"> &larr; Prev.
+                    </button>
+                    <button type="button" class="btn" id="complaint-btn-next" onclick="getNextPage()"> Next &rarr;
+                    </button>
                     <button type="button" class="btn btn-success" data-toggle="modal"
                             data-target="#new-complaint-modal" onclick="openNewComplaintModal()">
                         New
@@ -252,29 +256,37 @@
                             <div class="row">
                                 <div class="form-group">
                                     <label for="selected-complain-content ">Complain content:</label>
-                                    <textarea class="form-control " name="complain-content" rows="5"
+                                    <textarea class="form-control " name="complain-content" rows="4"
                                               placeholder="Content"
                                               id="selected-complain-content"
-                                              resize ="none" readonly></textarea>
+                                              maxlength="240"
+                                              resize="none" readonly></textarea>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <label for="omplain-response">Complain Responce:</label>
-                                    <textarea class="form-control" name="complain-response" rows="5"
+                                    <textarea class="form-control" name="complain-response" rows="4"
                                               placeholder="Responce"
                                               id="selected-complain-responce"
-                                              resize ="none"></textarea>
+                                              maxlength="240"
+                                              resize="none"></textarea>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
                 <div class="panel-footer" id="complain-content-panel-footer">
-                    <button type="button" class="btn">Update</button>
-                    <button type="button" class="btn">Start</button>
-                    <button type="button" class="btn">Cansel</button>
-                    <button type="button" class="btn">Complete</button>
+                    <button type="button" class="btn" id="take-complaint-btn" onclick="takeComplaintForConsideration()">
+                        Take for consideration
+                    </button>
+                    <button type="button" class="btn" id="complet-consideration-complaint-btn"
+                            onclick="completComplaintConsideration()">
+                        Consideration completed
+                    </button>
+                    <button type="button" class="btn" id="update-complaint-btn" onclick="updateComplaint()">
+                        Update
+                    </button>
                 </div>
             </div>
         </div>

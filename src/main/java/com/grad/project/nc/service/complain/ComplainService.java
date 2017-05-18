@@ -9,6 +9,9 @@ import java.util.Collection;
  * Created by DeniG on 16.05.2017.
  */
 public interface ComplainService {
-    Collection<Complain> getAllComplains(long size, long offset);
-    Complain newComplain(long userId, long instanceId, long reasonId, String title, String content);
+    public Collection<Complain> getAllComplains(long size, long offset);
+    public Complain newComplain(long userId, long instanceId, long reasonId, String title, String content);
+    public void appointComplain(long userId, long complainId);
+    public void updadeComplainResponse(long complainId, long userId, String response);
+    public void completeComplaint(long userId, long complainId);
 }
