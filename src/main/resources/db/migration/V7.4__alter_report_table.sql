@@ -1,0 +1,2 @@
+ALTER TABLE "report"
+  ALTER COLUMN "report_script" SET DATA TYPE TEXT;
