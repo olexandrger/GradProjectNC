@@ -46,26 +46,6 @@ function registerByAdmin() {
 
     console.log(JSON.stringify($("#client").is(':checked')));
 
-    //user-roles-checkboxes
-    var _csrf = $('meta[name=_csrf]').attr("content");
-
-
-
-    $.ajax({
-            type: 'GET',
-            url: '/api/admin/domains/addDomain?address='+address+'&aptNum='+aptNumber+'&type='+domainType+'&name='+domainName,
-            headers: {
-
-                'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-            },
-
-            //data: (address: address,aptNum:aptNumber,type:domainType,name:domainName),
-            dataType: 'json',
-
-            success: function (data) {
-                domains.push(data);
-                console.log(JSON.stringify(data));
-
 
                 $.ajax({
                     type: 'POST',
@@ -88,6 +68,7 @@ function registerByAdmin() {
                         domains: domains
                     }),
                     success: function (data) {
+                        $("#add-domain-btn-reg").removeClass("hidden");
                         var alert;
                         if (data.status == 'success') {
                             console.log("Registration success! " + JSON.stringify(data));
@@ -109,17 +90,6 @@ function registerByAdmin() {
                         $("#registration-header-alert1").replaceWith(alert);
                     }
                 });
-
-
-            },
-            error: function (data) {
-
-
-            }
-
-        }
-    );
-
 
 
 }
@@ -360,7 +330,7 @@ function addUserDomain(node,id, name, city) {
 
 function displayDomain(element) {
     $("#domain-editor").removeClass("hidden");
-    $("#del-dom-btn").removeClass("hidden");
+    //$("#del-dom-btn").removeClass("hidden");
     selectedDomain = element.name;
     console.log("Domain" + selectedDomain);
     for (var characteristic in userData.domains) {
@@ -445,9 +415,128 @@ function removeRole(element) {
 
 $(document).ready(function () {
     loadInfo();
+    changeRegistrationCheckboxes();
+    changeModifyCheckBoxes();
 
 
 });
+
+
+function changeCheckboxes(adminCh,userCh,pmgCh,csrCh) {
+    adminCh.change(function() {
+        if(this.checked) {
+
+            console.log("YEEEEEY CHECKED");
+
+            $(this).prop("checked");
+            userCh.prop('checked',false);
+
+            userCh.prop("disabled", true);
+
+        }
+        else {
+            userCh.prop("disabled", false);
+        }
+
+    });
+    userCh.change(function() {
+        if(this.checked) {
+
+
+            console.log("YEEEEEY CHECKED");
+
+            $(this).prop("checked");
+            adminCh.prop('checked',false);
+            csrCh.prop('checked',false);
+            pmgCh.prop('checked',false);
+
+            adminCh.prop("disabled", true);
+            csrCh.prop("disabled", true);
+            pmgCh.prop("disabled", true);
+        }
+        else {
+
+            adminCh.prop("disabled", false);
+            csrCh.prop("disabled", false);
+            pmgCh.prop("disabled", false);
+
+        }
+
+    });
+    csrCh.change(function() {
+        if(this.checked) {
+
+
+            console.log("YEEEEEY CHECKED");
+
+            $(this).prop("checked");
+            //adminCh.prop('checked',false);
+            userCh.prop('checked',false);
+
+            if (!adminCh.prop("checked")) {
+                adminCh.prop('checked',false);
+                adminCh.prop("disabled", true);
+            }
+
+
+            //adminCh.prop("disabled", true);
+            userCh.prop("disabled", true);
+
+        }
+        else {
+
+            if(!pmgCh.prop("checked")) {
+
+                adminCh.prop("disabled", false);
+
+                userCh.prop("disabled", false);
+            }
+
+        }
+
+    });
+    pmgCh.change(function() {
+
+        if(this.checked) {
+
+
+            console.log("YEEEEEY CHECKED");
+
+            $(this).prop("checked");
+
+            userCh.prop('checked',false);
+
+
+            if (!adminCh.prop("checked")) {
+                adminCh.prop('checked',false);
+                adminCh.prop("disabled", true);
+            }
+            //adminCh.prop("disabled", true);
+            userCh.prop("disabled", true);
+
+        }
+        else {
+
+            if(!csrCh.prop("checked")) {
+
+                adminCh.prop("disabled", false);
+
+                userCh.prop("disabled", false);
+            }
+
+        }
+
+    });
+
+}
+
+function changeModifyCheckBoxes() {
+    changeCheckboxes($("#adminM"),$("#clientM"),$("#pmgM"),$("#csrM"))
+}
+
+function changeRegistrationCheckboxes() {
+    changeCheckboxes($("#adminchbx"),$("#client"),$("#pmgchbx"),$("#csrchbx"));
+}
 
 function redirectToDomains() {
     location.href = "/client/domains";

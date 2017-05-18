@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class FrontendDiscount {
     private Long discountId;
     private String discountTitle;
-    private double discount;
+    private Double discount;
     private OffsetDateTime startDate;
     private OffsetDateTime endDate;
     private List<FrontEndProductRegionPrice> productRegionPrices;
@@ -28,9 +28,23 @@ public class FrontendDiscount {
                 .discountTitle(discount.getDiscountTitle())
                 .discount(discount.getDiscount())
                 .startDate(discount.getStartDate())
-                .endDate(discount.getEndDate()).productRegionPrices(discount.getProductRegionPrices().stream()
+                .endDate(discount.getEndDate())
+                .productRegionPrices(discount.getProductRegionPrices().stream()
                         .map(FrontEndProductRegionPrice::fromEntity)
                         .collect(Collectors.toList()))
                 .build();
+    }
+
+    public static Discount toEntity(FrontendDiscount frontendDiscount){
+
+        return Discount.builder().discountId(frontendDiscount.getDiscountId())
+                .discountTitle(frontendDiscount.getDiscountTitle()).discount(frontendDiscount.getDiscount())
+                .startDate(frontendDiscount.getStartDate())
+                .endDate(frontendDiscount.getEndDate())
+                .productRegionPrices(frontendDiscount.getProductRegionPrices().stream()
+                        .map(FrontEndProductRegionPrice::toEntity)
+                        .collect(Collectors.toList()))
+                .build();
+
     }
 }

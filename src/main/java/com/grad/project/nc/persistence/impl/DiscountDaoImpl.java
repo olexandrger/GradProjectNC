@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence.impl;
 
 import com.grad.project.nc.model.Discount;
+import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.proxy.DiscountProxy;
 import com.grad.project.nc.persistence.AbstractDao;
 import com.grad.project.nc.persistence.DiscountDao;
@@ -9,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -30,6 +33,7 @@ public class DiscountDaoImpl extends AbstractDao implements DiscountDao {
     }
 
     @Override
+    @Transactional
     public Discount add(Discount discount) {
         String insertQuery = "INSERT INTO \"discount\" (\"discount_title\", \"discount\", " +
                 "\"start_date\", \"end_date\") VALUES (?, ?, ?, ?)";
@@ -39,10 +43,16 @@ public class DiscountDaoImpl extends AbstractDao implements DiscountDao {
 
         discount.setDiscountId(discountId);
 
+        deleteDiscountProductPrices(discountId);
+        persistDiscountProductPrices(discount);
+
+
+
         return discount;
     }
 
     @Override
+    @Transactional
     public Discount update(Discount discount) {
         String updateQuery = "UPDATE \"discount\" SET \"discount_title\" = ?, \"discount\" = ?, " +
                 "\"start_date\" = ?, \"end_date\" = ? WHERE \"discount_id\" = ?";
@@ -50,7 +60,32 @@ public class DiscountDaoImpl extends AbstractDao implements DiscountDao {
         executeUpdate(updateQuery, discount.getDiscountTitle(), discount.getDiscount(),
                 discount.getStartDate(), discount.getEndDate(), discount.getDiscountId());
 
+        deleteDiscountProductPrices(discount.getDiscountId());
+        persistDiscountProductPrices(discount);
+
+
         return discount;
+    }
+
+    @Override
+    public void deleteDiscountProductPrices(Long discountId) {
+        String deleteQuery = "DELETE FROM \"discount_price\" WHERE \"discount_id\" = ?";
+
+        executeUpdate(deleteQuery, discountId);
+    }
+
+
+    @Override
+    @Transactional
+    public void persistDiscountProductPrices(Discount discount) {
+        String insertQuery = "INSERT INTO \"discount_price\" (\"discount_id\", \"price_id\") VALUES(?, ?)";
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        for (ProductRegionPrice price : discount.getProductRegionPrices()) {
+            batchArgs.add(new Object[]{discount.getDiscountId(), price.getPriceId()});
+        }
+
+        batchUpdate(insertQuery, batchArgs);
     }
 
     @Override

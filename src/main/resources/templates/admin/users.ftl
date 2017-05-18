@@ -70,7 +70,7 @@
                                         <input type="checkbox" id="adminchbx">Admin
                                     </label>
                                     <label class="checkbox-inline">
-                                        <input type="checkbox" id="client" checked>Client
+                                        <input type="checkbox" id="client">Client
                                     </label>
                                     <label class="checkbox-inline">
                                         <input type="checkbox" id="csrchbx">CSR
@@ -82,12 +82,11 @@
 
                                 <div class="row">
                                     <div class="col-sm-12" style="margin-top: 10px;">
-                                        <div class="col-xs-12 text-center">
-                                            <div class="form-group">
-                                                <a class="btn btn-success" onclick="registerByAdmin()">
-                                                    Register
-                                                </a>
-                                            </div>
+
+                                        <div class="btn-group inline" >
+
+                                            <button type="button" class="btn btn-success" onclick="registerByAdmin()" >Register</button>
+                                        <button type="button" class="btn btn-default btn hidden" onclick="redirectToDomains()" id="add-domain-btn-reg">Add user to existing domain</button>
                                         </div>
                                     </div>
                                 </div>
@@ -111,7 +110,7 @@
                                 <#--</a>-->
 
 
-                                <p>User domain info:</p>
+                               <#-- <p>User domain info:</p>
                                 <div  id="domain-editor2">
 
                                     <div class="row">
@@ -147,13 +146,13 @@
 
                                              <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
                                                 <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
-                                                <#--</a>-->
+                                                <#--</a>
                                             </div>
                                     </div>
                                 </div>
 
                             </div>
-                        </div>
+                        </div>-->
 
                             </div></div></div>
                     <div class="tab-pane" id="tab2">

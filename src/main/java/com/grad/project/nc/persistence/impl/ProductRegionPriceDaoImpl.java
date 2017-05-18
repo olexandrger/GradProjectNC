@@ -173,6 +173,13 @@ public class ProductRegionPriceDaoImpl extends AbstractDao implements ProductReg
     }
 
     @Override
+    public List<ProductRegionPrice> findAllWithoutActiveDiscountForRegion(Long regionId) {
+
+        //TODO
+        return null;
+    }
+
+    @Override
     public ProductRegionPrice find(Long regionId, Long priceId) {
         String query = "SELECT prp.\"price_id\", prp.\"product_id\", prp.\"region_id\", prp.\"price\" " +
                 "FROM \"product_region_price\" prp " +
@@ -180,6 +187,9 @@ public class ProductRegionPriceDaoImpl extends AbstractDao implements ProductReg
 
         return findOne(query, new ProductRegionPriceRowMapper(), regionId, priceId);
     }
+
+
+
 
     private class ProductRegionPriceRowMapper implements RowMapper<ProductRegionPrice> {
 

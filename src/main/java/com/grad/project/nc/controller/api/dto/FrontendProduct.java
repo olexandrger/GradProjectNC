@@ -38,7 +38,7 @@ public class FrontendProduct {
 
     }
 
-    public Product toModel() {
+    public  Product toModel() {
         return Product.builder()
                 .productId(getProductId())
                 .productName(getProductName())
@@ -55,4 +55,6 @@ public class FrontendProduct {
                         .collect(Collectors.toList()))
                 .build();
     }
+
+
 }

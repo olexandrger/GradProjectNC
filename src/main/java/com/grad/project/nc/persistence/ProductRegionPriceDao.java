@@ -23,6 +23,7 @@ public interface ProductRegionPriceDao extends CrudDao<ProductRegionPrice> {
     List<ProductRegionPrice> findByProductId(Long productId);
 
     List<ProductRegionPrice> findByRegionId(Long regionId);
+    List<ProductRegionPrice> findAllWithoutActiveDiscountForRegion(Long regionId);
 
     ProductRegionPrice find(Long regionId, Long priceId);
 }

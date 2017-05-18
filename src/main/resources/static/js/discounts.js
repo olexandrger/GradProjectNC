@@ -1,8 +1,10 @@
 var regionsData;
 var discounts=[];
+var discountsCache=[];
 var productPricesForRegion;
 var productPricesForDiscount = [];
 var numberOfAdded = 0;
+var currentSelected = -1;
 function addDiscount() {
     clearDataFields();
 
@@ -20,7 +22,9 @@ function addDiscount() {
         ref.className = "list-group-item";
         var index = discounts.length;
         ref.onclick = function () {
+            //currentSelected = index;
             selectDiscount(index);
+
         };
 
         list.append(ref);
@@ -38,6 +42,65 @@ function addDiscount() {
 
 
     
+}
+function saveSelected() {
+    var discount = discounts[currentSelected];
+
+    var title = $("#discount-name-input").val();
+    var startDate = $('#datetimepicker1').data("DateTimePicker").date().unix();
+    var endDate = $('#datetimepicker2').data("DateTimePicker").date().unix();
+    var discountAmm = $("#ammInput").val();
+
+    discount.discountTitle = title;
+    discount.startDate = startDate;
+    discount.endDate = endDate;
+    discount.discount = discountAmm;
+
+    console.log(JSON.stringify(discounts[currentSelected]));
+
+    var operationType;
+    if(discount.discountId >= 0){
+        operationType = "update";
+    }else {
+        operationType = "add";
+    }
+
+
+
+    $.ajax({
+        type: 'POST',
+        url: '/api/admin/discounts/' + operationType,
+        headers: {
+
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        processData: false,
+        contentType: 'application/json',
+        data: JSON.stringify(discount),
+        success: function (data) {
+            //var alert;
+            if (data.status == 'success') {
+                console.log("Success on " + operationType + JSON.stringify(data));
+                //alert = $('<div id="search-alert" class="alert alert-success" role="alert">' +
+                    //"User " + userData1.email+" updated!" + "</div>");
+            } else {
+                console.log("Error on  " + operationType + JSON.stringify(data));
+               // alert = $('<div id="search-alert" class="alert alert-danger" role="alert">' +
+                  //  data.message + '</div>');
+            }
+
+
+           // $("#search-alert").replaceWith(alert);
+        },
+        error: function (data) {
+            console.error("Error on  " + operationType + JSON.stringify(data));
+            //var alert = $('<div id="search-alert" class="alert alert-danger" role="alert">' +
+              //  "Update failed</div>");
+           // $("#search-alert").replaceWith(alert);
+        }
+    });
+
+
 }
 function loadAllDiscounts() {
     $.ajax({
@@ -76,6 +139,7 @@ function loadAllDiscounts() {
 
 function selectDiscount(i) {
     clearDataFields();
+    currentSelected = i;
 
     console.log(JSON.stringify(discounts[i].discountTitle));
 
@@ -105,7 +169,8 @@ function addToProducts() {
 
     for (var i in productPricesForRegion){
         if(productPricesForRegion[i].priceId == id ){
-            productPricesForDiscount.push(productPricesForRegion[i]);
+            //productPricesForDiscount.push(productPricesForRegion[i]);
+            discounts[currentSelected].productRegionPrices.push(productPricesForRegion[i]);
         }
     }
 
@@ -219,6 +284,36 @@ function loadAllRegions() {
             console.error("Cannot load list product types");
         }
     });
+
+}
+
+function deleteSelectedProducts() {
+    console.log(JSON.stringify(discounts[currentSelected].productRegionPrices));
+    var tmpArr = [];
+
+    // $('.all').prop("checked",false);
+    var items = $("#products input:checked:not('.all')");
+    items.each(function(idx,item){
+        var choice = $(item);
+        var deleteDomId = choice.parent().attr("name");
+
+
+        for (var characteristic in discounts[currentSelected].productRegionPrices) {
+
+            if(discounts[currentSelected].productRegionPrices[characteristic].priceId == deleteDomId){
+                // tmpArr.push(userData.domains[characteristic]);
+                discounts[currentSelected].productRegionPrices.splice(characteristic,1);
+                choice.parent().remove();
+
+                console.log(JSON.stringify(characteristic));
+
+            }
+        }
+
+    });
+
+    //userData.domains = tmpArr;
+    console.log(JSON.stringify(discounts[currentSelected].productRegionPrices));
 
 }
 

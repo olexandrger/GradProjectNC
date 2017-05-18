@@ -5,6 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -108,11 +111,21 @@
 
                         </div>
 
-                            <button type="button" onclick="addToProducts()" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>Add to products</button>
+                            <button type="button" onclick="addToProducts()" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>Add</button>
+
+                                <button type="button" class="btn btn-danger btn-sm " onclick="deleteSelectedProducts()" id="del-dom-btn">Remove selected products </button>
+
 
                         </form>
 
                         <div class="list-group" style="margin-top: 10px;" id="products"></div>
+                        <div class="row">
+                            <div class="col-sm-12" style="margin-top: 10px;">
+
+
+
+                            </div>
+                        </div>
 
 
                     </div>

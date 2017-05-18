@@ -22,4 +22,14 @@ public class FrontEndProductRegionPrice {
                 .price(productRegionPrice.getPrice())
                 .build();
     }
+
+    public static ProductRegionPrice toEntity(FrontEndProductRegionPrice frontEndProductRegionPrice){
+        return ProductRegionPrice.builder()
+                .priceId(frontEndProductRegionPrice.getPriceId())
+                .product(frontEndProductRegionPrice.getProduct().toModel())
+                .region(frontEndProductRegionPrice.getRegion().toModel())
+                .price(frontEndProductRegionPrice.getPrice())
+                .build();
+
+    }
 }
