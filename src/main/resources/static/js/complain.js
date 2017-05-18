@@ -33,13 +33,13 @@ function loadComplaints() {
             });
             prevPage = $("#complaint-btn-prev");
             nextPage = $("#complaint-btn-next");
-            nextPage.addClass("disabled");
-            prevPage.addClass("disabled");
+            nextPage.attr("disabled","disabled");
+            prevPage.attr("disabled","disabled");
             if (complaintListCurrentPage > 0) {
-                prevPage.removeClass("disabled");
+                prevPage.removeAttr("disabled");
             }
             if (data.length > complaintListSize) {
-                nextPage.removeClass("disabled");
+                nextPage.removeAttr("disabled");
             }
             selectComplaint(selectedComplain);
         },

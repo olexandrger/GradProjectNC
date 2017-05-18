@@ -92,6 +92,9 @@ public class ComplainServiceImpl implements ComplainService {
         if(complain.getStatus().getCategoryId() == COMPLAIN_STATUS_UNDER_CONSIDERATION && complain.getResponsible().getUserId()!=userId){
             throw new IncorrectItemStateException("You can not change a complaint, assigned to another responsible!");
         }
+        if(complain.getStatus().getCategoryId() != COMPLAIN_STATUS_UNDER_CONSIDERATION && complain.getStatus().getCategoryId() != COMPLAIN_STATUS_CREATED){
+            throw new IncorrectItemStateException("You can not change a  complaint in status "+ complain.getStatus().getCategoryName());
+        }
         complain.setResponse(response);
         complainDao.update(complain);
     }
