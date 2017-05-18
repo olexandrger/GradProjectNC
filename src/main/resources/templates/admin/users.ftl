@@ -322,9 +322,20 @@
                                             onchange="loadUsers()">
                                     </select>
                                 </div>
-                                <div class="list-group" id="csr-users-list">
-
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="phone" id="find-by-phone">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" onclick="loadByPhone()">Find by phone<span class="glyphicon "></span></button></span>
                                 </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-primary" onclick="sortByPhone(); loadUsers()">Sort by phone</button>
+                                    <button type="button" class="btn btn-primary" onclick="sortByLastName(), loadUsers()">Sort by last name</button>
+                                </div>
+                                <div class="list-group" id="csr-users-list"></div>
+                                <ul class="pager">
+                                    <li class="previous hidden" id="users-page-previous"><a href="#" onclick="previousPage()">Previous</a></li>
+                                    <li class="next hidden" id="users-page-next"><a href="#" onclick="nextPage()">Next</a></li>
+                                </ul>
                             </div>
                             <div class="col-sm-8" id="user-info">
                                 <div id="registration-header-alert1"></div>

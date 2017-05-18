@@ -42,4 +42,8 @@ public interface UserDao extends CrudDao<User> {
     void addUserDomain(Long userId, Long roleId);
 
     void deleteUserDomain(Long userId, Long roleId);
-}
+
+    public List<User> findSorted(String sort, Long size, Long offset);
+
+    public List<User> findUsersByRegionIdSort(int id, String sort, Long size, Long offset);
+    }

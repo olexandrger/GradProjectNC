@@ -33,13 +33,16 @@ public class CsrUsersController {
     }
 
 
-    @RequestMapping(value = "/find/all", method = RequestMethod.GET)
-    Collection<FrontendUser> findAllUsers(){
-        return userService.findAllUsers().stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
-    }
+/*    @RequestMapping(value = "/find/phone/{phone}", method = RequestMethod.GET)
+    Collection<FrontendUser> findUsersByPhone(@PathVariable String phone){
+        return userService.findUsersPhone(phone).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+    }*/
 
-    @RequestMapping(value = "/find/all/region/{region}/", method = RequestMethod.GET)
-    Collection<FrontendUser> findUsersByRegion(@PathVariable int region){
-        return userService.findUsersByRegionId(region).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+    @RequestMapping(value = "/find/all/size/{size}/offset/{offset}/region/{region}/sort/{sort}", method = RequestMethod.GET)
+    Collection<FrontendUser> findUsersByRegion(@PathVariable Long size, @PathVariable Long offset, @PathVariable int region,@PathVariable String sort){
+        if (region == 0){
+            return userService.findAllUsersSorted(sort, size, offset).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+        }
+        return userService.findUsersByRegionIdSorted(region, sort, size, offset).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
     }
 }

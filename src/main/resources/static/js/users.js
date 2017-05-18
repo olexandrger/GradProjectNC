@@ -2,6 +2,9 @@
  * Created by Alex on 5/8/2017.
  */
 var regions;
+var sort;
+var usersListSize = 10;
+var usersListCurrentPage = 0;
 var usersDataList;
 var userData;
 var userData1 = {};
@@ -565,18 +568,14 @@ function loadRegions() {
 
             $("#new-region").empty();
             var options = $("#new-region");
-
+            var option = document.createElement("option");
+            option.setAttribute("selected", "selected");
+            option.setAttribute("value", 0);
+            option.appendChild(document.createTextNode("All regions"));
+            options.append(option);
             regions = data;
             regions.forEach(function(item, i) {
-                 console.log(item + " loaded");
-                console.log(item);
-                console.log(item.regionName);
-
-
                 var option = document.createElement("option");
-                if(i==0){
-                    option.setAttribute("selected", "selected");
-                }
                 option.setAttribute("value", item.regionId);
                 option.appendChild(document.createTextNode(item.regionName));
                 options.append(option);
@@ -594,9 +593,8 @@ function loadUsers() {
     var regionId = $("#new-region").val();
     console.log("Users Loaded ")
     console.log(regionId);
-
     $.ajax({
-        url: "/api/csr/users/find/all/region/" + regionId + "/",
+        url: "/api/csr/users/find/all/size/"+ (usersListSize + 1) +"/offset/" + usersListCurrentPage * usersListSize + "/region/" + regionId + "/sort/"+ sort + "/",
         success: function(data) {
 
             var list = $("#csr-users-list");
@@ -604,18 +602,32 @@ function loadUsers() {
 
             usersDataList = data;
             data.forEach(function(item, i) {
-                console.log(item);
-                var ref = document.createElement("a");
-                var orderName = item.email;
-                ref.appendChild(document.createTextNode(orderName));
-                ref.className = "list-group-item";
-                ref.href = "#";
-                ref.onclick = function () {
-                    selectUser(i);
-                };
-                list.append(ref);
-
+                if (i < usersListSize) {
+                    console.log(item);
+                    var ref = document.createElement("a");
+                    var orderName = item.email;
+                    ref.appendChild(document.createTextNode(orderName));
+                    ref.className = "list-group-item";
+                    ref.href = "#";
+                    ref.onclick = function () {
+                        selectUser(i);
+                    };
+                    list.append(ref);
+                }
             });
+
+            var prevPage = $("#users-page-previous");
+            var nextPage = $("#users-page-next");
+            nextPage.addClass("hidden");
+            prevPage.addClass("hidden");
+            if (usersListCurrentPage > 0) {
+                prevPage.removeClass("hidden");
+            }
+            if (data.length > usersListSize) {
+                nextPage.removeClass("hidden");
+            }
+
+
         },
         error: function () {
             console.error("Cannot load list of users");
@@ -651,4 +663,27 @@ function hideUserInfo(){
 
 function unhideaUserInfo(){
     $("#user-info").removeAttr("hidden");
+}
+
+
+function sortByPhone() {
+    sort = "phone";
+}
+
+function sortByLastName() {
+    sort = "lastname";
+}
+
+function sortById() {
+    sort = "lastname";
+}
+
+function nextPage() {
+    usersListCurrentPage++;
+    loadUsers();
+}
+
+function previousPage() {
+    usersListCurrentPage--;
+    loadUsers();
 }

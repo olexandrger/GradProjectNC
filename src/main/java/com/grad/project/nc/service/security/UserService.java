@@ -24,4 +24,8 @@ public interface UserService extends UserDetailsService {
 
     public List<User> findUsersByRegionId(int id);
 
-}
+    public List<User> findAllUsersSorted(String sort, Long size, Long offset);
+
+    public List<User> findUsersByRegionIdSorted(int id, String sort, Long size, Long offset);
+
+    }
