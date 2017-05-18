@@ -136,6 +136,6 @@ public class DomainServiceImpl implements DomainService {
     }
 
     private Category convertFrontendCategoryToCategory(FrontendCategory frontendCategory) {
-        return categoryDao.findByCategoryName(frontendCategory.getCategoryName());
+        return categoryDao.find(frontendCategory.getCategoryId());
     }
 }
