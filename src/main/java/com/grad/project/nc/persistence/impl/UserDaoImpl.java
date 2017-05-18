@@ -84,6 +84,24 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     }
 
     @Override
+    @Transactional
+    public User updateGeneralInformation(User user) {
+        String updateQuery = "UPDATE \"user\" SET \"email\" = ? ," +
+                "\"first_name\" = ?, \"last_name\" = ?, \"phone_number\" = ? WHERE \"user_id\" = ?";
+        executeUpdate(updateQuery, user.getEmail(),
+                user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getUserId());
+        return user;
+    }
+
+    @Override
+    @Transactional
+    public User updatePassword(User user) {
+        String updateQuery = "UPDATE \"user\" SET \"password\" = ? ";
+        executeUpdate(updateQuery, user.getPassword());
+        return user;
+    }
+
+    @Override
     public User find(Long id) {
         String findOneQuery = "SELECT \"user_id\", \"email\", \"password\", \"first_name\", " +
                 "\"last_name\", \"phone_number\" FROM \"user\" WHERE \"user_id\" = ?";

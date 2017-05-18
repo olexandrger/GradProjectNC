@@ -36,8 +36,10 @@ public class AccountController {
             User user = userOptional.get();
             result.put("authenticated", "true");
             result.put("name", user.getFirstName() + " " + user.getLastName());
-
+            result.put("userId", user.getUserId());
             List<Link> profileLinks = new LinkedList<>();
+
+            profileLinks.add(new Link("Edit profile", "/profile/edit"));
 
             if (user.getRoles().contains(roleDao.findByName("ROLE_CLIENT"))) {
                 profileLinks.add(new Link("Domains", "/client/domains"));

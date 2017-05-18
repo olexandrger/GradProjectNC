@@ -19,9 +19,13 @@ public class LogoutServiceImpl implements LogoutService {
         checkedUrls.add("admin");
         checkedUrls.add("csr");
         checkedUrls.add("client");
+        checkedUrls.add("pmg");
         checkedUrls.add("api/admin");
         checkedUrls.add("api/csr");
         checkedUrls.add("api/client");
+        checkedUrls.add("api/pmg");
+        checkedUrls.add("profile");
+        checkedUrls.add("api/profile");
     }
 
     @Override

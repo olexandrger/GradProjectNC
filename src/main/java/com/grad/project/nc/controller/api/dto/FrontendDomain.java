@@ -3,8 +3,12 @@ package com.grad.project.nc.controller.api.dto;
 import com.grad.project.nc.model.Address;
 import com.grad.project.nc.model.Category;
 import com.grad.project.nc.model.Domain;
+import com.grad.project.nc.model.User;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -14,6 +18,7 @@ public class FrontendDomain {
     private Long regionId;
     private FrontendAddress address;
     private FrontendCategory domainType;
+    private List<User> users;
 
     public static FrontendDomain fromEntity(Domain domain) {
         return builder()
@@ -22,6 +27,7 @@ public class FrontendDomain {
                 .regionId(domain.getAddress().getLocation().getRegion().getRegionId())
                 .address(FrontendAddress.fromEntity(domain.getAddress()))
                 .domainType(FrontendCategory.fromEntity(domain.getDomainType()))
+                //.users(domain.getUsers().stream().map(FrontendUser::fromEntity).collect(Collectors.toList()))
                 .build();
     }
 }

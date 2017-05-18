@@ -16,8 +16,12 @@ public interface UserService extends UserDetailsService {
 
     Boolean update(User user);
 
+    Boolean updateGeneralInformation(User user);
+
+    Boolean updatePassword(User user);
+
     public List<User> findAllUsers();
 
     public List<User> findUsersByRegionId(int id);
 
-    }
+}

@@ -62,10 +62,16 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
 
 
         executeUpdate(updateQuery, complain.getUser().getUserId(),
-                complain.getProductInstance().getInstanceId(), complain.getComplainTitle(),
-                complain.getContent(), complain.getStatus().getCategoryId(), complain.getResponsible().getUserId(),
-                complain.getResponse(), complain.getOpenDate(), complain.getCloseDate(),
-                complain.getComplainReason().getCategoryId(), complain.getComplainId());
+                complain.getProductInstance().getInstanceId(),
+                complain.getComplainTitle(),
+                complain.getContent(),
+                complain.getStatus().getCategoryId(),
+                (complain.getResponsible() == null) ? (null) : (complain.getResponsible().getUserId()),
+                complain.getResponse(),
+                complain.getOpenDate(),
+                complain.getCloseDate(),
+                complain.getComplainReason().getCategoryId(),
+                complain.getComplainId());
 
         return complain;
     }
@@ -84,8 +90,8 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
     public List<Complain> findAll() {
         String findAllQuery = "SELECT \"complain_id\", \"user_id\", \"product_instance_id\", " +
                 "\"complain_title\", \"content\", \"status_id\", \"responsible_id\", \"response\", " +
-                "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\"" +
-                "ORDER BY close_date DESC NULL FIRST, open_date DESC";
+                "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\" " +
+                "ORDER BY close_date DESC NULLS FIRST, open_date DESC";
 
         return findMultiple(findAllQuery, new ComplainRowMapper());
     }
@@ -94,7 +100,8 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
     public List<Complain> findAll(long size, long offset) {
         String findAllQuery = "SELECT \"complain_id\", \"user_id\", \"product_instance_id\", " +
                 "\"complain_title\", \"content\", \"status_id\", \"responsible_id\", \"response\", " +
-                "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\"";
+                "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\" " +
+                " ORDER BY close_date DESC NULLS FIRST, open_date DESC";
         return findMultiplePage(findAllQuery, new ComplainRowMapper(), size, offset);
     }
 

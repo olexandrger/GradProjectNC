@@ -31,6 +31,10 @@ public interface UserDao extends CrudDao<User> {
 
     User updateWithoutPassword(User user);
 
+    User updateGeneralInformation(User user);
+
+    User updatePassword(User user);
+
     void addUserRole(Long userId, Long roleId);
 
     void deleteUserRole(Long userId, Long roleId);
