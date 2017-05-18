@@ -1,6 +1,7 @@
 package com.grad.project.nc.persistence.impl;
 
 import com.grad.project.nc.model.Domain;
+import com.grad.project.nc.model.User;
 import com.grad.project.nc.model.proxy.DomainProxy;
 import com.grad.project.nc.persistence.AbstractDao;
 import com.grad.project.nc.persistence.DomainDao;
@@ -47,7 +48,6 @@ public class DomainDaoImpl extends AbstractDao implements DomainDao {
 
         executeUpdate(updateQuery, domain.getDomainName(), domain.getAddress().getAddressId(),
                 domain.getDomainType().getCategoryId(), domain.getDomainId());
-
         return domain;
     }
 
@@ -69,7 +69,6 @@ public class DomainDaoImpl extends AbstractDao implements DomainDao {
     @Override
     public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"domain\" WHERE \"domain_id\" = ?";
-
         executeUpdate(deleteQuery, id);
     }
 
@@ -90,6 +89,12 @@ public class DomainDaoImpl extends AbstractDao implements DomainDao {
                 "\"user_id\" = ?";
 
         executeUpdate(deleteQuery, domainId, userId);
+    }
+
+    @Override
+    public void deleteDomainUsers(Long domainId) {
+        String deleteQuery = "DELETE FROM \"user_domain\" WHERE \"domain_id\" = ? ";
+        executeUpdate(deleteQuery, domainId);
     }
 
     @Override
