@@ -271,14 +271,14 @@ function extractProductCharacteristicValues() {
                 if (data == null) {
                     return;
                 }
-                value.dateValue = date;
+                value.dateValue = data;
                 break;
             case 'STRING':
                 data = $(this).find('input[name=characteristic-value]').val();
                 if (data === '') {
                     return;
                 }
-                value.stringValue = str;
+                value.stringValue = data;
                 break;
         }
         productCharacteristicValues.push(value);
