@@ -24,7 +24,7 @@
 
 <div class="container" id="min-container">
 <#include "../resources/navbar.ftl"/>
-    <div class="col-sm-12" id = "alerts-bar"></div>
+    <div class="col-sm-12" id="alerts-bar"></div>
 <#--new complaint modal-->
     <div id="new-complaint-modal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -88,7 +88,17 @@
     <div class="row">
         <div class="col-sm-4">
             <div class="panel panel-default">
-                <div class="panel-heading" id="complain-list-panel-heading">Complains</div>
+                <div class="panel-heading" id="complain-list-panel-heading">
+                    <b>Complains:</b>
+                    <button type="button" class="btn" id="complaint-btn-prev-up" onclick="getPrevPage()"> &larr; Prev.
+                    </button>
+                    <button type="button" class="btn" id="complaint-btn-next-up" onclick="getNextPage()"> Next &rarr;
+                    </button>
+                    <button type="button" class="btn btn-success" data-toggle="modal"
+                            data-target="#new-complaint-modal" onclick="openNewComplaintModal()">
+                        New
+                    </button>
+                </div>
                 <div class="panel-body" id="complain-list-panel-body">
                     <ul class="list-group" id="complain-list"></ul>
                 </div>
@@ -127,14 +137,14 @@
 
                         <div class="col-sm-4">
                             <button class="btn btn-default" data-toggle="collapse"
-                                    data-target="#complain-user-details">&darr; More
+                                    data-target="#complain-user-details-collapse">&darr; More
                             </button>
                         </div>
                     </div>
 
                     <div class="col-sm-12">
-                        <div id="complain-user-details" class="collapse">
-                            <div class="row">
+                        <div  class="collapse" id="complain-user-details-collapse">
+                            <div class="row" id="complain-user-details">
                                 user details
                             </div>
                             <br>
@@ -143,61 +153,51 @@
 
 
                 <#--responsible-->
-                    <div class="row">
-                        <form>
-                            <div class="form-group">
-                                <div class="col-sm-4">
-                                    <label for="complain-responsible-email">Responsible email:</label>
+                    <div id="responsible-info-row">
+                        <div class="row" >
+                            <form>
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label for="complain-responsible-email">Responsible email:</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="email" class="form-control" id="complain-responsible-email"
+                                               value="1@1.com" disabled>
+                                    </div>
                                 </div>
-                                <div class="col-sm-4">
-                                    <input type="email" class="form-control" id="complain-responsible-email"
-                                           value="1@1.com" disabled>
-                                </div>
+                            </form>
+                            <div class="col-sm-4">
+                                <button class="btn btn-default" data-toggle="collapse"
+                                        data-target="#complain-responsible-details-collapse">&darr; More
+                                </button>
                             </div>
-                        </form>
-                        <div class="col-sm-4">
-                            <button class="btn btn-default" data-toggle="collapse"
-                                    data-target="#complain-responsible-details">&darr; More
-                            </button>
                         </div>
-                    </div>
-                    <div class="col-sm-12">
-                        <div id="complain-responsible-details" class="collapse">
-                            <div class="row">
-                                responsible details
+                        <div class="col-sm-12">
+                            <div id="complain-responsible-details-collapse" class="collapse">
+                                <div class="row" id="complain-responsible-details">
+                                    responsible details
+                                </div>
+                                <br>
                             </div>
-                            <br>
                         </div>
                     </div>
 
                 <#--instanse-->
-                    <div class="row">
-                        <form>
-                            <div class="form-group">
-                                <div class="col-sm-4">
-                                    <label for="complain-instance-name">Instance name:</label>
+                    <div id="instance-info-row">
+                        <div class="row">
+                            <form>
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label for="complain-instance-name">Instance name:</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="complain-instance-name"
+                                               value="Internet 100500" disabled>
+                                    </div>
                                 </div>
-                                <div class="col-sm-4">
-                                    <input type="text" class="form-control" id="complain-instance-name"
-                                           value="Internet 100500" disabled>
-                                </div>
-                            </div>
-                        </form>
-                        <div class="col-sm-4">
-                            <button class="btn btn-default" data-toggle="collapse"
-                                    data-target="#complain-instance-details">&darr; More
-                            </button>
+                            </form>
                         </div>
                     </div>
-                    <div class="col-sm-12">
-                        <div id="complain-instance-details" class="collapse">
-                            <div class="row">
-                                responsible details
-                            </div>
-                            <br>
-                        </div>
-                    </div>
-
                 <#--reason and status-->
                     <div class="row">
                         <form>
@@ -244,18 +244,17 @@
                             </div>
                         </form>
                     </div>
-
                     <div class="col-sm-12">
                         <form>
                             <div class="row">
                                 <div class="form-group">
-                                    <label for="selected-complain-title">Complain subject:</label>
+                                    <label for="selected-complain-title">Complaint subject:</label>
                                     <input type="text" class="form-control" id="selected-complain-title" disabled>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
-                                    <label for="selected-complain-content ">Complain content:</label>
+                                    <label for="selected-complain-content ">Complaint content:</label>
                                     <textarea class="form-control " name="complain-content" rows="4"
                                               placeholder="Content"
                                               id="selected-complain-content"
@@ -265,7 +264,7 @@
                             </div>
                             <div class="row">
                                 <div class="form-group">
-                                    <label for="omplain-response">Complain Responce:</label>
+                                    <label for="omplain-response">Complaint Responce:</label>
                                     <textarea class="form-control" name="complain-response" rows="4"
                                               placeholder="Responce"
                                               id="selected-complain-responce"

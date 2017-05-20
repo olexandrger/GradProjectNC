@@ -78,7 +78,7 @@ public class ComplainServiceImpl implements ComplainService {
     public void appointComplain(long userId, long complainId) {
         Complain complain = complainDao.find(complainId);
         User user = userDao.find(userId);
-        if(complain.getStatus().getCategoryId()==COMPLAIN_STATUS_CONSIDERATION_COMPLETED){
+        if (complain.getStatus().getCategoryId().longValue() == COMPLAIN_STATUS_CONSIDERATION_COMPLETED) {
             throw new IncorrectItemStateException("You can not change a completed complaint!");
         }
         complain.setStatus(categoryDao.find(COMPLAIN_STATUS_UNDER_CONSIDERATION));
@@ -89,11 +89,13 @@ public class ComplainServiceImpl implements ComplainService {
     @Override
     public void updadeComplainResponse(long complainId, long userId, String response) {
         Complain complain = complainDao.find(complainId);
-        if(complain.getStatus().getCategoryId() == COMPLAIN_STATUS_UNDER_CONSIDERATION && complain.getResponsible().getUserId()!=userId){
+        if (complain.getStatus().getCategoryId().longValue() == COMPLAIN_STATUS_UNDER_CONSIDERATION
+                && complain.getResponsible().getUserId().longValue() != userId) {
             throw new IncorrectItemStateException("You can not change a complaint, assigned to another responsible!");
         }
-        if(complain.getStatus().getCategoryId() != COMPLAIN_STATUS_UNDER_CONSIDERATION && complain.getStatus().getCategoryId() != COMPLAIN_STATUS_CREATED){
-            throw new IncorrectItemStateException("You can not change a  complaint in status "+ complain.getStatus().getCategoryName());
+        if (complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_UNDER_CONSIDERATION
+                && complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_CREATED) {
+            throw new IncorrectItemStateException("You can not change a  complaint in status " + complain.getStatus().getCategoryName());
         }
         complain.setResponse(response);
         complainDao.update(complain);
@@ -102,13 +104,13 @@ public class ComplainServiceImpl implements ComplainService {
     @Override
     public void completeComplaint(long userId, long complainId) {
         Complain complain = complainDao.find(complainId);
-        if(complain.getStatus().getCategoryId() != COMPLAIN_STATUS_UNDER_CONSIDERATION){
-            throw new IncorrectItemStateException("You can not end a problem with the status of "+complain.getStatus().getCategoryName());
+        if (complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_UNDER_CONSIDERATION) {
+            throw new IncorrectItemStateException("You can not end a problem with the status of " + complain.getStatus().getCategoryName());
         }
-        if(complain.getResponsible()==null){
+        if (complain.getResponsible() == null) {
             throw new IncorrectItemStateException("This complaint has no responsible!");
         }
-        if(complain.getResponsible().getUserId()!=userId){
+        if (complain.getResponsible().getUserId().longValue() != userId) {
             throw new IncorrectItemStateException("You can not change a complaint, assigned to another responsible!");
         }
         complain.setStatus(categoryDao.find(COMPLAIN_STATUS_CONSIDERATION_COMPLETED));

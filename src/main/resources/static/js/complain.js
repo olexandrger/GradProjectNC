@@ -21,8 +21,15 @@ function loadComplaints() {
             data.forEach(function (item, i) {
                 if (i < complaintListSize) {
                     ref = document.createElement("a");
-                    complaintName = item.complainReason + "_" + item.productInstanceName;
-                    ref.appendChild(document.createTextNode(complaintName));
+                    complaintName = item.userName + ": " + item.complainReason;
+                    ref.appendChild(document.createTextNode(item.userName + ": "));
+                    ref.appendChild(document.createElement("br"));
+                    if(item.productInstanceName!=null){
+                        ref.appendChild(document.createTextNode(item.productInstanceName + " - " + item.complainReason));
+                    } else {
+                        ref.appendChild(document.createTextNode(item.complainReason));
+                    }
+
                     ref.className = "list-group-item";
                     ref.href = "#";
                     ref.onclick = function () {
@@ -33,13 +40,19 @@ function loadComplaints() {
             });
             prevPage = $("#complaint-btn-prev");
             nextPage = $("#complaint-btn-next");
-            nextPage.attr("disabled","disabled");
-            prevPage.attr("disabled","disabled");
+            prevPageUp = $("#complaint-btn-prev-up");
+            nextPageUp = $("#complaint-btn-next-up");
+            nextPage.attr("disabled", "disabled");
+            prevPage.attr("disabled", "disabled");
+            nextPageUp.attr("disabled", "disabled");
+            prevPageUp.attr("disabled", "disabled");
             if (complaintListCurrentPage > 0) {
                 prevPage.removeAttr("disabled");
+                prevPageUp.removeAttr("disabled");
             }
             if (data.length > complaintListSize) {
                 nextPage.removeAttr("disabled");
+                nextPageUp.removeAttr("disabled");
             }
             selectComplaint(selectedComplain);
         },
@@ -52,6 +65,8 @@ function loadComplaints() {
 
 function selectComplaint(index) {
     list = $("#complain-list");
+    $("#responsible-info-row").addClass("hidden");
+    $("#instance-info-row").addClass("hidden");
     selectedComplain = index;
     if (index == -1) {
         $("#no-complain-selected-alert").removeClass("hidden");
@@ -65,10 +80,21 @@ function selectComplaint(index) {
     }
     if (selectedComplain != -1) {
         $("#complain-user-email").val(complaintsData[selectedComplain].userEmail);
-        //TODO add other user data
-        $("#complain-responsible-email").val(complaintsData[selectedComplain].responsibleEmail);
-        //TODO add other responsible data
-        $("#complain-instance-name").val(complaintsData[selectedComplain].productInstanceName);
+        userDetails= document.createTextNode(complaintsData[selectedComplain].userName+", Phpne: "+complaintsData[selectedComplain].userNumber);
+        $("#complain-user-details").empty();
+        $("#complain-user-details").append(userDetails);
+        if(complaintsData[selectedComplain].responsibleEmail!=null){
+            $("#complain-responsible-email").val(complaintsData[selectedComplain].responsibleEmail);
+            $("#responsible-info-row").removeClass("hidden");
+            responsibleDetails = document.createTextNode(complaintsData[selectedComplain].responsibleName+", Phone: "+(complaintsData[selectedComplain].responsibleNumber));
+            $("#complain-responsible-details").empty();
+            $("#complain-responsible-details").append(responsibleDetails);
+        }
+        if(complaintsData[selectedComplain].productInstanceName!=null){
+            $("#complain-instance-name").val(complaintsData[selectedComplain].productInstanceName);
+            $("#instance-info-row").removeClass("hidden");
+        }
+
         $("#selected-complain-stats").val(complaintsData[selectedComplain].status);
         $("#selected-complain-reason").val(complaintsData[selectedComplain].complainReason);
 
@@ -147,29 +173,31 @@ function loadProductInstancesInModal() {
         url: "/api/pmg/instances/find/bydomain/" + $("#new-complaint-domain").val() + "/",
         success: function (data) {
             clearNewComplaintModalFormByIncorrectDomain();
-            if (data.length > 0) {
-                modalAlert.empty();
-                modalAlert.addClass("hidden");
-                options = $("#new-complaint-instanse");
-                data.forEach(function (item, i) {
-                    var option = document.createElement("option");
-                    option.setAttribute("value", item.instanceId);
-                    if (i == 0) {
-                        option.setAttribute("selected", "selected");
-                    }
-                    option.appendChild(document.createTextNode(item.product.productName));
-                    options.append(option);
-                });
-                options.removeAttr("disabled");
-                $("#new-complaint-subject").removeAttr("disabled");
-                $("#new-complaint-reason").removeAttr("disabled");
-                $("#new-complaint-content").removeAttr("readonly");
-                $("#create-complaint-ftom-modal-btn").removeAttr("disabled");
-            } else {
-                clearNewComplaintModalFormByIncorrectDomain();
-                modalAlert.html("<strong>Warning! </strong> This domain does not have any instances!");
-                modalAlert.removeClass("hidden");
-            }
+            // if (data.length > 0) {
+            modalAlert.empty();
+            modalAlert.addClass("hidden");
+            options = $("#new-complaint-instanse");
+            option = document.createElement("option");
+            option.setAttribute("value", "-1");
+            option.appendChild(document.createTextNode("It does not apply to the product"));
+            option.setAttribute("selected", "selected");
+            options.append(option);
+            data.forEach(function (item, i) {
+                option = document.createElement("option");
+                option.setAttribute("value", item.instanceId);
+                option.appendChild(document.createTextNode(item.product.productName));
+                options.append(option);
+            });
+            options.removeAttr("disabled");
+            $("#new-complaint-subject").removeAttr("disabled");
+            $("#new-complaint-reason").removeAttr("disabled");
+            $("#new-complaint-content").removeAttr("readonly");
+            $("#create-complaint-ftom-modal-btn").removeAttr("disabled");
+            // } else {
+            //     clearNewComplaintModalFormByIncorrectDomain();
+            //     modalAlert.html("<strong>Warning! </strong> This domain does not have any instances!");
+            //     modalAlert.removeClass("hidden");
+            // }
         },
         error: function () {
             clearNewComplaintModalFormByIncorrectDomain();
@@ -413,7 +441,7 @@ function alertSuccess(msg) {
 }
 
 function printResult(data) {
-    if(data.status == "success"){
+    if (data.status == "success") {
         alertSuccess(data.message)
     } else {
         alertError(data.message)

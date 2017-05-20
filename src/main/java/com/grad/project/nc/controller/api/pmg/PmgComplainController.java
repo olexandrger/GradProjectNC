@@ -44,7 +44,7 @@ public class PmgComplainController {
             String content = params.get("content");
             Complain complain = complainService.newComplain(userId,instanceId,reasonId,title,content);
             result.put("status", "success");
-            result.put("message", "Order created");
+            result.put("message", "Complain created");
             result.put("id", complain.getComplainId());
         } catch (NumberFormatException ex){
             ex.printStackTrace();

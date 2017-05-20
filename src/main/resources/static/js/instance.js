@@ -1,3 +1,5 @@
+var currentUserId;
+var instanceId;
 
 function buttonsToDown() {
     $('.pull-down').each(function() {
@@ -96,6 +98,7 @@ function loadInstance() {
     $.ajax({
         url: "/api/client/instance/get/byId/" + instanceId,
         success: function (data) {
+            instanceId = data.instanceId;
             $("#instance-product-name").html(data.product.productName);
             $("#instance-status").html(data.status.categoryName);
             $("#instance-product-type").html(data.product.productType.productTypeName);
@@ -151,6 +154,26 @@ function loadInstance() {
     });
 }
 
+function loadNewComplaintModal() {
+    
+}
+
+function createComplaint() {
+
+}
+
 $(document).ready(function () {
-    loadInstance();
+
+    $.ajax({
+        url: "/api/user/account",
+        success: function (data) {
+            currentUserId = data.userId;
+            loadInstance();
+        },
+        error: function () {
+            alertError("Internal server error!")
+
+        }
+    });
+
 });

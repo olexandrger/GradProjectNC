@@ -39,7 +39,7 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
                 insertQuery,
                 PK_COLUMN_NAME,
                 complain.getUser().getUserId(),
-                complain.getProductInstance().getInstanceId(),
+                (complain.getProductInstance() == null) ? null : complain.getProductInstance().getInstanceId(),
                 complain.getComplainTitle(),
                 complain.getContent(),
                 complain.getStatus().getCategoryId(),
