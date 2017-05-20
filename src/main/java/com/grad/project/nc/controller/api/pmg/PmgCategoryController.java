@@ -30,7 +30,7 @@ public class PmgCategoryController {
     }
 
 
-    @RequestMapping(value = "/get/bytype/{typename}/", method = RequestMethod.GET)
+    //@RequestMapping(value = "/get/bytype/{typename}/", method = RequestMethod.GET)
     public Map<String, Object> findByCategoryTypeName(@PathVariable String typename){
         Map<String, Object> result = new HashMap<>();
         Collection<Category> categories = categoryService.findByCategoryTypeName(typename);

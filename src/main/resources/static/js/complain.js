@@ -238,7 +238,7 @@ function openNewComplaintModal() {
     reasons.attr("disabled", "disabled");
     reasons.empty();
     $.ajax({
-        url: "/api/pmg/category/get/bytype/COMPLAIN_REASON/",
+        url: "/api/category/get/bytype/COMPLAIN_REASON/",
         success: function (data) {
             if (data.status = "found") {
                 data.categories.forEach(function (item, i) {

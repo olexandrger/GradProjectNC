@@ -4,8 +4,12 @@ var ordersListCurrentPage = 0;
 var ordersData;
 
 var selectedOrder;
-var selectUserId
+var selectUserId;
 
+const INSTANCE_STATUS_CREATED = 9;
+const INSTANCE_STATUS_ACTIVATED = 10;
+const INSTANCE_STATUS_SUSPENDED = 11;
+const INSTANCE_STATUS_DEACTIVATED = 10;
 
 function orderErrorMessage(message) {
     var alert = $('<div id="order-alert" class="alert alert-danger" role="alert">' +
@@ -333,7 +337,7 @@ function createNewOrderFromModal() {
         data: JSON.stringify({
             instanceId: $("#new-order-instanse").val(),
             domainId: $("#new-order-domain").val(),
-            userId:selectUserId
+            userId: selectUserId
         }),
         success: function (data) {
             loadOrders();
@@ -348,9 +352,9 @@ function createNewOrderFromModal() {
 
 function getUserIdByMail(email) {
     $.ajax({
-        url: "/api/csr/users/find/"+email+"/",
+        url: "/api/csr/users/find/" + email + "/",
         success: function (data) {
-           selectUserId = data.userId;
+            selectUserId = data.userId;
         },
         error: function () {
             console.error(email)
@@ -384,7 +388,7 @@ function createNewOrderFromModal() {
         data: JSON.stringify({
             instanceId: $("#new-order-instanse").val(),
             domainId: $("#new-order-domain").val(),
-            userId:selectUserId
+            userId: selectUserId
         }),
         success: function (data) {
             loadOrders();
@@ -411,7 +415,7 @@ function loadDomainsInModal(keyCode) {
     $.ajax({
         url: "/api/csr/domains/find/" + $("#new-order-user-email").val() + "/",
         success: function (data) {
-            if(data.status == "not found"){
+            if (data.status == "not found") {
                 $("#new-order-modal-error-msg").html("<strong>Error! </strong> E-mail not found!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
                 $("#new-order-domain").empty();
@@ -431,7 +435,7 @@ function loadDomainsInModal(keyCode) {
                 var options = $("#new-order-domain");
                 data.domains.forEach(function (item, i) {
                     var option = document.createElement("option");
-                    if(i==0){
+                    if (i == 0) {
                         option.setAttribute("selected", "selected");
                     }
                     option.setAttribute("value", item.domainId);
@@ -489,7 +493,7 @@ function loadProductInstancesInModal() {
                 data.forEach(function (item, i) {
                     var option = document.createElement("option");
                     option.setAttribute("value", item.instanceId);
-                    if(i==0){
+                    if (i == 0) {
                         option.setAttribute("selected", "selected");
                     }
                     option.appendChild(document.createTextNode(item.product.productName));
@@ -518,53 +522,55 @@ function loadOrderAaimsInModal() {
     $("#new-order-modal-error-msg").empty();
     $("#new-order-modal-error-msg").attr("hidden", "true");
     $("#create-new-order-from-modal-button").attr("disabled", "true");
-    var options = $("#new-order-aim");
+    options = $("#new-order-aim");
+    options.empty();
     var status;
     $.ajax({
-        url: "/api/csr/category/getstatus/frominstance/" + $("#new-order-instanse").val() + "/",
+        url: "/api/category/getstatus/frominstance/" + $("#new-order-instanse").val() + "/",
         success: function (data) {
-            if(data.openOrders == "true"){
-                $("#new-order-aim").empty();
-                $("#new-order-aim").attr("disabled", "true");
+            if (data.openOrders == "true") {
+                options.attr("disabled", "true");
                 $("#new-order-modal-error-msg").html("<strong>Warning! </strong> The instance has at least one open order!");
                 $("#new-order-modal-error-msg").removeAttr("hidden");
                 $("#create-new-order-from-modal-button").attr("disabled", "true");
                 return;
             }
-            $("#new-order-aim").empty();
-            $("#new-order-aim").removeAttr("disabled");
+            options.empty();
+            options.removeAttr("disabled");
             $("#create-new-order-from-modal-button").removeAttr("disabled");
-            if (data.productStatus.categoryName.localeCompare("CREATED")) {
-                var option = document.createElement("option");
-                option.setAttribute("value", "/api/csr/orders/new/activate");
-                option.appendChild(document.createTextNode("ACTIVATE"));
-                option.setAttribute("selected", "selected");
-                options.append(option);
-            } else if (data.productStatus.categoryName.localeCompare("ACTIVATED")) {
-                var option1 = document.createElement("option");
-                option1.setAttribute("selected", "selected");
-                option1.setAttribute("value", "/api/csr/orders/new/suspend");
-                option1.appendChild(document.createTextNode("SUSPEND"));
-                options.append(option1);
-                var option2 = document.createElement("option");
-                option2.setAttribute("value", "/api/csr/orders/new/deactivate");
-                option2.appendChild(document.createTextNode("DEACTIVATE"));
-                options.append(option2);
-            } else if (data.productStatus.categoryName.localeCompare("SUSPENDED")) {
-                var option = document.createElement("option");
-                option.setAttribute("selected", "selected");
-                option.setAttribute("value", "/api/csr/orders/new/activate");
-                option.appendChild(document.createTextNode("ACTIVATE"));
-                options.append(option);
-            } else {
-                $("#new-order-aim").empty();
-                $("#new-order-aim").attr("disabled", "true");
-                $("#new-order-modal-error-msg").html("<strong>Warning! </strong> Incorrect state of the instance!");
-                $("#new-order-modal-error-msg").removeAttr("hidden");
-                $("#create-new-order-from-modal-button").attr("disabled", "true");
-
+            switch (data.productStatus.categoryId) {
+                case INSTANCE_STATUS_CREATED:
+                    option = document.createElement("option");
+                    option.setAttribute("value", "/api/csr/orders/new/activate");
+                    option.appendChild(document.createTextNode("ACTIVATE"));
+                    option.setAttribute("selected", "selected");
+                    options.append(option);
+                break;
+                case INSTANCE_STATUS_ACTIVATED:
+                    option1 = document.createElement("option");
+                    option1.setAttribute("selected", "selected");
+                    option1.setAttribute("value", "/api/csr/orders/new/suspend");
+                    option1.appendChild(document.createTextNode("SUSPEND"));
+                    options.append(option1);
+                    option2 = document.createElement("option");
+                    option2.setAttribute("value", "/api/csr/orders/new/deactivate");
+                    option2.appendChild(document.createTextNode("DEACTIVATE"));
+                    options.append(option2);
+                    break;
+                case INSTANCE_STATUS_SUSPENDED:
+                    option = document.createElement("option");
+                    option.setAttribute("selected", "selected");
+                    option.setAttribute("value", "/api/csr/orders/new/activate");
+                    option.appendChild(document.createTextNode("ACTIVATE"));
+                    options.append(option);
+                    break;
+                default:
+                    options.empty();
+                    options.attr("disabled", "true");
+                    $("#new-order-modal-error-msg").html("<strong>Warning! </strong> Incorrect state of the instance!");
+                    $("#new-order-modal-error-msg").removeAttr("hidden");
+                    $("#create-new-order-from-modal-button").attr("disabled", "true");
             }
-
         },
         error: function () {
 
