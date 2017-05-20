@@ -7,4 +7,5 @@ import java.util.List;
 public interface ComplainDao extends CrudDao<Complain> {
 
     List<Complain> findByUserId(Long userId);
+    List<Complain> findByInstanceId(Long instanceId, long size, long offset);
 }

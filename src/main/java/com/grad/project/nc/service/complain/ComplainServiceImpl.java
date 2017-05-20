@@ -118,5 +118,10 @@ public class ComplainServiceImpl implements ComplainService {
         complainDao.update(complain);
     }
 
+    @Override
+    public Collection<Complain> findByInstanceId(Long instanceId, long size, long offset) {
+        return complainDao.findByInstanceId(instanceId, size, offset);
+    }
+
 
 }

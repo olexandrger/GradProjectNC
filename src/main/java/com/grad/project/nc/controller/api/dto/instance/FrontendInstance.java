@@ -2,12 +2,14 @@ package com.grad.project.nc.controller.api.dto.instance;
 
 
 import com.grad.project.nc.controller.api.dto.FrontendCategory;
+import com.grad.project.nc.controller.api.dto.FrontendComplain;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
 import com.grad.project.nc.controller.api.dto.FrontendOrder;
 import com.grad.project.nc.model.ProductInstance;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 

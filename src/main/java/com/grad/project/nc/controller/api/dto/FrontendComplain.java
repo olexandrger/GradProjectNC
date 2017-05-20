@@ -48,7 +48,8 @@ public class FrontendComplain {
                 .responsiblId((complain.getResponsible() == null ? null : complain.getResponsible().getUserId()))
                 .responsibleEmail(complain.getResponsible() == null ? null : complain.getResponsible().getEmail())
                 .responsibleNumber(complain.getResponsible() == null ? null : complain.getResponsible().getPhoneNumber())
-                .responsibleName(complain.getResponsible() == null ? null : complain.getResponsible().getFirstName()+" "+complain.getResponsible().getLastName())
+                .responsibleName(complain.getResponsible() == null ?
+                        null : complain.getResponsible().getFirstName()+" "+complain.getResponsible().getLastName())
                 .response(complain.getResponse())
                 .openDate(complain.getOpenDate())
                 .closeDate(complain.getCloseDate())
