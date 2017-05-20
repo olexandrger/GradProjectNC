@@ -62,7 +62,7 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
 
 
         executeUpdate(updateQuery, complain.getUser().getUserId(),
-                complain.getProductInstance().getInstanceId(),
+                (complain.getProductInstance() == null) ? null : complain.getProductInstance().getInstanceId(),
                 complain.getComplainTitle(),
                 complain.getContent(),
                 complain.getStatus().getCategoryId(),
@@ -123,6 +123,16 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
                 "WHERE u.\"user_id\" = ?";
 
         return findMultiple(query, new ComplainRowMapper(), userId);
+    }
+
+    @Override
+    public List<Complain> findByInstanceId(Long instanceId, long size, long offset) {
+            String findAllQuery = "SELECT \"complain_id\", \"user_id\", \"product_instance_id\", " +
+                    "\"complain_title\", \"content\", \"status_id\", \"responsible_id\", \"response\", " +
+                    "\"open_date\", \"close_date\", \"complain_reason_id\" FROM \"complain\" " +
+                    "WHERE \"product_instance_id\" = ? " +
+                    "ORDER BY close_date DESC NULLS FIRST, open_date DESC";
+            return findMultiplePage(findAllQuery, new ComplainRowMapper(), size, offset, instanceId);
     }
 
     private class ComplainRowMapper implements RowMapper<Complain> {

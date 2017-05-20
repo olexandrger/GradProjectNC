@@ -1,5 +1,6 @@
 package com.grad.project.nc.service.complain;
 
+import com.grad.project.nc.controller.api.dto.FrontendComplain;
 import com.grad.project.nc.model.Complain;
 import com.grad.project.nc.model.ProductOrder;
 
@@ -14,4 +15,5 @@ public interface ComplainService {
     public void appointComplain(long userId, long complainId);
     public void updadeComplainResponse(long complainId, long userId, String response);
     public void completeComplaint(long userId, long complainId);
+    public Collection<Complain> findByInstanceId(Long instanceId, long size, long offset);
 }

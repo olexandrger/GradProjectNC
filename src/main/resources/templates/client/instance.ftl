@@ -24,7 +24,7 @@
 
 <#include "../resources/navbar.ftl"/>
 
-    <div id="complaintModal" class="modal fade" role="dialog">
+    <div id="complaint-modal" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
             <!-- Modal content-->
@@ -56,7 +56,9 @@
                     <div class="checkbox-inline">
                         <label><input type="checkbox" value="true" checked>It refers to the instance</label>
                     </div>
-                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="createComplaint()" disabled>Complain</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="createComplaint()"
+                            disabled>Complain
+                    </button>
                 </div>
             </div>
 
@@ -77,7 +79,8 @@
                 </div>
                 <div class="col-sm-3 pull-down" style="margin-bottom: 5px">
                     <button type="button" class="btn btn-default btn-block hidden" id="instance-complain-button"
-                            data-toggle="modal" data-target="#complaintModal" onclick="loadNewComplaintModal()">Create complain
+                            data-toggle="modal" data-target="#complaintModal" onclick="loadNewComplaintModal()">Create
+                        complain
                     </button>
                     <button class="btn btn-default btn-block hidden" id="instance-suspend-button"
                             onclick="suspendInstance()">Suspend
@@ -92,7 +95,31 @@
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <h3 class="text-center">Orders</h3>
+                    <ul class="nav nav-tabs">
+                        <li class="active" id="orders-tab"><a href="#" onclick="selectOrdersTab()">Orders:</a></li>
+                        <li id="conplaints-tab"><a href="#" onclick="selectComplaintsTab()">Complaints:</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-12 hidden" id="instance-complaints">
+                    <table class="table table-striped" id="instance-complaints-table">
+                        <tr>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Open date</th>
+                            <th>Close date</th>
+                        </tr>
+                    </table>
+                    <div class="row">
+                        <button type="button" class="btn" id="complaint-btn-prev" onclick="getPrevComplaintPage()"> &larr;
+                            Prev.
+                        </button>
+                        <button type="button" class="btn" id="complaint-btn-next" onclick="getNextComplaintPage()"> Next
+                            &rarr;
+                        </button>
+                    </div>
+                </div>
+                <div class="col-sm-12" id="instanse-orders">
+                <#--<h3 class="text-center">Orders</h3>-->
                     <table class="table table-striped" id="instance-orders-table">
                         <tr>
                             <th>Action</th>
