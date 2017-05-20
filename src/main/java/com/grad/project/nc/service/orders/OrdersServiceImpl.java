@@ -2,21 +2,24 @@ package com.grad.project.nc.service.orders;
 
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
+import com.grad.project.nc.service.exceptions.IllegalOrderOperationException;
+import com.grad.project.nc.service.exceptions.InsufficientRightsException;
+import com.grad.project.nc.service.exceptions.OrderCreationException;
+import com.grad.project.nc.service.exceptions.OrderException;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.List;
-
-//TODO security of states changing
+import java.util.*;
 
 @Service
-@Slf4j
 public class OrdersServiceImpl implements OrdersService {
+
+    private List<GrantedAuthority> CSR_AUTHORITIES = Arrays.asList(new SimpleGrantedAuthority("ROLE_CSR"));
 
     private UserDao userDao;
     private ProductOrderDao orderDao;
@@ -24,7 +27,6 @@ public class OrdersServiceImpl implements OrdersService {
     private DomainDao domainDao;
     private ProductInstanceDao productInstanceDao;
     private CategoryDao categoryDao;
-    private ProductDao productDao;
     private UserService userService;
     private EmailService emailService;
 
@@ -37,7 +39,7 @@ public class OrdersServiceImpl implements OrdersService {
     private static final long ORDER_AIM_SUSPEND = 14L;
     private static final long ORDER_AIM_DEACTIVATE = 15L;
     private static final long ORDER_AIM_RESUME = 25L;
-//    private static final long ORDER_AIM_MODIFY = 26L;
+    private static final long ORDER_AIM_MODIFY = 26L;
 
     private static final long ORDER_STATUS_CREATED = 1L;
     private static final long ORDER_STATUS_IN_PROGRESS = 2L;
@@ -47,28 +49,39 @@ public class OrdersServiceImpl implements OrdersService {
     @Autowired
     public OrdersServiceImpl(UserDao userDao, ProductOrderDao orderDao, ProductRegionPriceDao productRegionPriceDao,
                              DomainDao domainDao, ProductInstanceDao productInstanceDao, CategoryDao categoryDao,
-                             ProductDao productDao, UserService userService, EmailService emailService) {
+                             UserService userService, EmailService emailService) {
         this.userDao = userDao;
         this.orderDao = orderDao;
         this.productRegionPriceDao = productRegionPriceDao;
         this.domainDao = domainDao;
         this.productInstanceDao = productInstanceDao;
         this.categoryDao = categoryDao;
-        this.productDao = productDao;
+
         this.userService = userService;
         this.emailService = emailService;
     }
 
-    private ProductOrder newOrder(long instanceId, long userId, long aimId) {
-        ProductInstance instance = productInstanceDao.find(instanceId);
-        Category canceled = categoryDao.find(ORDER_STATUS_CANCELLED);
-        Category completed = categoryDao.find(ORDER_STATUS_COMPLETED);
-        boolean canCreate = instance.getProductOrders().stream()
-                .allMatch((order) -> order.getStatus().equals(canceled) || order.getStatus().equals(completed));
-        if (!canCreate) {
-            return null;
-        } else {
+    private boolean isAllowedToCreateOrder(User user, Domain domain) {
 
+        return domain.getUsers().stream().anyMatch(u -> user.getUserId().equals(u.getUserId())) ||
+                !Collections.disjoint(user.getAuthorities(), CSR_AUTHORITIES);
+    }
+
+    private ProductOrder newOrder(long instanceId, long aimId, long userId) throws OrderException {
+        ProductInstance instance = productInstanceDao.find(instanceId);
+
+        if (!isAllowedToCreateOrder(userService.getCurrentUser(), instance.getDomain())) {
+            throw new InsufficientRightsException("User must have CSR authority to create orders at this domain");
+        }
+        Category cancelled = categoryDao.find(ORDER_STATUS_CANCELLED);
+        Category completed = categoryDao.find(ORDER_STATUS_COMPLETED);
+
+        boolean canCreate = instance.getProductOrders().stream()
+                .allMatch((order) -> order.getStatus().equals(cancelled) || order.getStatus().equals(completed));
+
+        if (!canCreate) {
+            throw new OrderCreationException("You can not create more than one active order per instance");
+        } else {
             ProductOrder order = new ProductOrder();
 
             order.setOpenDate(OffsetDateTime.now());
@@ -80,72 +93,79 @@ public class OrdersServiceImpl implements OrdersService {
             order = orderDao.add(order);
 
             emailService.sendNewOrderEmail(order);
-
             return order;
         }
     }
 
     @Override
-    public ProductOrder newCreationOrder(long productId, long domainId, long userId) {
+    public ProductOrder newCreationOrder(long productId, long domainId, long userId) throws OrderException {
         Domain domain = domainDao.find(domainId);
+
+        ProductRegionPrice price = productRegionPriceDao.find(
+                domain.getAddress().getLocation().getRegion().getRegionId(), productId);
+
+        if (price == null) {
+            throw new OrderCreationException("No price for this product in selected region");
+        }
 
         ProductInstance instance = new ProductInstance();
 
         Category category = categoryDao.find(INSTANCE_STATUS_CREATED);
 
-        instance.setDomain(domain);
         instance.setStatus(category);
-        instance.setPrice(productRegionPriceDao.find(
-                domain.getAddress().getLocation().getRegion().getRegionId(), productId));
+        instance.setDomain(domain);
+        instance.setPrice(price);
 
         instance = productInstanceDao.add(instance);
 
-        return newOrder(instance.getInstanceId(), userId, ORDER_AIM_CREATE);
+        try {
+            return newOrder(instance.getInstanceId(), ORDER_AIM_CREATE, userId);
+        } catch (OrderException e) {
+            productInstanceDao.delete(instance.getInstanceId());
+            throw e;
+        }
     }
 
     @Override
-    public ProductOrder newSuspensionOrder(long instanceId, long userId) {
-        ProductOrder order = newOrder(instanceId, userId, ORDER_AIM_SUSPEND);
-        if (order != null) {
-            completeOrder(order.getProductOrderId());
-        }
+    public ProductOrder newSuspensionOrder(long instanceId, long userId) throws OrderException {
+        ProductOrder order = newOrder(instanceId, ORDER_AIM_SUSPEND, userId);
+
+        completeOrder(order.getProductOrderId());
 
         return order;
     }
 
     @Override
-    public ProductOrder newContinueOrder(long instanceId, long userId) {
-        ProductOrder order = newOrder(instanceId, userId, ORDER_AIM_RESUME);
-        if (order != null) {
-            completeOrder(order.getProductOrderId());
-        }
+    public ProductOrder newContinueOrder(long instanceId, long userId) throws OrderException {
+        ProductOrder order = newOrder(instanceId, ORDER_AIM_RESUME, userId);
+
+        completeOrder(order.getProductOrderId());
 
         return order;
     }
 
     @Override
-    public ProductOrder newDeactivationOrder(long instanceId, long userId) {
-        return newOrder(instanceId, userId, ORDER_AIM_DEACTIVATE);
+    public ProductOrder newDeactivationOrder(long instanceId, long userId) throws OrderException {
+        return newOrder(instanceId, ORDER_AIM_DEACTIVATE, userId);
     }
 
     @Override
-    public ProductOrder newCreationOrder(long productId, long domainId) {
+    public ProductOrder newCreationOrder(long productId, long domainId) throws OrderException {
         return newCreationOrder(productId, domainId, userService.getCurrentUser().getUserId());
     }
 
     @Override
-    public ProductOrder newSuspensionOrder(long instanceId) {
+    public ProductOrder newSuspensionOrder(long instanceId) throws OrderException {
         return newSuspensionOrder(instanceId, userService.getCurrentUser().getUserId());
-
     }
 
     @Override
-    public ProductOrder newDeactivationOrder(long instanceId) {
+    public ProductOrder newDeactivationOrder(long instanceId) throws OrderException {
         return newDeactivationOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
     @Override
-    public ProductOrder newContinueOrder(long instanceId) {
+    public ProductOrder newContinueOrder(long instanceId) throws OrderException {
         return newContinueOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
@@ -168,7 +188,6 @@ public class OrdersServiceImpl implements OrdersService {
         if (order.getOrderAim().getCategoryId() == ORDER_AIM_CREATE) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_DEACTIVATED));
             productInstanceDao.update(order.getProductInstance());
-//            productInstanceDao.delete(order.getProductInstance());
         }
         orderDao.update(order);
     }
@@ -207,11 +226,6 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public void userCancelOrder(Long id) {
-        cancelOrder(id);
-    }
-
-    @Override
     public List<ProductOrder> getOrdersByProductInstance(long id, long size, long offset) {
         return orderDao.findByProductInstanceId(id, size, offset);
     }
@@ -221,7 +235,7 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public ProductOrder updateOrderInfo(long orderId, long domainId, long productId) {
+    public ProductOrder updateOrderInfo(long orderId, long domainId, long productId) throws IllegalOrderOperationException {
         ProductOrder order = orderDao.find(orderId);
         Domain domain = domainDao.find(domainId);
 
@@ -229,7 +243,7 @@ public class OrdersServiceImpl implements OrdersService {
                 domain.getAddress().getLocation().getRegion().getRegionId(), productId);
 
         if (price == null) {
-            return null;
+            throw new IllegalOrderOperationException("No prices for this product at selected region");
         } else {
             order.getProductInstance().setDomain(domain);
             order.getProductInstance().setPrice(price);

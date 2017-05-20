@@ -1,6 +1,9 @@
 package com.grad.project.nc.service.orders;
 
 import com.grad.project.nc.model.ProductOrder;
+import com.grad.project.nc.service.exceptions.IllegalOrderOperationException;
+import com.grad.project.nc.service.exceptions.OrderCreationException;
+import com.grad.project.nc.service.exceptions.OrderException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -11,25 +14,23 @@ public interface OrdersService {
     /**
      * If user's id not specified, current account used
      */
-    ProductOrder newCreationOrder(long productId, long domainId);
+    ProductOrder newCreationOrder(long productId, long domainId) throws OrderException;
 
-    ProductOrder newCreationOrder(long productId, long domainId, long userId);
+    ProductOrder newCreationOrder(long productId, long domainId, long userId) throws OrderException;
 
-    ProductOrder newSuspensionOrder(long instanceId);
+    ProductOrder newSuspensionOrder(long instanceId) throws OrderException;
 
-    ProductOrder newSuspensionOrder(long instanceId, long userId);
+    ProductOrder newSuspensionOrder(long instanceId, long userId) throws OrderException;
 
-    ProductOrder newContinueOrder(long instanceId);
+    ProductOrder newContinueOrder(long instanceId) throws OrderException;
 
-    ProductOrder newContinueOrder(long instanceId, long userId);
+    ProductOrder newContinueOrder(long instanceId, long userId) throws OrderException;
 
-    ProductOrder newDeactivationOrder(long instanceId);
+    ProductOrder newDeactivationOrder(long instanceId) throws OrderException;
 
-    ProductOrder newDeactivationOrder(long instanceId, long userId);
+    ProductOrder newDeactivationOrder(long instanceId, long userId) throws OrderException;
 
-    Collection<ProductOrder> getOrdersByProductInstance(long id, long size, long offset);
-
-    ProductOrder updateOrderInfo(long orderId, long domainId, long productId);
+    ProductOrder updateOrderInfo(long orderId, long domainId, long productId) throws OrderException;
 
     void startOrder(long orderId);
 
@@ -43,6 +44,6 @@ public interface OrdersService {
 
     Collection<ProductOrder> getAllOrders(long size, long offset);
 
-    void userCancelOrder(Long id);
+    Collection<ProductOrder> getOrdersByProductInstance(long id, long size, long offset);
 }
 

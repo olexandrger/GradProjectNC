@@ -1,7 +1,9 @@
 package com.grad.project.nc.controller.api.client;
 
+import com.grad.project.nc.controller.api.csr.CsrOrdersController;
 import com.grad.project.nc.controller.api.dto.FrontendOrder;
 import com.grad.project.nc.model.ProductOrder;
+import com.grad.project.nc.service.exceptions.OrderException;
 import com.grad.project.nc.service.orders.OrdersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ public class ClientOrdersController {
         this.ordersService = ordersService;
     }
 
-    private Map<String, Object> newOrder(Function<Long, ProductOrder> function, Map<String, String> params) {
+    private Map<String, Object> newOrder(OrderCreationFunction function, Map<String, String> params) {
         Map<String, Object> result = new HashMap<>();
         try {
             long instanceId = Long.parseLong(params.get("instanceId"));
@@ -43,6 +45,11 @@ public class ClientOrdersController {
             ex.printStackTrace();
             result.put("status", "error");
             result.put("message", "Can not parse identifiers");
+        } catch (OrderException e) {
+            e.printStackTrace();
+
+            result.put("status", "error");
+            result.put("message", "Can not create order");
         }
 
         return result;
@@ -63,6 +70,11 @@ public class ClientOrdersController {
             ex.printStackTrace();
             result.put("status", "error");
             result.put("message", "Can not parse identifiers");
+        } catch (OrderException e) {
+            log.error("Can not create order", e);
+
+            result.put("status", "error");
+            result.put("message", "Can not create order");
         }
 
         return result;
@@ -85,7 +97,7 @@ public class ClientOrdersController {
 
     @RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST)
     public Map<String, String> cancel(@PathVariable Long id) {
-        ordersService.userCancelOrder(id);
+        ordersService.cancelOrder(id);
         return Collections.singletonMap("status", "success");
     }
 
@@ -97,5 +109,10 @@ public class ClientOrdersController {
     @RequestMapping(value = "/get/byInstance/{id}/size/{size}/offset/{offset}", method = RequestMethod.GET)
     public Collection<FrontendOrder> getByProductInstance(@PathVariable Long id, @PathVariable Long size, @PathVariable Long offset) {
         return ordersService.getOrdersByProductInstance(id, size, offset).stream().map(FrontendOrder::fromEntity).collect(Collectors.toList());
+    }
+
+    @FunctionalInterface
+    public interface OrderCreationFunction {
+        ProductOrder apply(long instanceId) throws OrderException;
     }
 }

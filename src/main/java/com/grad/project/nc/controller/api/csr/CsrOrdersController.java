@@ -2,9 +2,12 @@ package com.grad.project.nc.controller.api.csr;
 
 import com.grad.project.nc.controller.api.dto.FrontendOrder;
 import com.grad.project.nc.model.*;
+import com.grad.project.nc.service.exceptions.OrderException;
 import com.grad.project.nc.service.orders.OrdersService;
 import com.grad.project.nc.service.product.ProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -13,6 +16,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/csr/orders")
 public class CsrOrdersController {
@@ -26,24 +30,26 @@ public class CsrOrdersController {
         this.productService = productService;
     }
 
-    private Map<String, Object> newOrder(BiFunction<Long, Long, ProductOrder> function, Map<String, String> params) {
+    private Map<String, Object> newOrder(OrderCreationFunction function, Map<String, String> params) {
         Map<String, Object> result = new HashMap<>();
         try {
             long instanceId = Long.parseLong(params.get("instanceId"));
             long userId = Long.parseLong(params.get("userId"));
             ProductOrder order = function.apply(instanceId, userId);
-            if (order != null) {
-                result.put("status", "success");
-                result.put("message", "Order created");
-                result.put("id", order.getProductOrderId());
-            } else {
-                result.put("status", "error");
-                result.put("message", "Can not create order");
-            }
+
+            result.put("status", "success");
+            result.put("message", "Order created");
+            result.put("id", order.getProductOrderId());
         } catch (NumberFormatException ex) {
-            ex.printStackTrace();
+            log.error("Can not parse identifiers", ex);
+
             result.put("status", "error");
             result.put("message", "Can not parse identifiers");
+        } catch (OrderException e) {
+            log.error("Can not create order", e);
+
+            result.put("status", "error");
+            result.put("message", "Can not create order");
         }
 
         return result;
@@ -60,10 +66,16 @@ public class CsrOrdersController {
             result.put("status", "success");
             result.put("message", "Order created");
             result.put("id", order.getProductOrderId());
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
+        }  catch (NumberFormatException ex) {
+            log.error("Can not parse identifiers", ex);
+
             result.put("status", "error");
             result.put("message", "Can not parse identifiers");
+        } catch (OrderException e) {
+            log.error("Can not create order", e);
+
+            result.put("status", "error");
+            result.put("message", "Can not create order");
         }
 
         return result;
@@ -93,18 +105,18 @@ public class CsrOrdersController {
             long productId = Long.parseLong(params.get("productId"));
             ProductOrder order = ordersService.updateOrderInfo(orderId, domainId, productId);
 
-            if (order == null) {
-                result.put("status", "error");
-                result.put("message", "You cannot create order with such parameters");
-            } else {
-                result.put("status", "success");
-                result.put("message", "Order edited");
-                result.put("id", order.getProductOrderId());
-            }
+            result.put("status", "success");
+            result.put("message", "Order edited");
+            result.put("id", order.getProductOrderId());
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
             result.put("status", "error");
             result.put("message", "Can not parse identifiers");
+        } catch (OrderException e) {
+            log.error("Can not create order", e);
+
+            result.put("status", "error");
+            result.put("message", "Can not create order with such parameters");
         }
 
         return result;
@@ -172,5 +184,10 @@ public class CsrOrdersController {
             apt = " apt: " + address.getApartmentNumber();
         }
         return address.getLocation().getGooglePlaceId() + apt;
+    }
+
+    @FunctionalInterface
+    public interface OrderCreationFunction {
+        ProductOrder apply(long instanceId, long userId) throws OrderException;
     }
 }
