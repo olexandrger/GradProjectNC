@@ -3,6 +3,7 @@ package com.grad.project.nc.service.domains;
 import com.grad.project.nc.controller.api.dto.FrontendAddress;
 import com.grad.project.nc.controller.api.dto.FrontendCategory;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
+import com.grad.project.nc.controller.api.dto.FrontendUser;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
 import com.grad.project.nc.service.locations.LocationService;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DomainServiceImpl implements DomainService {
@@ -70,7 +72,8 @@ public class DomainServiceImpl implements DomainService {
         domain.setDomainName(frontendDomain.getDomainName());
         domain.setAddress(convertFrontendAddresToAddress(frontendDomain.getAddress()));
         domain.setDomainType(convertFrontendCategoryToCategory(frontendDomain.getDomainType()));
-        domain.setUsers(frontendDomain.getUsers());
+        //Commented because of incompatible type error must something like this domain.setUsers(frontendDomain.getUsers().stream().map(FrontendUser::toModel).collect(Collectors.toList()));
+        //domain.setUsers(frontendDomain.getUsers());
         return domain;
     }
 
