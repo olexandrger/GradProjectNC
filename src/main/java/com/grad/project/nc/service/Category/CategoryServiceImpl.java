@@ -31,4 +31,9 @@ public class CategoryServiceImpl implements CategoryService {
     public Collection<Category> findByCategoryTypeName(String categoryTypeName) {
         return categoryDao.findByCategoryTypeName(categoryTypeName);
     }
+
+    @Override
+    public Collection<Category> findByCategoryType(long categoryTypeId) {
+        return categoryDao.findByCategoryTypeId(categoryTypeId);
+    }
 }

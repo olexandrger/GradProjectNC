@@ -11,4 +11,5 @@ import java.util.Collection;
 public interface CategoryService {
     public Category getByProductInstanceId(Long productInstanceId);
     public Collection<Category> findByCategoryTypeName(String categoryTypeName);
+    public Collection<Category> findByCategoryType(long categoryTypeId);
 }

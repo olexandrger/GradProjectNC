@@ -43,3 +43,14 @@
 span.orders-list {
     margin-left: 10px;
 }
+textarea {
+    resize: none;
+}
+
+.complaint-row:hover{
+    background: #BEBEBE;
+}
+
+.complain-content-form{
+    width: 90%;
+}

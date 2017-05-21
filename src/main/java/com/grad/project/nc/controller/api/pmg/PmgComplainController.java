@@ -2,12 +2,12 @@ package com.grad.project.nc.controller.api.pmg;
 
 import com.grad.project.nc.controller.api.dto.FrontendComplain;
 import com.grad.project.nc.model.Complain;
-import com.grad.project.nc.model.User;
 import com.grad.project.nc.service.complain.ComplainService;
-import com.grad.project.nc.service.exceptions.IncorrectItemStateException;
+import com.grad.project.nc.service.exceptions.IncompleteComplaintDataExceptions;
+import com.grad.project.nc.service.exceptions.IncorrectComplaintStateException;
+import com.grad.project.nc.service.exceptions.InsufficientRightsException;
+import com.grad.project.nc.service.exceptions.ProhibitedComplaintActionExcrption;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -46,10 +46,10 @@ public class PmgComplainController {
             result.put("status", "success");
             result.put("message", "Complain created");
             result.put("id", complain.getComplainId());
-        } catch (NumberFormatException ex){
+        } catch (NumberFormatException | ProhibitedComplaintActionExcrption | IncompleteComplaintDataExceptions ex){
             ex.printStackTrace();
             result.put("status", "error");
-            result.put("message", "Can not parse identifiers");
+            result.put("message", ex.getMessage());
         }
         return result;
     }
@@ -63,7 +63,7 @@ public class PmgComplainController {
             complainService.appointComplain(userId, complainId);
             result.put("status", "success");
             result.put("message", "The complaint was successfully assigned!");
-        } catch (IncorrectItemStateException ex){
+        } catch (IncorrectComplaintStateException ex){
             result.put("status", "fail");
             result.put("message", ex.getMessage());
 
@@ -81,7 +81,7 @@ public class PmgComplainController {
             complainService.updadeComplainResponse(complainId,userId,response);
             result.put("status", "success");
             result.put("message", "Response successfully updated");
-        } catch (IncorrectItemStateException ex){
+        } catch (IncorrectComplaintStateException ex){
             result.put("status", "fail");
             result.put("message", ex.getMessage());
         }
@@ -96,7 +96,7 @@ public class PmgComplainController {
             complainService.completeComplaint(userId, complainId);
             result.put("status", "success");
             result.put("message", "Response successfully complete");
-        } catch (IncorrectItemStateException ex){
+        } catch (IncorrectComplaintStateException ex){
             result.put("status", "fail");
             result.put("message", ex.getMessage());
         }

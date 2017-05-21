@@ -8,7 +8,10 @@ import com.grad.project.nc.persistence.CategoryDao;
 import com.grad.project.nc.persistence.ComplainDao;
 import com.grad.project.nc.persistence.ProductInstanceDao;
 import com.grad.project.nc.persistence.UserDao;
-import com.grad.project.nc.service.exceptions.IncorrectItemStateException;
+import com.grad.project.nc.service.exceptions.IncompleteComplaintDataExceptions;
+import com.grad.project.nc.service.exceptions.IncorrectComplaintStateException;
+import com.grad.project.nc.service.exceptions.InsufficientRightsException;
+import com.grad.project.nc.service.exceptions.ProhibitedComplaintActionExcrption;
 import com.grad.project.nc.service.notifications.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,13 +55,19 @@ public class ComplainServiceImpl implements ComplainService {
     }
 
     @Override
-    public Complain newComplain(long userId, long instanceId, long reasonId, String title, String content) {
+    public Complain newComplain(long userId, long instanceId, long reasonId, String title, String content) throws ProhibitedComplaintActionExcrption, IncompleteComplaintDataExceptions {
+        if(title == null || title.length()<1){
+            throw new IncompleteComplaintDataExceptions("Subject can not be empty!");
+        }
         Category created = categoryDao.find(COMPLAIN_STATUS_CREATED);
         User user = userDao.find(userId);
         ProductInstance productInstance = productInstanceDao.find(instanceId);
 
         Category reason = categoryDao.find(reasonId);
 
+        if(productInstance!=null && !userIsContainedInInstance(user, productInstance)){
+           throw new ProhibitedComplaintActionExcrption("You do not belong to the domain of this product");
+        }
         Complain complain = new Complain();
 
         complain.setOpenDate(OffsetDateTime.now());
@@ -75,11 +84,11 @@ public class ComplainServiceImpl implements ComplainService {
     }
 
     @Override
-    public void appointComplain(long userId, long complainId) {
+    public void appointComplain(long userId, long complainId) throws IncorrectComplaintStateException {
         Complain complain = complainDao.find(complainId);
         User user = userDao.find(userId);
         if (complain.getStatus().getCategoryId().longValue() == COMPLAIN_STATUS_CONSIDERATION_COMPLETED) {
-            throw new IncorrectItemStateException("You can not change a completed complaint!");
+            throw new IncorrectComplaintStateException("You can not change a completed complaint!");
         }
         complain.setStatus(categoryDao.find(COMPLAIN_STATUS_UNDER_CONSIDERATION));
         complain.setResponsible(user);
@@ -87,31 +96,31 @@ public class ComplainServiceImpl implements ComplainService {
     }
 
     @Override
-    public void updadeComplainResponse(long complainId, long userId, String response) {
+    public void updadeComplainResponse(long complainId, long userId, String response) throws IncorrectComplaintStateException {
         Complain complain = complainDao.find(complainId);
         if (complain.getStatus().getCategoryId().longValue() == COMPLAIN_STATUS_UNDER_CONSIDERATION
                 && complain.getResponsible().getUserId().longValue() != userId) {
-            throw new IncorrectItemStateException("You can not change a complaint, assigned to another responsible!");
+            throw new IncorrectComplaintStateException("You can not change a complaint, assigned to another responsible!");
         }
         if (complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_UNDER_CONSIDERATION
                 && complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_CREATED) {
-            throw new IncorrectItemStateException("You can not change a  complaint in status " + complain.getStatus().getCategoryName());
+            throw new IncorrectComplaintStateException("You can not change a  complaint in status " + complain.getStatus().getCategoryName());
         }
         complain.setResponse(response);
         complainDao.update(complain);
     }
 
     @Override
-    public void completeComplaint(long userId, long complainId) {
+    public void completeComplaint(long userId, long complainId) throws IncorrectComplaintStateException {
         Complain complain = complainDao.find(complainId);
         if (complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_UNDER_CONSIDERATION) {
-            throw new IncorrectItemStateException("You can not end a problem with the status of " + complain.getStatus().getCategoryName());
+            throw new IncorrectComplaintStateException("You can not end a problem with the status of " + complain.getStatus().getCategoryName());
         }
         if (complain.getResponsible() == null) {
-            throw new IncorrectItemStateException("This complaint has no responsible!");
+            throw new IncorrectComplaintStateException("This complaint has no responsible!");
         }
         if (complain.getResponsible().getUserId().longValue() != userId) {
-            throw new IncorrectItemStateException("You can not change a complaint, assigned to another responsible!");
+            throw new IncorrectComplaintStateException("You can not change a complaint, assigned to another responsible!");
         }
         complain.setStatus(categoryDao.find(COMPLAIN_STATUS_CONSIDERATION_COMPLETED));
         complain.setCloseDate(OffsetDateTime.now());
@@ -121,6 +130,16 @@ public class ComplainServiceImpl implements ComplainService {
     @Override
     public Collection<Complain> findByInstanceId(Long instanceId, long size, long offset) {
         return complainDao.findByInstanceId(instanceId, size, offset);
+    }
+
+
+    private boolean userIsContainedInInstance(User user, ProductInstance productInstance){
+        for(User currentUser:productInstance.getDomain().getUsers()){
+            if(currentUser.getUserId().equals(user.getUserId())){
+                return true;
+            }
+        }
+        return false;
     }
 
 

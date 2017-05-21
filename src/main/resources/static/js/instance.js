@@ -4,6 +4,9 @@ var selectedComplain = -1;
 var complaintListSize = 5;
 var complaintListCurrentPage = 0;
 
+const MIN_SUBJECT_LENGTH = 5;
+const CATEGORY_TYPE_COMPLAIN_REASON = 5;
+
 function buttonsToDown() {
     $('.pull-down').each(function () {
         var $this = $(this);
@@ -165,10 +168,71 @@ function loadNewComplaintModal() {
     reasons = $("#new-complaint-reason");
     reasons.attr("disabled", "disabled");
     reasons.empty();
+    $("#new-complaint-subject").val("");
+    $("#new-complaint-content").val("");
+    $("#instanse-depend-check").prop("checked", "checked");
+
+    $.ajax({
+        url: "/api/category/get/bytype/" + CATEGORY_TYPE_COMPLAIN_REASON + "/",
+        success: function (data) {
+            if (data.status = "found") {
+                data.categories.forEach(function (item, i) {
+                    option = document.createElement("option");
+                    if (i == 0) {
+                        option.setAttribute("selected", "selected");
+                    }
+                    option.setAttribute("value", item.categoryId);
+                    option.appendChild(document.createTextNode(item.categoryName));
+                    reasons.append(option);
+                });
+                reasons.removeAttr("disabled");
+            }
+            else {
+                alertError("Error in the database");
+                reasons.attr("disabled", "disabled");
+                reasons.empty();
+            }
+        },
+        error: function () {
+            alertError("Internal server error!");
+            reasons.attr("disabled", "disabled");
+            reasons.empty();
+        }
+    })
 }
 
 function createComplaint() {
-//TODO
+    reason = $("#new-complaint-reason").val();
+    userId = currentUserId;
+    complaintInstanceId = ($("#instanse-depend-check").prop("checked")) ? instanceId : "-1";
+    complaintSubject = $("#new-complaint-subject").val();
+    complaintContent = $("#new-complaint-content").val();
+    $.ajax({
+        url: "/api/client/complaints/new/",
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        contentType: 'application/json',
+        data: JSON.stringify({
+            instanceId: complaintInstanceId,
+            reasonId: reason,
+            title: complaintSubject,
+            content: complaintContent
+        }),
+        success: function (data) {
+            loadComplaints();
+            if (data.status == "success") {
+                alertSuccess(data.message);
+            } else {
+                alertError(data.message);
+            }
+
+        },
+        error: function () {
+            alertError("Internal server error!")
+        }
+    });
 }
 
 function getPrevComplaintPage() {
@@ -187,18 +251,55 @@ function loadComplaints() {
 
     complaints = $("#instance-complaints-table");
     complaints.find(".complaint-row").remove();
+    complaints.find(".complaint-content-row").remove();
     $.ajax({
-        url: "/api/client/complaints/get/byInstance/" + instanceId + "/size/" + (complaintListSize + 1) + "/offset/" + complaintListCurrentPage + "/",
+        url: "/api/client/complaints/get/byInstance/" + instanceId + "/size/" + (complaintListSize + 1) + "/offset/" + complaintListCurrentPage * complaintListSize + "/",
         success: function (data) {
             data.forEach(function (complaint, i) {
                 if (i < complaintListSize) {
-                    html = "<tr class='complaint-row' id='table-order-" + complaint.complainId + "'>" +
+
+                    html = "<tr class='complaint-row' onclick='selectComplaintRow(" + complaint.complainId + ")' id='table-order-" + complaint.complainId + "'>" +
                         "<td class='col-sm-2'>" + complaint.complainReason + "</td>" +
-                        "<td class='col-sm-2 order-status'>" + complaint.status + "</td>" +
+                        "<td class='col-sm-2'>" + complaint.status + "</td>" +
                         "<td class='col-sm-2'>" + moment.unix(complaint.openDate).format("LLL") + "</td>" +
-                        "<td class='col-sm-2 close-date'>" +
-                        (complaint.closeDate == null ? "" : moment.unix(complaint.closeDate).format("LLL")) + "</td>";
+                        "<td class='col-sm-2'>" +
+                        (complaint.closeDate == null ? "" : moment.unix(complaint.closeDate).format("LLL")) + "</td>" + "</tr>"
+                        + "<tr class='complaint-content-row hidden' align='center' id='table-order-content-" + complaint.complainId + "'>" +
+                        "<td class='col-sm-2' colspan='4'> " +
+                        "<form class='complain-content-form'>" +
+                        "<div class='row'>" +
+                        "<div class='form-group'>" +
+                        "<label for='selected-complain-title'>Complaint subject:</label>" +
+                        "<input type='text' class='form-control' id='selected-complain-title' value='"+complaint.complainTitle+"' disabled>" +
+                        "</div>" +
+                        "</div>" +
+                        "<div class='row'>" +
+                        "<div class='form-group'>" +
+                        "<label for='selected-complain-content '>Complaint content:</label>" +
+                        "<textarea class='form-control ' name='complain-content' rows='4'" +
+                        "placeholder='Content'" +
+                        "id='selected-complain-content'" +
+                        "maxlength='240'" +
+                        "resize='none' readonly>" + complaint.content+
+                        "</textarea>" +
+                        "</div>" +
+                        "</div>" +
+                        "<div class='row'>" +
+                        "<div class='form-group'>" +
+                        "<label for='omplain-response'>Complaint Responce:</label>" +
+                        "<textarea class='form-control' name='complain-response' rows='4'" +
+                        "placeholder='Responce'" +
+                        "id='selected-complain-responce'" +
+                        "maxlength='240'" +
+                        "resize='none' readonly>" +complaint.response+"</textarea>" +
+                        "</div>" +
+                        "</div>" +
+                        "</form>" +
+                        " </td>" +
+                        "</tr>";
                     complaints.append($(html));
+
+
                 }
                 prevComplaintPage = $("#complaint-btn-prev");
                 nextComplaintPage = $("#complaint-btn-next");
@@ -218,6 +319,20 @@ function loadComplaints() {
             alertError(data)
         }
     });
+
+}
+
+function selectComplaintRow(complainId) {
+    complaints = $("#instance-complaints-table");
+    rowId = 'table-order-content-' + complainId;
+    row = $("#" + rowId);
+    if(row.hasClass("hidden")){
+        complaints.find(".complaint-content-row").addClass("hidden");
+        row.removeClass("hidden");
+    } else{
+        complaints.find(".complaint-content-row").addClass("hidden");
+    }
+
 
 }
 
@@ -266,6 +381,14 @@ function alertSuccess(msg) {
     ref.setAttribute("aria-label", "close");
     alert.appendChild(ref);
     container.append(alert);
+}
+
+function unlockCreateButton() {
+    if ($("#new-complaint-subject").val().length < MIN_SUBJECT_LENGTH) {
+        $("#create-new-complaint-from-modal-btn").attr("disabled", "disabled");
+    } else {
+        $("#create-new-complaint-from-modal-btn").removeAttr("disabled");
+    }
 }
 
 $(document).ready(function () {

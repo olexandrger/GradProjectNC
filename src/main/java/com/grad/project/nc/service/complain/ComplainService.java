@@ -1,8 +1,10 @@
 package com.grad.project.nc.service.complain;
 
-import com.grad.project.nc.controller.api.dto.FrontendComplain;
 import com.grad.project.nc.model.Complain;
-import com.grad.project.nc.model.ProductOrder;
+import com.grad.project.nc.service.exceptions.IncompleteComplaintDataExceptions;
+import com.grad.project.nc.service.exceptions.IncorrectComplaintStateException;
+import com.grad.project.nc.service.exceptions.InsufficientRightsException;
+import com.grad.project.nc.service.exceptions.ProhibitedComplaintActionExcrption;
 
 import java.util.Collection;
 
@@ -11,9 +13,9 @@ import java.util.Collection;
  */
 public interface ComplainService {
     public Collection<Complain> getAllComplains(long size, long offset);
-    public Complain newComplain(long userId, long instanceId, long reasonId, String title, String content);
-    public void appointComplain(long userId, long complainId);
-    public void updadeComplainResponse(long complainId, long userId, String response);
-    public void completeComplaint(long userId, long complainId);
+    public Complain newComplain(long userId, long instanceId, long reasonId, String title, String content) throws ProhibitedComplaintActionExcrption, IncompleteComplaintDataExceptions;
+    public void appointComplain(long userId, long complainId) throws IncorrectComplaintStateException;
+    public void updadeComplainResponse(long complainId, long userId, String response) throws IncorrectComplaintStateException;
+    public void completeComplaint(long userId, long complainId) throws IncorrectComplaintStateException;
     public Collection<Complain> findByInstanceId(Long instanceId, long size, long offset);
 }

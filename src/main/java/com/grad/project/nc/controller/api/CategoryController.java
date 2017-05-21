@@ -49,10 +49,10 @@ public class CategoryController {
         return result;
     }
 
-    @RequestMapping(value = "/get/bytype/{typename}/", method = RequestMethod.GET)
-    public Map<String, Object> findByCategoryTypeName(@PathVariable String typename){
+    @RequestMapping(value = "/get/bytype/{typeId}/", method = RequestMethod.GET)
+    public Map<String, Object> findByCategoryTypeName(@PathVariable long typeId){
         Map<String, Object> result = new HashMap<>();
-        Collection<Category> categories = categoryService.findByCategoryTypeName(typename);
+        Collection<Category> categories = categoryService.findByCategoryType(typeId);
         if(categories.size()>0){
             result.put("status", "found");
             result.put("categories", categories);

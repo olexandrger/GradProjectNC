@@ -9,6 +9,7 @@ var complaintsData;
 var modalAlert;
 var selectUserId;
 var currentUserId;
+const CATEGORY_TYPE_COMPLAIN_REASON = 5;
 
 function loadComplaints() {
     $.ajax({
@@ -238,7 +239,7 @@ function openNewComplaintModal() {
     reasons.attr("disabled", "disabled");
     reasons.empty();
     $.ajax({
-        url: "/api/category/get/bytype/COMPLAIN_REASON/",
+        url: "/api/category/get/bytype/"+CATEGORY_TYPE_COMPLAIN_REASON+ "/",
         success: function (data) {
             if (data.status = "found") {
                 data.categories.forEach(function (item, i) {

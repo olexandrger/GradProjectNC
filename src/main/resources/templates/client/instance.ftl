@@ -23,7 +23,7 @@
 <div class="container">
 
 <#include "../resources/navbar.ftl"/>
-
+    <div class="col-sm-12" id="alerts-bar"></div>
     <div id="complaint-modal" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
@@ -42,7 +42,7 @@
                     <div class="form-group">
                         <label for="new-complaint-subject">Subject:</label>
                         <input type="text" class="form-control" name="new-complaint-subject" placeholder="Subject"
-                               id="new-complaint-subject">
+                               id="new-complaint-subject" onkeyup="unlockCreateButton()">
                     </div>
                     <div class="form-group">
                         <label for="new-complaint-content">Content:</label>
@@ -54,17 +54,16 @@
                 </div>
                 <div class="modal-footer">
                     <div class="checkbox-inline">
-                        <label><input type="checkbox" value="true" checked>It refers to the instance</label>
+                        <label><input type="checkbox" id="instanse-depend-check">It refers to the instance</label>
                     </div>
                     <button type="button" class="btn btn-success" data-dismiss="modal" onclick="createComplaint()"
-                            disabled>Complain
+                            id ="create-new-complaint-from-modal-btn" disabled>Complain
                     </button>
                 </div>
             </div>
 
         </div>
     </div>
-
     <div class="row">
         <div class="col-sm-10 col-sm-offset-1">
             <div class="row">
@@ -79,8 +78,8 @@
                 </div>
                 <div class="col-sm-3 pull-down" style="margin-bottom: 5px">
                     <button type="button" class="btn btn-default btn-block hidden" id="instance-complain-button"
-                            data-toggle="modal" data-target="#complaintModal" onclick="loadNewComplaintModal()">Create
-                        complain
+                            data-toggle="modal" data-target="#complaint-modal" onclick="loadNewComplaintModal()">
+                        Create complain
                     </button>
                     <button class="btn btn-default btn-block hidden" id="instance-suspend-button"
                             onclick="suspendInstance()">Suspend
