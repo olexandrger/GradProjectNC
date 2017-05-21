@@ -9,7 +9,9 @@ var complaintsData;
 var modalAlert;
 var selectUserId;
 var currentUserId;
+
 const CATEGORY_TYPE_COMPLAIN_REASON = 5;
+const MIN_SUBJECT_LENGTH = 5;
 
 function loadComplaints() {
     $.ajax({
@@ -25,7 +27,7 @@ function loadComplaints() {
                     complaintName = item.userName + ": " + item.complainReason;
                     ref.appendChild(document.createTextNode(item.userName + ": "));
                     ref.appendChild(document.createElement("br"));
-                    if(item.productInstanceName!=null){
+                    if (item.productInstanceName != null) {
                         ref.appendChild(document.createTextNode(item.productInstanceName + " - " + item.complainReason));
                     } else {
                         ref.appendChild(document.createTextNode(item.complainReason));
@@ -81,17 +83,17 @@ function selectComplaint(index) {
     }
     if (selectedComplain != -1) {
         $("#complain-user-email").val(complaintsData[selectedComplain].userEmail);
-        userDetails= document.createTextNode(complaintsData[selectedComplain].userName+", Phpne: "+complaintsData[selectedComplain].userNumber);
+        userDetails = document.createTextNode(complaintsData[selectedComplain].userName + ", Phpne: " + complaintsData[selectedComplain].userNumber);
         $("#complain-user-details").empty();
         $("#complain-user-details").append(userDetails);
-        if(complaintsData[selectedComplain].responsibleEmail!=null){
+        if (complaintsData[selectedComplain].responsibleEmail != null) {
             $("#complain-responsible-email").val(complaintsData[selectedComplain].responsibleEmail);
             $("#responsible-info-row").removeClass("hidden");
-            responsibleDetails = document.createTextNode(complaintsData[selectedComplain].responsibleName+", Phone: "+(complaintsData[selectedComplain].responsibleNumber));
+            responsibleDetails = document.createTextNode(complaintsData[selectedComplain].responsibleName + ", Phone: " + (complaintsData[selectedComplain].responsibleNumber));
             $("#complain-responsible-details").empty();
             $("#complain-responsible-details").append(responsibleDetails);
         }
-        if(complaintsData[selectedComplain].productInstanceName!=null){
+        if (complaintsData[selectedComplain].productInstanceName != null) {
             $("#complain-instance-name").val(complaintsData[selectedComplain].productInstanceName);
             $("#instance-info-row").removeClass("hidden");
         }
@@ -193,7 +195,7 @@ function loadProductInstancesInModal() {
             $("#new-complaint-subject").removeAttr("disabled");
             $("#new-complaint-reason").removeAttr("disabled");
             $("#new-complaint-content").removeAttr("readonly");
-            $("#create-complaint-ftom-modal-btn").removeAttr("disabled");
+            //$("#create-complaint-ftom-modal-btn").removeAttr("disabled");
             // } else {
             //     clearNewComplaintModalFormByIncorrectDomain();
             //     modalAlert.html("<strong>Warning! </strong> This domain does not have any instances!");
@@ -239,7 +241,7 @@ function openNewComplaintModal() {
     reasons.attr("disabled", "disabled");
     reasons.empty();
     $.ajax({
-        url: "/api/category/get/bytype/"+CATEGORY_TYPE_COMPLAIN_REASON+ "/",
+        url: "/api/category/get/bytype/" + CATEGORY_TYPE_COMPLAIN_REASON + "/",
         success: function (data) {
             if (data.status = "found") {
                 data.categories.forEach(function (item, i) {
@@ -448,6 +450,13 @@ function printResult(data) {
         alertError(data.message)
     }
 }
+function unlockCreateButton() {
+    if ($("#new-complaint-subject").val().length < MIN_SUBJECT_LENGTH) {
+        $("#create-new-complaint-from-modal-btn").attr("disabled", "disabled");
+    } else {
+        $("#create-new-complaint-from-modal-btn").removeAttr("disabled");
+    }
+}
 
 $(document).ready(function () {
     $.ajax({
@@ -461,6 +470,5 @@ $(document).ready(function () {
 
         }
     });
-
 
 });

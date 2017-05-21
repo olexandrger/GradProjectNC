@@ -65,7 +65,7 @@
                     <div class="form-group">
                         <label for="new-complaint-subject">Subject:</label>
                         <input type="text" class="form-control" name="new-complaint-subject" placeholder="Subject"
-                               id="new-complaint-subject">
+                               id="new-complaint-subject" onkeyup="unlockCreateButton()">
                     </div>
                     <div class="form-group">
                         <label for="new-complaint-content">Content:</label>

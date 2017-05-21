@@ -3,6 +3,7 @@ package com.grad.project.nc.controller.api.dto;
 
 import com.grad.project.nc.model.Address;
 import com.grad.project.nc.service.locations.LocationService;
+import com.grad.project.nc.service.locations.LocationServiceImpl;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,20 @@ public class FrontendAddress {
     private static LocationService locationService;
 
     public static FrontendAddress fromEntity(Address address) {
-        googlePlaceId = address.getLocation().getGooglePlaceId();
-        locationService.doRequestForJSONByGooglePlaceId(googlePlaceId);
+//        googlePlaceId = address.getLocation().getGooglePlaceId();
+//        System.err.println(googlePlaceId);
+//        locationService.doRequestForJSONByGooglePlaceId(googlePlaceId);
+//        return builder()
+//                .city(locationService.getCity())
+//                .street(locationService.getStreet())
+//                .building(locationService.getBuildingNumber())
+//                .apartment(address.getApartmentNumber())
+//                .build();
+
         return builder()
-                .city(locationService.getCity())
-                .street(locationService.getStreet())
-                .building(locationService.getBuildingNumber())
+                .city("Sity")
+                .street("Street")
+                .building("Building")
                 .apartment(address.getApartmentNumber())
                 .build();
     }
