@@ -26,4 +26,14 @@ public class FrontendUser {
                 .phoneNumber(user.getPhoneNumber())
                 .build();
     }
+
+    public User toModel(){
+        return User.builder()
+                .userId(getUserId())
+                .email(getEmail())
+                .firstName(getFirstName())
+                .lastName(getLastName())
+                .phoneNumber(getPhoneNumber())
+                .build();
+    }
 }

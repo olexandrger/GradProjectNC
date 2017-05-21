@@ -18,7 +18,7 @@ public class FrontendDomain {
     private Long regionId;
     private FrontendAddress address;
     private FrontendCategory domainType;
-    private List<User> users;
+    private List<FrontendUser> users;
 
     public static FrontendDomain fromEntity(Domain domain) {
         return builder()
@@ -27,7 +27,21 @@ public class FrontendDomain {
                 .regionId(domain.getAddress().getLocation().getRegion().getRegionId())
                 .address(FrontendAddress.fromEntity(domain.getAddress()))
                 .domainType(FrontendCategory.fromEntity(domain.getDomainType()))
-                //.users(domain.getUsers().stream().map(FrontendUser::fromEntity).collect(Collectors.toList()))
+                .users(domain.getUsers().stream().map(FrontendUser::fromEntity).collect(Collectors.toList()))
+                .build();
+    }
+
+    public Domain toModel(){
+        return Domain.builder()
+                .domainId(domainId)
+                .domainName(domainName)
+                .domainType(domainType.toModel())
+                .address(address.toModel())
+                .users(getUsers()
+                        .stream()
+                        .map(user -> user.toModel())
+                        .collect(Collectors.toList()))
+                //.productInstances()
                 .build();
     }
 }
