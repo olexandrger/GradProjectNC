@@ -8,15 +8,18 @@ import com.grad.project.nc.service.exceptions.OrderCreationException;
 import com.grad.project.nc.service.exceptions.OrderException;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class OrdersServiceImpl implements OrdersService {
 
     private List<GrantedAuthority> CSR_AUTHORITIES = Arrays.asList(new SimpleGrantedAuthority("ROLE_CSR"));
@@ -61,16 +64,33 @@ public class OrdersServiceImpl implements OrdersService {
         this.emailService = emailService;
     }
 
-    private boolean isAllowedToCreateOrder(User user, Domain domain) {
+    private boolean hasCsrAuthority(User user) {
+        for (GrantedAuthority userAuthority: user.getAuthorities()) {
+            for (GrantedAuthority authority: CSR_AUTHORITIES) {
+                if (authority.getAuthority().equals(userAuthority.getAuthority())) {
+                    return true;
+                }
+            }
+        }
 
-        return domain.getUsers().stream().anyMatch(u -> user.getUserId().equals(u.getUserId())) ||
-                !Collections.disjoint(user.getAuthorities(), CSR_AUTHORITIES);
+        return false;
     }
 
-    private ProductOrder newOrder(long instanceId, long aimId, long userId) throws OrderException {
+    private boolean isDomainOwner(User user, Domain domain) {
+        return domain.getUsers().stream().anyMatch(u -> user.getUserId().equals(u.getUserId()));
+    }
+
+    private boolean isCsrOrOwner(User user, Domain domain) {
+        return domain.getUsers().stream().anyMatch(u -> user.getUserId().equals(u.getUserId())) ||
+                hasCsrAuthority(user);
+    }
+
+    private ProductOrder newOrder(long instanceId, long aimId, long userId)
+            throws InsufficientRightsException, OrderCreationException {
+
         ProductInstance instance = productInstanceDao.find(instanceId);
 
-        if (!isAllowedToCreateOrder(userService.getCurrentUser(), instance.getDomain())) {
+        if (!isCsrOrOwner(userService.getCurrentUser(), instance.getDomain())) {
             throw new InsufficientRightsException("User must have CSR authority to create orders at this domain");
         }
         Category cancelled = categoryDao.find(ORDER_STATUS_CANCELLED);
@@ -98,7 +118,9 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public ProductOrder newCreationOrder(long productId, long domainId, long userId) throws OrderException {
+    public ProductOrder newCreationOrder(long productId, long domainId, long userId)
+            throws InsufficientRightsException, OrderCreationException {
+
         Domain domain = domainDao.find(domainId);
 
         ProductRegionPrice price = productRegionPriceDao.find(
@@ -127,51 +149,76 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public ProductOrder newSuspensionOrder(long instanceId, long userId) throws OrderException {
+    public ProductOrder newSuspensionOrder(long instanceId, long userId)
+            throws InsufficientRightsException, OrderCreationException {
+
         ProductOrder order = newOrder(instanceId, ORDER_AIM_SUSPEND, userId);
 
-        completeOrder(order.getProductOrderId());
-
+        try {
+            startOrder(order.getProductOrderId());
+            completeOrder(order.getProductOrderId());
+        } catch (IllegalOrderOperationException e) {
+            //theoretically impossible
+            throw new RuntimeException(e);
+        }
         return order;
     }
 
     @Override
-    public ProductOrder newContinueOrder(long instanceId, long userId) throws OrderException {
+    public ProductOrder newContinueOrder(long instanceId, long userId)
+            throws InsufficientRightsException, OrderCreationException {
+
         ProductOrder order = newOrder(instanceId, ORDER_AIM_RESUME, userId);
 
-        completeOrder(order.getProductOrderId());
+        try {
+            startOrder(order.getProductOrderId());
+            completeOrder(order.getProductOrderId());
+        } catch (IllegalOrderOperationException e) {
+            //theoretically impossible
+            throw new RuntimeException(e);
+        }
 
         return order;
     }
 
     @Override
-    public ProductOrder newDeactivationOrder(long instanceId, long userId) throws OrderException {
+    public ProductOrder newDeactivationOrder(long instanceId, long userId)
+            throws InsufficientRightsException, OrderCreationException {
+
         return newOrder(instanceId, ORDER_AIM_DEACTIVATE, userId);
     }
 
     @Override
-    public ProductOrder newCreationOrder(long productId, long domainId) throws OrderException {
+    public ProductOrder newCreationOrder(long productId, long domainId) throws InsufficientRightsException, OrderCreationException {
         return newCreationOrder(productId, domainId, userService.getCurrentUser().getUserId());
     }
 
     @Override
-    public ProductOrder newSuspensionOrder(long instanceId) throws OrderException {
+    public ProductOrder newSuspensionOrder(long instanceId) throws InsufficientRightsException, OrderCreationException {
         return newSuspensionOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
     @Override
-    public ProductOrder newDeactivationOrder(long instanceId) throws OrderException {
+    public ProductOrder newDeactivationOrder(long instanceId) throws InsufficientRightsException, OrderCreationException {
         return newDeactivationOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
     @Override
-    public ProductOrder newContinueOrder(long instanceId) throws OrderException {
+    public ProductOrder newContinueOrder(long instanceId) throws InsufficientRightsException, OrderCreationException {
         return newContinueOrder(instanceId, userService.getCurrentUser().getUserId());
     }
 
     @Override
-    public void startOrder(long orderId) {
+    public void startOrder(long orderId) throws InsufficientRightsException, IllegalOrderOperationException {
+        if (!hasCsrAuthority(userService.getCurrentUser())) {
+            throw new InsufficientRightsException("Orders can be started only by CSR");
+        }
+
         ProductOrder order = orderDao.find(orderId);
+
+        if (!order.getStatus().getCategoryId().equals(ORDER_STATUS_CREATED)) {
+            throw new IllegalOrderOperationException("You can only start created orders");
+        }
 
         order.setStatus(categoryDao.find(ORDER_STATUS_IN_PROGRESS));
         order.setResponsible(userService.getCurrentUser());
@@ -179,8 +226,24 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public void cancelOrder(long orderId) {
+    public void cancelOrder(long orderId) throws InsufficientRightsException, IllegalOrderOperationException {
         ProductOrder order = orderDao.find(orderId);
+        User user = userService.getCurrentUser();
+
+        if (!isCsrOrOwner(user, order.getProductInstance().getDomain())) {
+            throw new InsufficientRightsException("Order can be cancelled only by owner or CSR");
+        }
+
+        boolean hasCreatedStatus = order.getStatus().getCategoryId().equals(ORDER_STATUS_CREATED);
+        boolean hasStartedStatus = order.getStatus().getCategoryId().equals(ORDER_STATUS_IN_PROGRESS);
+
+        if (!hasCsrAuthority(user) && !hasCreatedStatus) {
+            throw new IllegalOrderOperationException("User can cancel only orders that was not started");
+        }
+
+        if (!hasCreatedStatus && !hasStartedStatus) {
+            throw new IllegalOrderOperationException("CSR can not cancel orders with status " + order.getStatus().getCategoryName());
+        }
 
         order.setStatus(categoryDao.find(ORDER_STATUS_CANCELLED));
         order.setCloseDate(OffsetDateTime.now());
@@ -193,8 +256,20 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public void completeOrder(long orderId) {
+    public void completeOrder(long orderId) throws IllegalOrderOperationException, InsufficientRightsException {
         ProductOrder order = orderDao.find(orderId);
+
+//        if (order.getResponsible() == null) {
+//            throw new RuntimeException("Responsible can not be null in started order");
+//        }
+
+        if (order.getResponsible() != null && !order.getResponsible().getUserId().equals(userService.getCurrentUser().getUserId())) {
+            throw new InsufficientRightsException("Orders can be finished only by responsible");
+        }
+
+        if (!order.getStatus().getCategoryId().equals(ORDER_STATUS_IN_PROGRESS)) {
+            throw new IllegalOrderOperationException("Orders can be completed only if they are started");
+        }
 
         order.setStatus(categoryDao.find(ORDER_STATUS_COMPLETED));
         order.setCloseDate(OffsetDateTime.now());
@@ -211,7 +286,6 @@ public class OrdersServiceImpl implements OrdersService {
 
         productInstanceDao.update(order.getProductInstance());
         orderDao.update(order);
-
         emailService.sendInstanceStatusChangedEmail(order.getProductInstance());
     }
 

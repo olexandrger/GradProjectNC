@@ -126,10 +126,16 @@ public class CsrOrdersController {
     public Map<String, Object> start(@PathVariable Long orderId) {
         Map<String, Object> result = new HashMap<>();
 
-        ordersService.startOrder(orderId);
+        try {
+            ordersService.startOrder(orderId);
 
-        result.put("status", "success");
-        result.put("message", "Order in progress");
+            result.put("status", "success");
+            result.put("message", "Order in progress");
+        } catch (OrderException e) {
+            log.error("Can not start order", e);
+            result.put("status", "error");
+            result.put("message", e.getMessage());
+        }
         return result;
     }
 
@@ -137,10 +143,16 @@ public class CsrOrdersController {
     public Map<String, Object> cancel(@PathVariable Long orderId) {
         Map<String, Object> result = new HashMap<>();
 
-        ordersService.cancelOrder(orderId);
+        try {
+            ordersService.cancelOrder(orderId);
 
-        result.put("status", "success");
-        result.put("message", "Order canceled");
+            result.put("status", "success");
+            result.put("message", "Order canceled");
+        } catch (OrderException e) {
+            log.error("Can not cancel order", e);
+            result.put("status", "error");
+            result.put("message", e.getMessage());
+        }
         return result;
     }
 
@@ -148,10 +160,16 @@ public class CsrOrdersController {
     public Map<String, Object> complete(@PathVariable Long orderId) {
         Map<String, Object> result = new HashMap<>();
 
-        ordersService.completeOrder(orderId);
+        try {
+            ordersService.completeOrder(orderId);
 
-        result.put("status", "success");
-        result.put("message", "Order completed");
+            result.put("status", "success");
+            result.put("message", "Order completed");
+        } catch (OrderException e) {
+            log.error("Can not complete order", e);
+            result.put("status", "error");
+            result.put("message", e.getMessage());
+        }
         return result;
     }
 

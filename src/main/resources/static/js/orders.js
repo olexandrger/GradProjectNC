@@ -6,6 +6,8 @@ var ordersData;
 var selectedOrder;
 var selectUserId;
 
+var currentUserId;
+
 const INSTANCE_STATUS_CREATED = 9;
 const INSTANCE_STATUS_ACTIVATED = 10;
 const INSTANCE_STATUS_SUSPENDED = 11;
@@ -187,6 +189,7 @@ function selectOrder(index) {
         var domainSelector = $('#order-domain');
         var productSelector = $('#order-product');
 
+
         if (ordersData[selectedOrder].orderAim == "CREATE" && ordersData[selectedOrder].status == "CREATED") {
             domainSelector.prop("disabled", false);
             productSelector.prop("disabled", false);
@@ -224,19 +227,25 @@ function selectOrder(index) {
             }
         }
 
+
         $(".order-button").addClass("hidden");
 
-        if (ordersData[selectedOrder].status == "CREATED") {
-            $("#order-button-start").removeClass("hidden");
-            $("#order-button-cancel").removeClass("hidden");
+        if (!(ordersData[selectedOrder].responsibleId == null || ordersData[selectedOrder].responsibleId == currentUserId)) {
+            domainSelector.prop("disabled", true);
+            productSelector.prop("disabled", true);
+        } else {
+            if (ordersData[selectedOrder].status == "CREATED") {
+                $("#order-button-start").removeClass("hidden");
+                $("#order-button-cancel").removeClass("hidden");
 
-            if (ordersData[selectedOrder].orderAim == "CREATE") {
-                $("#order-button-update").removeClass("hidden");
+                if (ordersData[selectedOrder].orderAim == "CREATE") {
+                    $("#order-button-update").removeClass("hidden");
+                }
             }
-        }
-        if (ordersData[selectedOrder].status == "IN_PROGRESS") {
-            $("#order-button-complete").removeClass("hidden");
-            $("#order-button-cancel").removeClass("hidden");
+            if (ordersData[selectedOrder].status == "IN_PROGRESS") {
+                $("#order-button-complete").removeClass("hidden");
+                $("#order-button-cancel").removeClass("hidden");
+            }
         }
 
     }
@@ -579,6 +588,23 @@ function loadOrderAaimsInModal() {
 
 }
 
+function loadAccountInfo() {
+    var _csrf = $('meta[name=_csrf]').attr("content");
+
+    $.ajax({
+        type: 'GET',
+        url: "/api/user/account",
+        headers: {
+            'X-CSRF-TOKEN': _csrf
+        },
+        success: function (data) {
+
+            currentUserId = data.userId;
+            loadOrders();
+        }
+    });
+}
+
 $(document).ready(function () {
-    loadOrders();
+    loadAccountInfo();
 });

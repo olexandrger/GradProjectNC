@@ -97,7 +97,12 @@ public class ClientOrdersController {
 
     @RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST)
     public Map<String, String> cancel(@PathVariable Long id) {
-        ordersService.cancelOrder(id);
+        try {
+            ordersService.cancelOrder(id);
+        } catch (OrderException e) {
+            log.error("Can not cancel order", e);
+            return Collections.singletonMap("status", "error");
+        }
         return Collections.singletonMap("status", "success");
     }
 
