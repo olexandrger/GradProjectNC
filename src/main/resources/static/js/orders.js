@@ -13,6 +13,13 @@ const INSTANCE_STATUS_ACTIVATED = 10;
 const INSTANCE_STATUS_SUSPENDED = 11;
 const INSTANCE_STATUS_DEACTIVATED = 10;
 
+const ORDER_STATUS_CREATED = "CREATED";
+const ORDER_STATUS_IN_PROGRESS = "IN_PROGRESS";
+const ORDER_STATUS_CANCELLED = "CANCELLED";
+const ORDER_STATUS_COMPLETED = "COMPLETED";
+
+const ORDER_AIM_CREATE = "CREATE";
+
 function orderErrorMessage(message) {
     var alert = $('<div id="order-alert" class="alert alert-danger" role="alert">' +
         '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
@@ -80,7 +87,7 @@ function cancelSelectedOrder() {
         success: function (data) {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
-                ordersData[selectedId].status = "CANCELLED";
+                ordersData[selectedId].status = ORDER_STATUS_CANCELLED;
                 ordersData[selectedId].closeDate = Date.now() / 1000;
 
                 if (selectedOrder == selectedId) {
@@ -109,7 +116,7 @@ function startSelectedOrder() {
         success: function (data) {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
-                ordersData[selectedId].status = "IN_PROGRESS";
+                ordersData[selectedId].status = ORDER_STATUS_IN_PROGRESS;
 
                 if (selectedOrder == selectedId) {
                     selectOrder(selectedOrder);
@@ -137,7 +144,7 @@ function completeSelectedOrder() {
         success: function (data) {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
-                ordersData[selectedId].status = "COMPLETED";
+                ordersData[selectedId].status = ORDER_STATUS_CREATED;
                 ordersData[selectedId].closeDate = Date.now() / 1000;
 
                 if (selectedOrder == selectedId) {
@@ -190,7 +197,7 @@ function selectOrder(index) {
         var productSelector = $('#order-product');
 
 
-        if (ordersData[selectedOrder].orderAim == "CREATE" && ordersData[selectedOrder].status == "CREATED") {
+        if (ordersData[selectedOrder].orderAim == ORDER_AIM_CREATE && ordersData[selectedOrder].status == ORDER_STATUS_CREATED) {
             domainSelector.prop("disabled", false);
             productSelector.prop("disabled", false);
         } else {
@@ -234,15 +241,15 @@ function selectOrder(index) {
             domainSelector.prop("disabled", true);
             productSelector.prop("disabled", true);
         } else {
-            if (ordersData[selectedOrder].status == "CREATED") {
+            if (ordersData[selectedOrder].status == ORDER_STATUS_CREATED) {
                 $("#order-button-start").removeClass("hidden");
                 $("#order-button-cancel").removeClass("hidden");
 
-                if (ordersData[selectedOrder].orderAim == "CREATE") {
+                if (ordersData[selectedOrder].orderAim == ORDER_AIM_CREATE) {
                     $("#order-button-update").removeClass("hidden");
                 }
             }
-            if (ordersData[selectedOrder].status == "IN_PROGRESS") {
+            if (ordersData[selectedOrder].status == ORDER_STATUS_IN_PROGRESS) {
                 $("#order-button-complete").removeClass("hidden");
                 $("#order-button-cancel").removeClass("hidden");
             }
@@ -262,13 +269,13 @@ function previousPage() {
 }
 
 function getLabelName(status) {
-    if (status == "CREATED") {
+    if (status == ORDER_STATUS_CREATED) {
         return "label label-info orders-list";
-    } else if (status == "IN_PROGRESS") {
+    } else if (status == ORDER_STATUS_IN_PROGRESS) {
         return "label label-primary orders-list";
-    } else if (status == "CANCELLED") {
+    } else if (status == ORDER_STATUS_CANCELLED) {
         return "label label-danger orders-list";
-    } else if (status == "COMPLETED") {
+    } else if (status == ORDER_STATUS_COMPLETED) {
         return "label label-success orders-list";
     }
 }

@@ -103,6 +103,11 @@ function loadInstance() {
     loadComplaints();
 }
 
+const INSTANCE_STATUS_ACTIVATED = "ACTIVATED";
+const INSTANCE_STATUS_SUSPENDED = "SUSPENDED";
+const INSTANCE_STATUS_DEACTIVATED = "DEACTIVATED";
+const INSTANCE_STATUS_CREATED = "CREATED";
+
 function loadOrders() {
     $.ajax({
         url: "/api/client/instance/get/byId/" + instanceId,
@@ -122,16 +127,16 @@ function loadOrders() {
             $("#instance-suspend-button").addClass("hidden");
             $("#instance-continue-button").addClass("hidden");
             $("#instance-deactivate-button").addClass("hidden");
-            // if (data.status.categoryName == "CREATED") {
-            if (data.status.categoryName == "ACTIVATED") {
+            // if (data.status.categoryName == INSTANCE_STATUS_CREATED) {
+            if (data.status.categoryName == INSTANCE_STATUS_ACTIVATED) {
                 $("#instance-suspend-button").removeClass("hidden");
                 $("#instance-continue-button").addClass("hidden");
                 $("#instance-deactivate-button").removeClass("hidden");
-            } else if (data.status.categoryName == "SUSPENDED") {
+            } else if (data.status.categoryName == INSTANCE_STATUS_SUSPENDED) {
                 $("#instance-suspend-button").addClass("hidden");
                 $("#instance-continue-button").removeClass("hidden");
                 $("#instance-deactivate-button").addClass("hidden");
-                // }  else if (data.status.categoryName == "DEACTIVATED") {
+                // }  else if (data.status.categoryName == INSTANCE_STATUS_DEACTIVATED) {
                 //     $("#instance-suspend-button").addClass("hidden");
                 //     $("#instance-continue-button").addClass("hidden");
                 //     $("#instance-deactivate-button").addClass("hidden");
@@ -360,7 +365,7 @@ function alertError(msg) {
     ref = document.createElement("a");
     ref.appendChild(document.createTextNode("X"));
     ref.href = "#";
-    ref.className = "close"
+    ref.className = "close";
     ref.setAttribute("data-dismiss", "alert");
     ref.setAttribute("aria-label", "close");
     alert.appendChild(ref);
@@ -375,7 +380,7 @@ function alertSuccess(msg) {
     ref = document.createElement("a");
     ref.appendChild(document.createTextNode("X"));
     ref.href = "#";
-    ref.className = "close"
+    ref.className = "close";
     ref.setAttribute("data-dismiss", "alert");
     ref.setAttribute("aria-label", "close");
     alert.appendChild(ref);
