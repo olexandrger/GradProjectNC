@@ -131,6 +131,8 @@
                     <#--<button class="btn pull-right">Cancel</button></td></tr>-->
                     <#--<tr><td>Create</td><td>Closed</td><td>1.1.1111</td><td>2.1.1111</td><td></td></tr>-->
                     </table>
+                    <button id="more-orders" class="btn btn-default center-block hidden" onclick="loadOrders()">More</button>
+
                 </div>
             </div>
         </div>

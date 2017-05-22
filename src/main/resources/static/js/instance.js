@@ -6,13 +6,6 @@ var complaintListCurrentPage = 0;
 const MIN_SUBJECT_LENGTH = 5;
 const CATEGORY_TYPE_COMPLAIN_REASON = 5;
 
-function buttonsToDown() {
-    $('.pull-down').each(function () {
-        var $this = $(this);
-        $this.css('margin-top', $this.parent().height() - $this.height())
-    });
-}
-
 function suspendInstance() {
     var path = window.location.pathname.split("/");
     var instanceId = path[path.length - 1];
@@ -96,9 +89,10 @@ function cancelOrder(orderId) {
     });
 }
 
-function loadInstance() {
+function loadInfo() {
     path = window.location.pathname.split("/");
     instanceId = path[path.length - 1];
+    loadInstance();
     loadOrders();
     loadComplaints();
 }
@@ -108,7 +102,7 @@ const INSTANCE_STATUS_SUSPENDED = "SUSPENDED";
 const INSTANCE_STATUS_DEACTIVATED = "DEACTIVATED";
 const INSTANCE_STATUS_CREATED = "CREATED";
 
-function loadOrders() {
+function loadInstance() {
     $.ajax({
         url: "/api/client/instance/get/byId/" + instanceId,
         success: function (data) {
@@ -144,6 +138,7 @@ function loadOrders() {
                 // console.error("Unknown instasnce status: " + data.status.categoryName);
             }
 
+            /*
             var ordersTable = $("#instance-orders-table");
             ordersTable.find(".order-row").remove();
             data.productOrders.forEach(function (order) {
@@ -160,9 +155,47 @@ function loadOrders() {
 
                 ordersTable.append($(html));
             });
+            */
         },
         error: function (data) {
             console.error("Failed to load instance");
+            console.log(data);
+        }
+    });
+}
+
+const ordersPageSize = 10;
+var ordersPageNumber = 0;
+
+function loadOrders() {
+    $.ajax({
+        url: "/api/client/orders/get/byInstance/" + instanceId + "/size/" + (ordersPageSize + 1) + "/offset/" + (ordersPageNumber++ * ordersPageSize) ,
+        success: function (data) {
+            var ordersTable = $("#instance-orders-table");
+            // ordersTable.find(".order-row").remove();
+            if (data.length <= ordersPageSize) {
+                $("#more-orders").addClass("hidden");
+            } else {
+                $("#more-orders").removeClass("hidden");
+            }
+            data.forEach(function (order) {
+                var cancelId = order.productOrderId;
+                var cancelButton = '<button class="btn pull-right" onclick="cancelOrder(' + cancelId + ')">Cancel</button>';
+
+                var html = "<tr class='order-row' id='table-order-" + order.productOrderId + "'>" +
+                "<td class='col-sm-2'>" + order.orderAim + "</td>" +
+                "<td class='col-sm-2 order-status'>" + order.status + "</td>" +
+                "<td class='col-sm-2'>" + moment.unix(order.openDate).format("LLL") + "</td>" +
+                "<td class='col-sm-2 close-date'>" + (order.closeDate == null ? "" : moment.unix(order.closeDate).format("LLL")) + "</td>" +
+                "<td class='col-sm-2 cancel-button'>" + (order.status == "CREATED" ? cancelButton : "") + "</td>" +
+                "</tr>";
+
+                ordersTable.append($(html));
+            });
+
+        },
+        error: function (data) {
+            console.error("Failed to load orders");
             console.log(data);
         }
     });
@@ -401,7 +434,7 @@ $(document).ready(function () {
         url: "/api/user/account",
         success: function (data) {
             currentUserId = data.userId;
-            loadInstance();
+            loadInfo();
         },
         error: function () {
             alertError("Internal server error!")
