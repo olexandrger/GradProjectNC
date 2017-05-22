@@ -12,6 +12,10 @@ var currentUserId;
 
 const CATEGORY_TYPE_COMPLAIN_REASON = 5;
 const MIN_SUBJECT_LENGTH = 5;
+const MIN_RESPONCE_LENGTH = 5;
+const COMPLAINT_STATUS_CREATED = 5;
+const COMPLAINT_STATUS_UNDER_CONSIDERATION = 6;
+const COMPLAINT_STATUS_CONSIDERATION_COMPLETED = 7;
 
 function loadComplaints() {
     $.ajax({
@@ -327,27 +331,35 @@ function takeComplaintForConsideration() {
         }
     });
 }
-function updateComplaint() {
-    $.ajax({
-        url: "/api/pmg/complaint/update/response/",
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-        },
-        contentType: 'application/json',
-        data: JSON.stringify({
-            userId: currentUserId,
-            complaintId: complaintsData[selectedComplain].complainId,
-            response: $("#selected-complain-responce").val()
-        }),
-        success: function (data) {
-            loadComplaints();
-            printResult(data);
-        },
-        error: function () {
-            alertError("Internal server error!")
-        }
-    });
+// function updateComplaint() {
+//     $.ajax({
+//         url: "/api/pmg/complaint/update/response/",
+//         method: 'POST',
+//         headers: {
+//             'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+//         },
+//         contentType: 'application/json',
+//         data: JSON.stringify({
+//             userId: currentUserId,
+//             complaintId: complaintsData[selectedComplain].complainId,
+//             response: $("#selected-complain-responce").val()
+//         }),
+//         success: function (data) {
+//             loadComplaints();
+//             printResult(data);
+//         },
+//         error: function () {
+//             alertError("Internal server error!")
+//         }
+//     });
+// }
+
+function unlockCompletConsiderationButton() {
+    if($("#selected-complain-responce").val().length>MIN_RESPONCE_LENGTH){
+        $("#complet-consideration-complaint-btn").removeAttr("disabled");
+    } else {
+        $("#complet-consideration-complaint-btn").attr("disabled", "disabled");
+    }
 }
 
 function completComplaintConsideration() {
@@ -360,7 +372,8 @@ function completComplaintConsideration() {
         contentType: 'application/json',
         data: JSON.stringify({
             userId: currentUserId,
-            complaintId: complaintsData[selectedComplain].complainId
+            complaintId: complaintsData[selectedComplain].complainId,
+            response: $("#selected-complain-responce").val()
         }),
         success: function (data) {
             selectedComplain = 0;
@@ -375,12 +388,9 @@ function completComplaintConsideration() {
 
 function loadControlButtons() {
     takeComplaintBtn = $("#take-complaint-btn");
-    updateComplaintBtn = $("#update-complaint-btn");
     completComplaintBtn = $("#complet-consideration-complaint-btn");
     takeComplaintBtn.attr("disabled", "disabled");
     takeComplaintBtn.addClass("hidden");
-    updateComplaintBtn.attr("disabled", "disabled");
-    updateComplaintBtn.addClass("hidden");
     completComplaintBtn.attr("disabled", "disabled");
     completComplaintBtn.addClass("hidden");
     addButtons();
@@ -390,26 +400,25 @@ function loadControlButtons() {
 
 function addButtons() {
 
-    switch (complaintsData[selectedComplain].status) {
-        case "CREATED":
+    switch (complaintsData[selectedComplain].statusId) {
+        case COMPLAINT_STATUS_CREATED:
             takeComplaintBtn.removeAttr("disabled");
             takeComplaintBtn.removeClass("hidden");
-            updateComplaintBtn.removeAttr("disabled");
-            updateComplaintBtn.removeClass("hidden");
             break;
 
-        case "UNDER_CONSIDERATION":
+        case COMPLAINT_STATUS_UNDER_CONSIDERATION:
             if (currentUserId == complaintsData[selectedComplain].responsiblId) {
-                completComplaintBtn.removeAttr("disabled");
+                //completComplaintBtn.removeAttr("disabled");
                 completComplaintBtn.removeClass("hidden");
-                updateComplaintBtn.removeAttr("disabled");
-                updateComplaintBtn.removeClass("hidden");
             }
             break;
 
-        case "CONSIDERATION_COMPLETED":
+        case COMPLAINT_STATUS_CONSIDERATION_COMPLETED:
 
             break;
+
+        default:
+            alertError("Unknown complaint status");
     }
 }
 
@@ -452,9 +461,9 @@ function printResult(data) {
 }
 function unlockCreateButton() {
     if ($("#new-complaint-subject").val().length < MIN_SUBJECT_LENGTH) {
-        $("#create-new-complaint-from-modal-btn").attr("disabled", "disabled");
+        $("#create-complaint-ftom-modal-btn").attr("disabled", "disabled");
     } else {
-        $("#create-new-complaint-from-modal-btn").removeAttr("disabled");
+        $("#create-complaint-ftom-modal-btn").removeAttr("disabled");
     }
 }
 

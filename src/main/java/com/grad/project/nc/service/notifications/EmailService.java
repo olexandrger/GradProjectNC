@@ -10,6 +10,7 @@ public interface EmailService {
     void sendRegistrationEmail(User user);
     void sendNewOrderEmail(ProductOrder order);
     void sendInstanceStatusChangedEmail(ProductInstance instance);
-    void sendNewComplainEmail(Complain complain);
-    void sendComplainStatusChangedEmail(Complain complain);
+    void sendNewComplaintEmail(Complain complain);
+    void sendComplaintUnderConsiderationChangedEmail(Complain complain);
+    void sendComplaintCompleteEmail(Complain complain);
 }

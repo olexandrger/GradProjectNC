@@ -1,6 +1,5 @@
 var currentUserId;
 var instanceId;
-var selectedComplain = -1;
 var complaintListSize = 5;
 var complaintListCurrentPage = 0;
 

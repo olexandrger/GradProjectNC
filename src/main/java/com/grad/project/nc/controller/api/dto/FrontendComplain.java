@@ -22,6 +22,7 @@ public class FrontendComplain {
     private String complainTitle;
     private String content;
     private String status;
+    private Long statusId;
     private Long responsiblId;
     private String responsibleEmail;
     private String responsibleNumber;
@@ -45,6 +46,7 @@ public class FrontendComplain {
                 .complainTitle(complain.getComplainTitle())
                 .content(complain.getContent())
                 .status(complain.getStatus().getCategoryName())
+                .statusId(complain.getStatus().getCategoryId())
                 .responsiblId((complain.getResponsible() == null ? null : complain.getResponsible().getUserId()))
                 .responsibleEmail(complain.getResponsible() == null ? null : complain.getResponsible().getEmail())
                 .responsibleNumber(complain.getResponsible() == null ? null : complain.getResponsible().getPhoneNumber())
