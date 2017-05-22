@@ -76,11 +76,11 @@ function loadInfo() {
     $.ajax({
             url: '/api/profile/get',
             success: function (data) {
-                var showDomainButton = true;
+                var showDomainButton = false;
                 for (var i = 0; i < data.roles.length; i++) {
                     var role = data.roles[i].roleName
-                    if (role === "ROLE_ADMIN" || role === "ROLE_CSR" || role === "ROLE_PMG") {
-                        showDomainButton = false;
+                    if (role === "ROLE_CLIENT") {
+                        showDomainButton = true;
                         break;
                     }
                 }
@@ -94,6 +94,7 @@ function loadInfo() {
             },
             error: function (data) {
                 console.error("User does not exists! ");
+                console.error(data);
             }
         }
     );
