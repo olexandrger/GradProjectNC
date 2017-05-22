@@ -16,7 +16,6 @@ public interface UserDao extends CrudDao<User> {
     @Transactional
     void persistUserDomains(User user);
 
-
     Optional<User> findByEmail(String email);
 
     User findUserByProductOrderId(Long productOrderId);

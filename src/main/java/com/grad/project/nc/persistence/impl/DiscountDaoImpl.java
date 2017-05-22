@@ -105,6 +105,14 @@ public class DiscountDaoImpl extends AbstractDao implements DiscountDao {
     }
 
     @Override
+    public List<Discount> findAll(long size, long offset) {
+        String findAllQuery = "SELECT \"discount_id\", \"discount_title\", \"discount\", " +
+                "\"start_date\", \"end_date\" FROM \"discount\"";
+
+        return findMultiplePage(findAllQuery, new DiscountRowMapper(), size, offset);
+    }
+
+    @Override
     public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"discount\" WHERE \"discount_id\" = ?";
 

@@ -82,14 +82,12 @@ public class AdminDiscountController {
 
         return responseHolder;
     }
-
-
-
-    @RequestMapping(value = "/allDiscounts", method = RequestMethod.GET)
+    
+    @RequestMapping(value = "/allDiscounts/size/{size}/offset/{offset}", method = RequestMethod.GET)
     @ResponseBody
-    public Collection<FrontendDiscount> getDiscounts() {
+    public Collection<FrontendDiscount> getDiscounts(@PathVariable Long size, @PathVariable Long offset) {
 
-        return discountService.getDiscounts().stream()
+        return discountService.getDiscountsPage(size, offset).stream()
                 .map(FrontendDiscount::fromEntity)
                 .collect(Collectors.toList());
 

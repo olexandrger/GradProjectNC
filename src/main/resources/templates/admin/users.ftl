@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <title>Users</title>
     <meta charset="UTF-8">
@@ -327,9 +327,13 @@
                                     <span class="input-group-btn">
                                         <button type="button" class="btn btn-default" onclick="loadByPhone()">Find by phone<span class="glyphicon "></span></button></span>
                                 </div>
-                                <div class="btn-group">
+                                <div class="btn-group btn-group-justified" role="group">
+                                    <div class="btn-group" role="group">
                                     <button type="button" class="btn btn-primary" onclick="sortByPhone(); loadUsers()">Sort by phone</button>
+                                    </div>
+                                    <div class="btn-group" role="group">
                                     <button type="button" class="btn btn-primary" onclick="sortByLastName(), loadUsers()">Sort by last name</button>
+                                    </div>
                                 </div>
                                 <div class="list-group" id="csr-users-list"></div>
                                 <ul class="pager">

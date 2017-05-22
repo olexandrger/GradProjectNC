@@ -3,6 +3,8 @@ var discounts=[];
 var discountsCache=[];
 var productPricesForRegion;
 var productPricesForDiscount = [];
+var discountsListSize = 10;
+var discountsListCurrentPage = 0;
 var numberOfAdded = 0;
 var currentSelected = -1;
 function addDiscount() {
@@ -127,26 +129,39 @@ function saveSelected() {
 }
 function loadAllDiscounts() {
     $.ajax({
-        url: "/api/admin/discounts/allDiscounts ",
+        url: "/api/admin/discounts/allDiscounts/size/" + (discountsListSize + 1) + "/offset/" + discountsListCurrentPage * discountsListSize,
         success: function(data) {
             discounts = data;
             var list = $("#discounts-list");
+            list.empty();
             console.log(JSON.stringify(discounts));
 
             data.forEach(function(item, i) {
-                console.log(item.discountTitle + "discount title loaded");
+                if (i < discountsListSize) {
+                    console.log(item.discountTitle + "discount title loaded");
 
-                var ref = document.createElement("a");
-                ref.appendChild(document.createTextNode(item.discountTitle));
-                ref.className = "list-group-item";
-                ref.href = "#";
-                ref.onclick = function () {
-                    selectDiscount(i);
-                };
+                    var ref = document.createElement("a");
+                    ref.appendChild(document.createTextNode(item.discountTitle));
+                    ref.className = "list-group-item";
+                    ref.href = "#";
+                    ref.onclick = function () {
+                        selectDiscount(i);
+                    };
 
-                list.append(ref);
+                    list.append(ref);
+                }
             });
 
+            var prevPage = $("#discounts-page-previous");
+            var nextPage = $("#discounts-page-next");
+            nextPage.addClass("hidden");
+            prevPage.addClass("hidden");
+            if (discountsListCurrentPage > 0) {
+                prevPage.removeClass("hidden");
+            }
+            if (data.length > discountsListSize) {
+                nextPage.removeClass("hidden");
+            }
 
 
             for (var i in discounts){
@@ -398,6 +413,16 @@ function clearDataFields() {
     node.empty();
 
 
+}
+
+function nextPage() {
+    discountsListCurrentPage++;
+    loadAllDiscounts();
+}
+
+function previousPage() {
+    discountsListCurrentPage--;
+    loadAllDiscounts();
 }
 
 

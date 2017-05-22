@@ -47,6 +47,12 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
+    public Collection<Discount> getDiscountsPage(Long size, Long offset) {
+
+        return discountDao.findAll(size, offset);
+    }
+
+    @Override
     public Collection<Region> getRegions() {
 
         return regionsDao.findAll();
