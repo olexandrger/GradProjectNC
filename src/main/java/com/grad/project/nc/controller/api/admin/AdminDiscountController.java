@@ -1,6 +1,7 @@
 package com.grad.project.nc.controller.api.admin;
 
 import com.grad.project.nc.controller.api.data.DiscountResponseHolder;
+import com.grad.project.nc.controller.api.data.NewDiscountResponseHolder;
 import com.grad.project.nc.controller.api.dto.FrontEndProductRegionPrice;
 import com.grad.project.nc.controller.api.dto.FrontendDiscount;
 import com.grad.project.nc.controller.api.dto.FrontendRegion;
@@ -31,21 +32,33 @@ public class AdminDiscountController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public DiscountResponseHolder add(@RequestBody FrontendDiscount frontendDiscount) {
+    public NewDiscountResponseHolder add(@RequestBody FrontendDiscount frontendDiscount) {
 
         Discount discount = FrontendDiscount.toEntity(frontendDiscount);
-        DiscountResponseHolder responseHolder = new DiscountResponseHolder();
+        NewDiscountResponseHolder responseHolder = new NewDiscountResponseHolder();
 
         log.info("Adding discount " + frontendDiscount.getDiscountTitle() );
 
         if (!discountService.add(discount)) {
-            responseHolder.setMessage("Error during discount adding");
-            responseHolder.setStatus("error");
+            responseHolder.setMessage(discountService.getMessage());
+            responseHolder.setStatus(discountService.getStatus());
         } else {
-            responseHolder.setMessage("Discount added successfully");
-            responseHolder.setStatus("success");
+            if (discountService.getAddedDiscountId() >= 0){
+                responseHolder.setMessage(discountService.getMessage());
+                responseHolder.setStatus(discountService.getStatus());
+                responseHolder.setDiscountID(discountService.getAddedDiscountId());
+                System.out.println(discountService.getAddedDiscountId());
+
+            }
+            else {
+                responseHolder.setMessage(discountService.getMessage());
+                responseHolder.setStatus(discountService.getStatus());
+
+            }
+
 
         }
+
 
         return responseHolder;
     }
@@ -59,11 +72,11 @@ public class AdminDiscountController {
         log.info("Updating discount " + frontendDiscount.getDiscountTitle() + frontendDiscount.getStartDate() );
 
         if (!discountService.update(discount)) {
-            responseHolder.setMessage("Error during discount updating");
-            responseHolder.setStatus("error");
+            responseHolder.setMessage(discountService.getMessage());
+            responseHolder.setStatus(discountService.getStatus());
         } else {
-            responseHolder.setMessage("Discount updated successfully");
-            responseHolder.setStatus("success");
+            responseHolder.setMessage(discountService.getMessage());
+            responseHolder.setStatus(discountService.getStatus());
 
         }
 

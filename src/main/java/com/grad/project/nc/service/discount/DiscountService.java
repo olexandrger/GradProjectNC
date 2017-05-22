@@ -16,4 +16,8 @@ public interface DiscountService {
      Boolean add(Discount discount);
      Boolean update(Discount discount);
 
+     String getStatus();
+     String getMessage();
+     Long getAddedDiscountId();
+
 }
