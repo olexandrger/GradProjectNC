@@ -10,6 +10,8 @@ public interface ProductService extends CrudService<Product> {
 
     Page<Product> findPaginated(int page, int amount);
 
+    List<Product> findLastN(int n);
+
     List<Product> findByProductTypeId(Long productTypeId);
 
     List<Product> findActiveProductsByRegionId(Long regionId);

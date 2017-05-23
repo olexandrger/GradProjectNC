@@ -1,6 +1,7 @@
 package com.grad.project.nc.controller.api;
 
 import com.grad.project.nc.controller.api.dto.FrontendProduct;
+import com.grad.project.nc.controller.api.dto.TypeaheadItem;
 import com.grad.project.nc.controller.api.dto.catalog.FrontendCatalogProduct;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.service.product.ProductService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -59,5 +61,27 @@ public class ProductsController {
 
 
         return new Page<>(content, productPage.getTotalPages());
+    }
+
+    @RequestMapping(
+            value = "/last",
+            params = {"amount"},
+            method = RequestMethod.GET
+    )
+    public List<TypeaheadItem> fetchProductTypeaheadItems(@RequestParam("amount") int amount) {
+        return productService.findLastN(amount)
+                .stream()
+                .map(product -> new TypeaheadItem(product.getProductId(), product.getProductName()))
+                .collect(Collectors.toList());
+    }
+
+    @RequestMapping(
+            value = "/search",
+            params = {"query"},
+            method = RequestMethod.GET
+    )
+    public List<TypeaheadItem> fetchProductTypeaheadItemsByQuery(@RequestParam("query") String query) {
+        //TODO implement
+        return null;
     }
 }

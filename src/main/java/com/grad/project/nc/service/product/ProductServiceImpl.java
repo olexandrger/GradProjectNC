@@ -67,6 +67,12 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
 
     @Override
     @Transactional
+    public List<Product> findLastN(int n) {
+        return productDao.findLastN(n);
+    }
+
+    @Override
+    @Transactional
     public Product add(Product product) {
         productDao.add(product);
 
