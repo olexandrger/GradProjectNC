@@ -76,48 +76,34 @@ function loadInfo() {
     $.ajax({
             url: '/api/profile/get',
             success: function (data) {
-                var showDomainButton = false;
-                for (var i = 0; i < data.roles.length; i++) {
-                    var role = data.roles[i].roleName
-                    if (role === "ROLE_CLIENT") {
-                        showDomainButton = true;
-                        break;
-                    }
-                }
-                if (showDomainButton) {
-                    $('#changeDomain').show();
-                }
-                $("#mf1").val(data.firstName);
-                $("#mf2").val(data.lastName);
-                $("#mf3").val(data.email);
-                $("#mf4").val(data.phoneNumber);
+                showInfo(data);
             },
             error: function (data) {
-                console.error("User does not exists! ");
-                console.error(data);
+                showInfo(data);
             }
         }
     );
 }
 
-// function showDomainButton() {
-//     $.ajax({
-//             url: '/api/profile/getRole',
-//             success: function (data) {
-//                 // clearFields();
-//                 $("#mf1").val(data.firstName);
-//                 $("#mf2").val(data.lastName);
-//                 $("#mf3").val(data.email);
-//                 $("#mf4").val(data.phoneNumber);
-//             },
-//             error: function (data) {
-//                 console.error("User does not exists! ");
-//             }
-//         }
-//     );
-// }
+function showInfo(data) {
+    var showDomainButton = false;
+    for (var i = 0; i < data.roles.length; i++) {
+        var role = data.roles[i].roleName
+        if (role === "ROLE_CLIENT") {
+            showDomainButton = true;
+            break;
+        }
+    }
+    if (showDomainButton) {
+        $('#changeDomain').show();
+    }
+    $("#mf1").val(data.firstName);
+    $("#mf2").val(data.lastName);
+    $("#mf3").val(data.email);
+    $("#mf4").val(data.phoneNumber);
+}
+
 
 $(document).ready(function () {
     loadInfo();
-    // showDomainButton();
 });
