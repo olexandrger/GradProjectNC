@@ -15,8 +15,10 @@ public class FrontendOrder {
     private String userName;
     private String orderAim;
     private String status;
+    private Long statusId;
     private Long responsibleId;
     private Long domainId;
+    private String domain;
     private Long productId;
     private String productName;
     private OffsetDateTime openDate;
@@ -31,10 +33,12 @@ public class FrontendOrder {
                 .userName(item.getUser().getFirstName() + " " + item.getUser().getLastName())
                 .orderAim(item.getOrderAim().getCategoryName())
                 .status(item.getStatus().getCategoryName())
+                .statusId(item.getStatus().getCategoryId())
                 .responsibleId(item.getResponsible() == null ? null : item.getResponsible().getUserId())
                 .openDate(item.getOpenDate())
                 .closeDate(item.getCloseDate())
                 .domainId(item.getProductInstance().getDomain().getDomainId())
+                .domain(item.getProductInstance().getDomain().getDomainName())
                 .productId(item.getProductInstance().getPrice().getProduct().getProductId())
                 .productName(item.getProductInstance().getPrice().getProduct().getProductName())
                 .build();
