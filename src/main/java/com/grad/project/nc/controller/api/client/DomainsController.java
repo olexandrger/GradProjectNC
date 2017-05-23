@@ -4,6 +4,7 @@ package com.grad.project.nc.controller.api.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
+import com.grad.project.nc.controller.api.dto.FrontendUser;
 import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.model.User;
 import com.grad.project.nc.service.domains.DomainService;
@@ -33,15 +34,21 @@ public class DomainsController {
     }
 
     //TODO rework after base domains done
+    //TODO this method
     @RequestMapping(path = "/get/all", method = RequestMethod.GET)
     public Collection<FrontendDomain> getUserDomains() {
-        List<FrontendDomain> domains = domainService.findByUserId(((User) SecurityContextHolder.getContext().
+        List<FrontendDomain> frontendDomains = domainService.getAllDomains(((User) SecurityContextHolder.getContext().
                 getAuthentication().getPrincipal()).getUserId()).stream().map(FrontendDomain::fromEntity).collect(Collectors.toList());
-//        for(FrontendDomain domain: domains){
-//            domain.setAddress(domainService.);
-//        }
-
-        return domains;
+        //serialization
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println("/get/all");
+            System.out.println("frontendDomain:");
+            System.out.println(mapper.writeValueAsString(frontendDomains));
+        } catch (JsonProcessingException e) {
+            System.out.println("frontendDomain error");
+        }
+        return frontendDomains;
     }
 
     @RequestMapping(path = "/get/byId/{id}", method = RequestMethod.GET)
@@ -49,10 +56,10 @@ public class DomainsController {
         return FrontendDomain.fromEntity(domainService.find(id));
     }
 
+    //ready
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public Map<String, String> deleteDomain(@RequestBody Map<String, Long> domainId) {
         Map<String, String> result = new HashMap<>();
-        //System.out.println(domainId.get("id"));
         try {
             Domain domain = domainService.find(domainId.get("id"));
             if (domain != null) {
@@ -71,19 +78,32 @@ public class DomainsController {
         }
     }
 
+    //ready
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     public Map<String, String> updateDomain(@RequestBody FrontendDomain frontendDomain) {
         Map<String, String> result = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
+
+        //serialization
         try {
+            System.out.println("/update");
+            System.out.println("frontendDomain:");
             System.out.println(mapper.writeValueAsString(frontendDomain));
         } catch (JsonProcessingException e) {
-            //e.printStackTrace();
-            System.out.println("frontend error");
+            System.out.println("frontendDomain error");
         }
+
         try {
-            Domain domain = domainService.convertFrontendDomainToDomain(frontendDomain);
-            System.out.println(domain.getDomainType().getCategoryId());
+            Domain domain = frontendDomain.toModel();
+
+            //serialization
+            try {
+                System.out.println("domain:");
+                System.out.println(mapper.writeValueAsString(domain));
+            } catch (JsonProcessingException e) {
+                System.out.println("domain error");
+            }
+
             if (domainService.find(frontendDomain.getDomainId()) == null) {
                 domainService.add(domain);
                 result.put("status", "success");
@@ -91,30 +111,33 @@ public class DomainsController {
                 result.put("domainId", domain.getDomainId().toString());
             } else {
                 domainService.update(domain);
-                System.out.println("in controller");
                 result.put("status", "success");
                 result.put("message", "Domain updated succesfully");
             }
             return result;
         } catch (DataAccessException exception) {
+            exception.printStackTrace();
             result.put("status", "error");
             result.put("message", "Can not add domain to database");
             return result;
         }
     }
 
+    //ready
     @RequestMapping(path = "/get/user", method = RequestMethod.GET)
-    public User getUserByEmail(@RequestParam(name = "email") String email) {
+    public FrontendUser getUserByEmail(@RequestParam(name = "email") String email) {
         try {
-            return userService.findByEMail(email);
+            User user = userService.findByEMail(email);
+            return user != null ? FrontendUser.fromEntity(user) : null;
         } catch (DataAccessException exception) {
             return null;
         }
     }
 
+    //ready
     @RequestMapping(path = "/get/user/authorized", method = RequestMethod.GET)
-    public User getAuthorizedUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public FrontendUser getAuthorizedUser() {
+        return FrontendUser.fromEntity((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 
 //    @Data
