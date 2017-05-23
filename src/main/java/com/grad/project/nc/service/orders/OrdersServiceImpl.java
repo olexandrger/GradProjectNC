@@ -303,6 +303,27 @@ public class OrdersServiceImpl implements OrdersService {
     public List<ProductOrder> getOrdersByProductInstance(long id, long size, long offset) {
         return orderDao.findByProductInstanceId(id, size, offset);
     }
+
+    @Override
+    public ProductOrder find(Long id) {
+        return orderDao.find(id);
+    }
+
+    @Override
+    public List<ProductOrder> getByAim(String aim, Long size, Long offset) {
+        return orderDao.findByAim(aim, size, offset);
+    }
+
+    @Override
+    public List<ProductOrder> getByStatus(String status, Long size, Long offset) {
+        return orderDao.findByStatus(status, size, offset);
+    }
+
+    @Override
+    public List<ProductOrder> getByAimAndStatus(String aim, String status, Long size, Long offset) {
+        return orderDao.findByAimAndStatus(aim, status, size, offset);
+    }
+
     @Override
     public Collection<ProductOrder> getOpenInstanceOrders(long instanceId, long size, long offset) {
         return orderDao.findOpenOrdersByInstanseId(instanceId, size, offset);

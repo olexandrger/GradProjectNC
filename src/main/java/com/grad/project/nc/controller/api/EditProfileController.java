@@ -1,6 +1,7 @@
 package com.grad.project.nc.controller.api;
 
 import com.grad.project.nc.model.User;
+import com.grad.project.nc.service.profile.ProfileService;
 import com.grad.project.nc.service.security.AutoLoginService;
 import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,9 @@ import java.util.Map;
 @RequestMapping("/api/profile")
 public class EditProfileController {
     @Autowired
-    private UserService userService;
-    @Autowired
     private AutoLoginService loginService;
     @Autowired
-    private BCryptPasswordEncoder encoder;
+    private ProfileService profileService;
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     public User dataTypes() {
@@ -37,14 +36,12 @@ public class EditProfileController {
 
         user.setUserId(oldUser.getUserId());
 
-        if (!userService.updateGeneralInformation(user)) {
-            response.put("status", "error");
-            response.put("message", "Error :(");
-        } else {
+        if (profileService.updateGeneralInformation(user)) {
             loginService.autologin(user.getEmail(), oldUser.getPassword());
-            response.put("status", "success");
-            response.put("message", "Changes saved");
         }
+        response.put("status", profileService.getStatus());
+        response.put("message", profileService.getMessage());
+
         return response;
     }
 
@@ -55,36 +52,12 @@ public class EditProfileController {
 
         Map<String, String> response = new HashMap<>();
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!encoder.matches(currentPassword, user.getPassword())) {
-            response.put("status", "error");
-            response.put("message", "Invalid current password.");
-        } else if (!isPasswordValid(newPassword)) {
-            response.put("status", "error");
-            response.put("message", "Incorrect new password.");
-        } else {
-            user.setPassword(newPassword);
-            if (!userService.updatePassword(user)) {
-                response.put("status", "error");
-                response.put("message", "Error.");
-            } else {
-                loginService.autologin(user.getEmail(), user.getPassword());
-                response.put("status", "success");
-                response.put("message", "Your password has been changed.");
-            }
-        }
+        profileService.updatePassword(user, currentPassword, newPassword);
+
+        response.put("status", profileService.getStatus());
+        response.put("message", profileService.getMessage());
 
         return response;
-    }
-
-    private boolean isPasswordValid(String password) {
-        if (password.length() < 8 ||
-                password.length() > 20) {
-            return false;
-        }
-        final String regex = "^[a-zA-Z0-9!@#$%^&*()_+|~\\-=\\/‘\\{\\}\\[\\]:\";’<>?,./]+$";
-        java.util.regex.Pattern p = java.util.regex.Pattern.compile(regex);
-        java.util.regex.Matcher m = p.matcher(password);
-        return m.matches();
     }
 
 }

@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -23,6 +25,8 @@ public class CsrOrdersController {
 
     private OrdersService ordersService;
     private ProductService productService;
+
+    private static final Long ORDER_AIM_CREATE = 13L;
 
     @Autowired
     public CsrOrdersController(OrdersService ordersService, ProductService productService) {
@@ -173,13 +177,11 @@ public class CsrOrdersController {
         return result;
     }
 
-    @RequestMapping(value = "/get/all/size/{size}/offset/{offset}")
-    public Collection<FrontendOrder> getOrders(@PathVariable Long size, @PathVariable Long offset) {
-
-        return ordersService.getAllOrders(size, offset).stream().map((item) -> {
+    private Collection<FrontendOrder> convertToFrontendOrders(Collection<ProductOrder> orders) {
+        return orders.stream().map((item) -> {
             FrontendOrder order = FrontendOrder.fromEntity(item);
 
-            if ("CREATE".equals(item.getOrderAim().getCategoryName())) {
+            if (ORDER_AIM_CREATE.equals(item.getOrderAim().getCategoryId())) {
                 order.setPossibleDomains(new HashMap<>());
                 item.getUser().getDomains().forEach((domain) -> {
                     order.getPossibleDomains().put(domain.getDomainId(), getFullAddress(domain.getAddress()));
@@ -187,13 +189,44 @@ public class CsrOrdersController {
 
                 order.setPossibleProducts(new HashMap<>());
                 productService.findByProductTypeId(item.getProductInstance().getPrice()
-                                .getProduct().getProductType().getProductTypeId())
+                        .getProduct().getProductType().getProductTypeId())
                         .forEach((product -> order.getPossibleProducts()
                                 .put(product.getProductId(), product.getProductName())));
             }
 
             return order;
         }).collect(Collectors.toList());
+    }
+
+    @Deprecated
+    @RequestMapping(value = "/get/all/size/{size}/offset/{offset}")
+    public Collection<FrontendOrder> getOrders(@PathVariable Long size, @PathVariable Long offset) {
+        return convertToFrontendOrders(ordersService.getAllOrders(size, offset));
+    }
+
+    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+    public Collection<FrontendOrder> getOrderById(@PathVariable Long id) {
+        return convertToFrontendOrders(Collections.singletonList(ordersService.find(id)));
+    }
+
+
+    @RequestMapping(value = "/get/all", method = RequestMethod.GET)
+    public Collection<FrontendOrder> getOrdersByCategories(
+            @RequestParam(value = "aim", required = false) String aim,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "size") Long size,
+            @RequestParam(value = "offset") Long offset) {
+        Collection<ProductOrder> orders;
+        if (aim != null && status != null) {
+            orders = ordersService.getByAimAndStatus(aim, status, size, offset);
+        } else if (status != null) {
+            orders = ordersService.getByStatus(status, size, offset);
+        } else if (aim != null) {
+            orders = ordersService.getByAim(aim, size, offset);
+        } else {
+            orders = ordersService.getAllOrders(size, offset);
+        }
+        return convertToFrontendOrders(orders);
     }
 
     private static String getFullAddress(Address address) {

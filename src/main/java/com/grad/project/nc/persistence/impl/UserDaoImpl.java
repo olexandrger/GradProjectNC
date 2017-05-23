@@ -96,8 +96,8 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     @Override
     @Transactional
     public User updatePassword(User user) {
-        String updateQuery = "UPDATE \"user\" SET \"password\" = ? ";
-        executeUpdate(updateQuery, user.getPassword());
+        String updateQuery = "UPDATE \"user\" SET \"password\" = ? WHERE \"email\" = ?";
+        executeUpdate(updateQuery, user.getPassword(), user.getEmail());
         return user;
     }
 

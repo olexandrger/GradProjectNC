@@ -93,7 +93,6 @@ function loadInfo() {
     path = window.location.pathname.split("/");
     instanceId = path[path.length - 1];
     loadInstance();
-    loadOrders();
     loadComplaints();
 }
 
@@ -138,6 +137,9 @@ function loadInstance() {
                 // console.error("Unknown instasnce status: " + data.status.categoryName);
             }
 
+
+            reloadOrders();
+
             /*
             var ordersTable = $("#instance-orders-table");
             ordersTable.find(".order-row").remove();
@@ -167,9 +169,13 @@ function loadInstance() {
 const ordersPageSize = 10;
 var ordersPageNumber = 0;
 
-function loadOrders() {
+function loadMoreOrders() {
+    addOrdersPage(ordersPageNumber++);
+}
+
+function addOrdersPage(pageNumber) {
     $.ajax({
-        url: "/api/client/orders/get/byInstance/" + instanceId + "/size/" + (ordersPageSize + 1) + "/offset/" + (ordersPageNumber++ * ordersPageSize) ,
+        url: "/api/client/orders/get/byInstance/" + instanceId + "/size/" + (ordersPageSize + 1) + "/offset/" + (ordersPageNumber * ordersPageSize) ,
         success: function (data) {
             var ordersTable = $("#instance-orders-table");
             // ordersTable.find(".order-row").remove();
@@ -197,8 +203,22 @@ function loadOrders() {
         error: function (data) {
             console.error("Failed to load orders");
             console.log(data);
-        }
+        },
+        async: false
     });
+}
+
+function reloadOrders() {
+
+    $("#instance-orders-table").find(".order-row").remove();
+
+    //execute async
+    setTimeout(function() {
+        for (var i = 0; i <= ordersPageNumber; i++) {
+            console.log(i);
+            addOrdersPage(i);
+        }
+    }, 0);
 }
 
 function loadNewComplaintModal() {

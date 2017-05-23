@@ -202,6 +202,72 @@ public class ProductOrderDaoImpl extends AbstractDao
         return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, instanceId);
     }
 
+    @Override
+    public List<ProductOrder> findByAim(String aim, Long size, Long offset) {
+        String query =
+                "SELECT " +
+                        "po.product_order_id, " +
+                        "po.product_instance_id, " +
+                        "po.user_id, " +
+                        "po.order_aim_id, " +
+                        "po.status_id, " +
+                        "po.responsible_id, " +
+                        "po.open_date, " +
+                        "po.close_date " +
+                        "FROM product_order po " +
+                        "INNER JOIN category c " +
+                        "ON c.category_id=po.order_aim_id " +
+                        "WHERE c.category_name=? " +
+                        "ORDER BY close_date DESC " +
+                        "NULLS FIRST, " +
+                        "open_date DESC";
+        return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, aim);
+    }
+
+    @Override
+    public List<ProductOrder> findByStatus(String status, Long size, Long offset) {
+        String query =
+                "SELECT " +
+                        "po.product_order_id, " +
+                        "po.product_instance_id, " +
+                        "po.user_id, " +
+                        "po.order_aim_id, " +
+                        "po.status_id, " +
+                        "po.responsible_id, " +
+                        "po.open_date, " +
+                        "po.close_date " +
+                        "FROM product_order po " +
+                        "INNER JOIN category c " +
+                        "ON c.category_id=po.status_id " +
+                        "WHERE c.category_name=? " +
+                        "ORDER BY close_date DESC " +
+                        "NULLS FIRST, " +
+                        "open_date DESC";
+        return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, status);
+    }
+
+    @Override
+    public List<ProductOrder> findByAimAndStatus(String aim, String status, Long size, Long offset) {
+        String query =
+                "SELECT " +
+                        "po.product_order_id, " +
+                        "po.product_instance_id, " +
+                        "po.user_id, " +
+                        "po.order_aim_id, " +
+                        "po.status_id, " +
+                        "po.responsible_id, " +
+                        "po.open_date, " +
+                        "po.close_date " +
+                        "FROM product_order po " +
+                        "INNER JOIN category c ON c.category_id=po.status_id " +
+                        "INNER JOIN category c2 on po.order_aim_id = c2.category_id " +
+                        "WHERE c.category_name=? and c2.category_name=? " +
+                        "ORDER BY close_date DESC " +
+                        "NULLS FIRST, " +
+                        "open_date DESC";
+        return findMultiplePage(query, new ProductOrderRowMapper(), size, offset, status, aim);
+    }
+
     private class ProductOrderRowMapper implements RowMapper<ProductOrder> {
 
         @Override
