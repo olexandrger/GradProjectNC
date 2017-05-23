@@ -42,6 +42,10 @@
         <div class="row">
             <div class=" col-sm-3 col-sm-offset-1">
                 <div class="list-group" id="discounts-list"></div>
+                <ul class="pager">
+                    <li class="previous hidden" id="discounts-page-previous"><a href="#" onclick="previousPage()">Previous</a></li>
+                    <li class="next hidden" id="discounts-page-next"><a href="#" onclick="nextPage()">Next</a></li>
+                </ul>
                 <span class="input-group-btn">
                 <#--<button type="button" onclick="this.style.visibility='hidden'; loadAllDiscounts();" class="btn btn-info btn-block"> show all</button>-->
                     </span>

@@ -81,14 +81,26 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendNewComplainEmail(Complain complain) {
-        //TODO email sending
+    public void sendNewComplaintEmail(Complain complain) {
+        User user = complain.getUser();
+        logger.info("Sending new complain email to " + user.getUsername());
+        sendEmail(new Mail(user.getEmail(), new NewComplaintMailContent(complain)));
     }
 
     @Override
-    public void sendComplainStatusChangedEmail(Complain complain) {
-        //TODO email sending
+    public void sendComplaintUnderConsiderationChangedEmail(Complain complain) {
+        User user = complain.getUser();
+        logger.info("Sending complain under considerations email to " + user.getUsername());
+        sendEmail(new Mail(user.getEmail(), new ComplaintUnderConsiderationMailContent(complain)));
     }
+
+    @Override
+    public void sendComplaintCompleteEmail(Complain complain) {
+        User user = complain.getUser();
+        logger.info("Sending complain complete email to " + user.getUsername());
+        sendEmail(new Mail(user.getEmail(), new ComplaintCompletedMailContent(complain)));
+    }
+
 
     @Data
     @AllArgsConstructor

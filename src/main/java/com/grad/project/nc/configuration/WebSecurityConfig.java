@@ -50,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/csr/**", "/api/csr/**").hasRole("CSR")
                 .antMatchers("/client/**", "/api/client/**").hasRole("CLIENT")
                 .antMatchers("/pmg/**", "/api/pmg/**").hasRole("PMG")
-                .antMatchers("/profile/**", "/api/profile/**").hasAnyRole("ADMIN", "CSR", "CLIENT")
+                .antMatchers("/profile/**", "/api/profile/**").hasAnyRole("ADMIN", "CSR", "CLIENT", "PMG")
 //                    .antMatchers("/api/**").authenticated()
                 .and()
                 .formLogin()

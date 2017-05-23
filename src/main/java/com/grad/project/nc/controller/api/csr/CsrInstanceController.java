@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/csr/instances")
 public class CsrInstanceController {
 
+    private static final long INSTANCE_STATUS_DEACTIVATED = 12;
     InstanceService instanceService;
 
     @Autowired
@@ -31,7 +32,7 @@ public class CsrInstanceController {
     Collection<FrontendInstance> findByDomainID(@PathVariable Long id){
         return instanceService.getByDomainId(id)
                 .stream()
-                .filter(instance->{ return !instance.getStatus().getCategoryName().equals("DEACTIVATE");})
+                .filter(instance->{ return instance.getStatus().getCategoryId().longValue() != INSTANCE_STATUS_DEACTIVATED;})
                 .map(FrontendInstance::fromEntity)
                 .collect(Collectors.toCollection(ArrayList::new));
     }

@@ -79,7 +79,7 @@ public class ComplainServiceImpl implements ComplainService {
         complain.setContent(content);
 
         complain = complainDao.add(complain);
-        emailService.sendNewComplainEmail(complain);
+        emailService.sendNewComplaintEmail(complainDao.find(complain.getComplainId()));
         return complain;
     }
 
@@ -92,26 +92,27 @@ public class ComplainServiceImpl implements ComplainService {
         }
         complain.setStatus(categoryDao.find(COMPLAIN_STATUS_UNDER_CONSIDERATION));
         complain.setResponsible(user);
-        complainDao.update(complain);
+        complain = complainDao.update(complain);
+        emailService.sendComplaintUnderConsiderationChangedEmail(complainDao.find(complain.getComplainId()));
     }
 
-    @Override
-    public void updadeComplainResponse(long complainId, long userId, String response) throws IncorrectComplaintStateException {
-        Complain complain = complainDao.find(complainId);
-        if (complain.getStatus().getCategoryId().longValue() == COMPLAIN_STATUS_UNDER_CONSIDERATION
-                && complain.getResponsible().getUserId().longValue() != userId) {
-            throw new IncorrectComplaintStateException("You can not change a complaint, assigned to another responsible!");
-        }
-        if (complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_UNDER_CONSIDERATION
-                && complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_CREATED) {
-            throw new IncorrectComplaintStateException("You can not change a  complaint in status " + complain.getStatus().getCategoryName());
-        }
-        complain.setResponse(response);
-        complainDao.update(complain);
-    }
+//    @Override
+//    public void updadeComplainResponse(long complainId, long userId, String response) throws IncorrectComplaintStateException {
+//        Complain complain = complainDao.find(complainId);
+//        if (complain.getStatus().getCategoryId().longValue() == COMPLAIN_STATUS_UNDER_CONSIDERATION
+//                && complain.getResponsible().getUserId().longValue() != userId) {
+//            throw new IncorrectComplaintStateException("You can not change a complaint, assigned to another responsible!");
+//        }
+//        if (complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_UNDER_CONSIDERATION
+//                && complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_CREATED) {
+//            throw new IncorrectComplaintStateException("You can not change a  complaint in status " + complain.getStatus().getCategoryName());
+//        }
+//        complain.setResponse(response);
+//        complainDao.update(complain);
+//    }
 
     @Override
-    public void completeComplaint(long userId, long complainId) throws IncorrectComplaintStateException {
+    public void completeComplaint(long userId, long complainId, String responce) throws IncorrectComplaintStateException, IncompleteComplaintDataExceptions {
         Complain complain = complainDao.find(complainId);
         if (complain.getStatus().getCategoryId().longValue() != COMPLAIN_STATUS_UNDER_CONSIDERATION) {
             throw new IncorrectComplaintStateException("You can not end a problem with the status of " + complain.getStatus().getCategoryName());
@@ -122,9 +123,14 @@ public class ComplainServiceImpl implements ComplainService {
         if (complain.getResponsible().getUserId().longValue() != userId) {
             throw new IncorrectComplaintStateException("You can not change a complaint, assigned to another responsible!");
         }
+        if(responce==null || responce.length()<1){
+            throw new IncompleteComplaintDataExceptions("You can not close a complaint without response!");
+        }
         complain.setStatus(categoryDao.find(COMPLAIN_STATUS_CONSIDERATION_COMPLETED));
         complain.setCloseDate(OffsetDateTime.now());
-        complainDao.update(complain);
+        complain.setResponse(responce);
+        complain = complainDao.update(complain);
+        emailService.sendComplaintCompleteEmail(complainDao.find(complain.getComplainId()));
     }
 
     @Override

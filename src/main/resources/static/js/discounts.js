@@ -3,6 +3,8 @@ var discounts=[];
 var discountsCache=[];
 var productPricesForRegion;
 var productPricesForDiscount = [];
+var discountsListSize = 10;
+var discountsListCurrentPage = 0;
 var numberOfAdded = 0;
 var currentSelected = -1;
 function addDiscount() {
@@ -33,9 +35,9 @@ function addDiscount() {
 
         selectDiscount(index);
     } else {
-        $("#new-discount-alert-place").remove();
+        $("#new-discount-alert-place1").remove();
 
-        $('<div id="new-discount-alert-place" class="alert alert-danger" role="alert">' +
+        $('<div id="new-discount-alert-place1" class="alert alert-danger" role="alert">' +
             '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
             'Can not add empty name </div>').insertAfter( list);
     }
@@ -50,19 +52,31 @@ function saveSelected() {
     var startDate = $('#datetimepicker1').data("DateTimePicker").date().unix();
     var endDate = $('#datetimepicker2').data("DateTimePicker").date().unix();
     var discountAmm = $("#ammInput").val();
+    var alert;
 
     discount.discountTitle = title;
     discount.startDate = startDate;
     discount.endDate = endDate;
     discount.discount = discountAmm;
 
-    console.log(JSON.stringify(discounts[currentSelected]));
+    //console.log(JSON.stringify(discounts[currentSelected]));
 
     var operationType;
+    var  alertText="";
     if(discount.discountId >= 0){
         operationType = "update";
+        alertText = "Discount update operation ";
     }else {
         operationType = "add";
+        alertText = "Discount adding operation " ;
+    }
+
+    if (title == "") {
+        alert = $('<div id="new-discount-alert-place" class="alert alert-danger" role="alert">' +
+             ' Discount name must not be empty!'+ '</div>');
+        $("#new-discount-alert-place").replaceWith(alert);
+
+        return;
     }
 
 
@@ -77,53 +91,77 @@ function saveSelected() {
         processData: false,
         contentType: 'application/json',
         data: JSON.stringify(discount),
+
         success: function (data) {
-            //var alert;
+
             if (data.status == 'success') {
-                console.log("Success on " + operationType + JSON.stringify(data));
-                //alert = $('<div id="search-alert" class="alert alert-success" role="alert">' +
-                    //"User " + userData1.email+" updated!" + "</div>");
+                console.log("Success on " + operationType + data.discountID );
+                alert = $('<div id="new-discount-alert-place" class="alert alert-success" role="alert">' +
+                    data.message + "</div>");
+
+                if (operationType == "add"){
+                    discounts[currentSelected].discountId = data.discountID;
+                }
             } else {
-                console.log("Error on  " + operationType + JSON.stringify(data));
-               // alert = $('<div id="search-alert" class="alert alert-danger" role="alert">' +
-                  //  data.message + '</div>');
+                console.log("Error on  " + operationType );
+                alert = $('<div id="new-discount-alert-place" class="alert alert-danger" role="alert">' +
+                    data.message + '</div>');
             }
+            $("#new-discount-alert-place").replaceWith(alert);
 
 
-           // $("#search-alert").replaceWith(alert);
+
         },
         error: function (data) {
-            console.error("Error on  " + operationType + JSON.stringify(data));
-            //var alert = $('<div id="search-alert" class="alert alert-danger" role="alert">' +
-              //  "Update failed</div>");
+            console.error("Error on  " + operationType );
+            alert = $('<div id="new-discount-alert-place" class="alert alert-danger" role="alert">' +
+                alertText + ' failed!'+ '</div>');
+            $("#new-discount-alert-place").replaceWith(alert);
            // $("#search-alert").replaceWith(alert);
         }
+
+
     });
+
+
 
 
 }
 function loadAllDiscounts() {
     $.ajax({
-        url: "/api/admin/discounts/allDiscounts ",
+        url: "/api/admin/discounts/allDiscounts/size/" + (discountsListSize + 1) + "/offset/" + discountsListCurrentPage * discountsListSize,
         success: function(data) {
             discounts = data;
             var list = $("#discounts-list");
+            list.empty();
             console.log(JSON.stringify(discounts));
 
             data.forEach(function(item, i) {
-                console.log(item.discountTitle + "discount title loaded");
+                if (i < discountsListSize) {
+                    console.log(item.discountTitle + "discount title loaded");
 
-                var ref = document.createElement("a");
-                ref.appendChild(document.createTextNode(item.discountTitle));
-                ref.className = "list-group-item";
-                ref.href = "#";
-                ref.onclick = function () {
-                    selectDiscount(i);
-                };
+                    var ref = document.createElement("a");
+                    ref.appendChild(document.createTextNode(item.discountTitle));
+                    ref.className = "list-group-item";
+                    ref.href = "#";
+                    ref.onclick = function () {
+                        selectDiscount(i);
+                    };
 
-                list.append(ref);
+                    list.append(ref);
+                }
             });
 
+            var prevPage = $("#discounts-page-previous");
+            var nextPage = $("#discounts-page-next");
+            nextPage.addClass("hidden");
+            prevPage.addClass("hidden");
+            if (discountsListCurrentPage > 0) {
+                prevPage.removeClass("hidden");
+            }
+            if (data.length > discountsListSize) {
+                nextPage.removeClass("hidden");
+            }
 
 
             for (var i in discounts){
@@ -159,18 +197,35 @@ function selectDiscount(i) {
         addProduct(prices[prp].priceId, prices[prp].product.productName +" for "+ prices[prp].region.regionName + " region");
     }
 
+    changeRegion();
+    $("#new-discount-alert-place").addClass('hidden');
+
 }
 
 function addToProducts() {
+    $("#new-discount-alert-place").addClass('hidden');
+
 
     var id = document.getElementById("discount-product-selector").value;
     var name = $("#discount-product-selector option:selected").text();
+
+    console.log(JSON.stringify($('#discount-product-selector  option[value="' + id + '"]').text()));
+
+
+
+
 
 
     for (var i in productPricesForRegion){
         if(productPricesForRegion[i].priceId == id ){
             //productPricesForDiscount.push(productPricesForRegion[i]);
-            discounts[currentSelected].productRegionPrices.push(productPricesForRegion[i]);
+
+            if (checkProduct(id)){
+                discounts[currentSelected].productRegionPrices.push(productPricesForRegion[i]);
+            }
+            else {
+                return;
+            }
         }
     }
 
@@ -178,6 +233,34 @@ function addToProducts() {
     var fullProductName = name +" for " + $("#discount-region-selector option:selected").text() + " region";
 
     addProduct(id, fullProductName);
+    //$('#discount-product-selector option[value="' + id + '"]').remove();
+}
+
+
+function checkProduct(ID) {
+
+    //currentSelected = i;
+    //console.log(JSON.stringify(discounts[i].discountTitle));
+
+    var discount12 = discounts[currentSelected];
+    var discountRegionPrices = discount12.productRegionPrices;
+
+
+    for (var i in discountRegionPrices){
+        if(discountRegionPrices[i].priceId == ID ){
+
+            var alert = $('<div id="new-discount-alert-place" class="alert alert-danger" role="alert">' +
+                "Product already added" + '</div>');
+            $("#new-discount-alert-place").replaceWith(alert);
+
+            return false;
+            //productPricesForDiscount.push(productPricesForRegion[i]);
+
+        }
+    }
+    return true;
+
+
 }
 
 function addProduct(id,name) {
@@ -278,7 +361,7 @@ function loadAllRegions() {
                 options.appendChild(option);
             });
 
-            console.log(JSON.stringify(regionsData));
+            //console.log(JSON.stringify(regionsData));
         },
         error: function () {
             console.error("Cannot load list product types");
@@ -288,7 +371,7 @@ function loadAllRegions() {
 }
 
 function deleteSelectedProducts() {
-    console.log(JSON.stringify(discounts[currentSelected].productRegionPrices));
+    //console.log(JSON.stringify(discounts[currentSelected].productRegionPrices));
     var tmpArr = [];
 
     // $('.all').prop("checked",false);
@@ -319,6 +402,8 @@ function deleteSelectedProducts() {
 
 function clearDataFields() {
 
+    $("#new-discount-alert-place1").remove();
+
     $("#discount-name-input").val("");
     $('#datetimepicker1').data("DateTimePicker").date(moment());
     $('#datetimepicker2').data("DateTimePicker").date(moment());
@@ -328,6 +413,16 @@ function clearDataFields() {
     node.empty();
 
 
+}
+
+function nextPage() {
+    discountsListCurrentPage++;
+    loadAllDiscounts();
+}
+
+function previousPage() {
+    discountsListCurrentPage--;
+    loadAllDiscounts();
 }
 
 

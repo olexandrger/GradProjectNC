@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="col-sm-12">
-                        <div  class="collapse" id="complain-user-details-collapse">
+                        <div class="collapse" id="complain-user-details-collapse">
                             <div class="row" id="complain-user-details">
                                 user details
                             </div>
@@ -154,7 +154,7 @@
 
                 <#--responsible-->
                     <div id="responsible-info-row">
-                        <div class="row" >
+                        <div class="row">
                             <form>
                                 <div class="form-group">
                                     <div class="col-sm-4">
@@ -258,8 +258,7 @@
                                     <textarea class="form-control " name="complain-content" rows="4"
                                               placeholder="Content"
                                               id="selected-complain-content"
-                                              maxlength="240"
-                                              resize="none" readonly></textarea>
+                                              maxlength="240" readonly></textarea>
                                 </div>
                             </div>
                             <div class="row">
@@ -269,7 +268,7 @@
                                               placeholder="Responce"
                                               id="selected-complain-responce"
                                               maxlength="240"
-                                              resize="none"></textarea>
+                                              onkeyup="unlockCompletConsiderationButton()"></textarea>
                                 </div>
                             </div>
                         </form>
@@ -280,11 +279,8 @@
                         Take for consideration
                     </button>
                     <button type="button" class="btn" id="complet-consideration-complaint-btn"
-                            onclick="completComplaintConsideration()">
-                        Consideration completed
-                    </button>
-                    <button type="button" class="btn" id="update-complaint-btn" onclick="updateComplaint()">
-                        Update
+                            onclick="completComplaintConsideration()" disabled>
+                        Reply and close
                     </button>
                 </div>
             </div>

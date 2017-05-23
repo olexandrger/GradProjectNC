@@ -11,9 +11,14 @@ import java.util.Collection;
  */
 public interface DiscountService {
      Collection<Discount> getDiscounts();
+     Collection<Discount> getDiscountsPage(Long size, Long offset);
      Collection<Region> getRegions();
      Collection<ProductRegionPrice> getProductsRegionPricesForRegion(Long regionId);
      Boolean add(Discount discount);
      Boolean update(Discount discount);
+
+     String getStatus();
+     String getMessage();
+     Long getAddedDiscountId();
 
 }

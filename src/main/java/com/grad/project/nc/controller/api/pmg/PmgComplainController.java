@@ -71,32 +71,33 @@ public class PmgComplainController {
         return result;
     }
 
-    @RequestMapping (value = "/update/response/", method = RequestMethod.POST)
-    public Map<String, Object> updareResponce(@RequestBody Map<String, String> params){
-        Map<String, Object> result = new HashMap<>();
-        long userId =Long.parseLong(params.get("userId"));
-        long complainId =Long.parseLong(params.get("complaintId"));
-        String response = params.get("response");
-        try {
-            complainService.updadeComplainResponse(complainId,userId,response);
-            result.put("status", "success");
-            result.put("message", "Response successfully updated");
-        } catch (IncorrectComplaintStateException ex){
-            result.put("status", "fail");
-            result.put("message", ex.getMessage());
-        }
-        return result;
-    }
+//    @RequestMapping (value = "/update/response/", method = RequestMethod.POST)
+//    public Map<String, Object> updareResponce(@RequestBody Map<String, String> params){
+//        Map<String, Object> result = new HashMap<>();
+//        long userId =Long.parseLong(params.get("userId"));
+//        long complainId =Long.parseLong(params.get("complaintId"));
+//        String response = params.get("response");
+//        try {
+//            complainService.updadeComplainResponse(complainId,userId,response);
+//            result.put("status", "success");
+//            result.put("message", "Response successfully updated");
+//        } catch (IncorrectComplaintStateException ex){
+//            result.put("status", "fail");
+//            result.put("message", ex.getMessage());
+//        }
+//        return result;
+//    }
     @RequestMapping (value = "/complete/byid/", method = RequestMethod.POST)
     public Map<String, Object> completeComplain(@RequestBody Map<String, String> params){
         Map<String, Object> result = new HashMap<>();
         long userId =Long.parseLong(params.get("userId"));
         long complainId =Long.parseLong(params.get("complaintId"));
+        String response = params.get("response");
         try {
-            complainService.completeComplaint(userId, complainId);
+            complainService.completeComplaint(userId, complainId, response);
             result.put("status", "success");
             result.put("message", "Response successfully complete");
-        } catch (IncorrectComplaintStateException ex){
+        } catch (IncorrectComplaintStateException | IncompleteComplaintDataExceptions ex){
             result.put("status", "fail");
             result.put("message", ex.getMessage());
         }
