@@ -9,13 +9,9 @@ var regionsHtml;
 var amount = 10; //amount of items per page
 var startPage = 1;
 var defaultOpts = { //twbs pagination default options
-    visiblePages : 3,
+    visiblePages : 7,
     initiateStartPageClick: false,
     hideOnlyOnePage : true,
-    first: '<<',
-    last: '>>',
-    next: '>',
-    prev: '<',
     onPageClick: function (event, page) {
         console.log('clicked page #' + page);
         loadProductPage(page, amount);
@@ -412,7 +408,7 @@ function checkProductName(productName) {
                 alertDiv.remove();
             });
 
-        alertDiv.insertAfter($("#products-list"));
+        alertDiv.appendTo($("#alert-box"));
 
         return false;
     }

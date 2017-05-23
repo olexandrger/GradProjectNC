@@ -35,11 +35,7 @@
     <div class="row">
         <div class="col-sm-3 col-sm-offset-1">
             <div class="list-group" id="products-list"></div>
-
-            <div class="text-center">
-                <ul id="pagination" class="pagination-xs"></ul>
-            </div>
-
+            <div id="alert-box"></div>
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="New product" id="new-product-name">
                 <span class="input-group-btn">
@@ -118,6 +114,13 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="text-center">
+                <ul id="pagination" class="pagination-xs"></ul>
             </div>
         </div>
     </div>
