@@ -215,14 +215,14 @@ public class CsrOrdersController {
             @RequestParam(value = "size") Long size,
             @RequestParam(value = "offset") Long offset) {
         Collection<ProductOrder> orders;
-        if (aim == null && status == null) {
-            orders = ordersService.getAllOrders(size, offset);
-        } else if (status == null) {
-            orders = ordersService.getByAim(aim, size, offset);
-        } else if (aim == null) {
-            orders = ordersService.getByStatus(status, size, offset);
-        } else {
+        if (aim != null && status != null) {
             orders = ordersService.getByAimAndStatus(aim, status, size, offset);
+        } else if (status != null) {
+            orders = ordersService.getByStatus(status, size, offset);
+        } else if (aim != null) {
+            orders = ordersService.getByAim(aim, size, offset);
+        } else {
+            orders = ordersService.getAllOrders(size, offset);
         }
         return convertToFrontendOrders(orders);
     }
