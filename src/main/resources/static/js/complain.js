@@ -29,7 +29,7 @@ function loadComplaints() {
                 if (i < complaintListSize) {
                     ref = document.createElement("a");
                     complaintName = item.userName + ": " + item.complainReason;
-                    ref.appendChild(document.createTextNode(item.userName + ": "));
+                    ref.appendChild(document.createTextNode("#"+item.complainId +": "+item.userName + ": "));
                     ref.appendChild(document.createElement("br"));
                     if (item.productInstanceName != null) {
                         ref.appendChild(document.createTextNode(item.productInstanceName + " - " + item.complainReason));
@@ -112,8 +112,8 @@ function selectComplaint(index) {
         $("#selected-complain-title").val(complaintsData[selectedComplain].complainTitle);
         $("#selected-complain-content").val(complaintsData[selectedComplain].content);
         $("#selected-complain-responce").val(complaintsData[selectedComplain].response);
-        if (complaintsData[selectedComplain].status == "CONSIDERATION_COMPLETED"
-            || (complaintsData[selectedComplain].status == "UNDER_CONSIDERATION"
+        if (complaintsData[selectedComplain].statusId == COMPLAINT_STATUS_CONSIDERATION_COMPLETED
+            || (complaintsData[selectedComplain].statusId == COMPLAINT_STATUS_UNDER_CONSIDERATION
             && currentUserId != complaintsData[selectedComplain].responsiblId)) {
             $("#selected-complain-responce").attr("readonly", "readonly");
         } else {

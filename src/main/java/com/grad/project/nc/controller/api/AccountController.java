@@ -51,6 +51,7 @@ public class AccountController {
                 profileLinks.add(new Link("Edit products", "/admin/products"));
                 profileLinks.add(new Link("Users", "/admin/users"));
                 profileLinks.add(new Link("Discounts", "/admin/discounts"));
+                profileLinks.add(new Link("Orders And Complaints", "/admin/ordersAndComplains"));
 
             }
 
