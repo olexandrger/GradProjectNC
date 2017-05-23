@@ -26,6 +26,8 @@ public class CsrOrdersController {
     private OrdersService ordersService;
     private ProductService productService;
 
+    private static final Long ORDER_AIM_CREATE = 13L;
+
     @Autowired
     public CsrOrdersController(OrdersService ordersService, ProductService productService) {
         this.ordersService = ordersService;
@@ -179,7 +181,7 @@ public class CsrOrdersController {
         return orders.stream().map((item) -> {
             FrontendOrder order = FrontendOrder.fromEntity(item);
 
-            if ("CREATE".equals(item.getOrderAim().getCategoryName())) {
+            if (ORDER_AIM_CREATE.equals(item.getOrderAim().getCategoryId())) {
                 order.setPossibleDomains(new HashMap<>());
                 item.getUser().getDomains().forEach((domain) -> {
                     order.getPossibleDomains().put(domain.getDomainId(), getFullAddress(domain.getAddress()));
