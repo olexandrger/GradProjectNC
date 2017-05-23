@@ -7,6 +7,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -80,7 +81,7 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
     @Override
     public List<Product> findFirstN(int n) {
         String findAllQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
-                "\"product_type_id\" FROM \"product\"ORDER BY product_id LIMIT " + n;
+                "\"product_type_id\" FROM \"product\" ORDER BY product_id LIMIT " + n;
 
         return findMultiple(findAllQuery, new ProductRowMapper());
     }
@@ -88,9 +89,18 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
     @Override
     public List<Product> findLastN(int n) {
         String findAllQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
-                "\"product_type_id\" FROM \"product\"ORDER BY product_id OFFSET " + n;
+                "\"product_type_id\" FROM \"product\" ORDER BY product_id OFFSET " + n;
 
         return findMultiple(findAllQuery, new ProductRowMapper());
+    }
+
+    @Override
+    public List<Product> findPaginated(int page, int amount) {
+        int offset = (page - 1) * amount;
+        String findPaginatedQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
+                "\"product_type_id\" FROM \"product\" ORDER BY product_id DESC LIMIT ? OFFSET ?";
+
+        return findMultiple(findPaginatedQuery, new ProductRowMapper(), amount, offset);
     }
 
     @Override
@@ -140,6 +150,12 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
                 "FROM \"product_region_price\" prp WHERE prp.\"price_id\" = ?)";
 
         return findOne(query, new ProductRowMapper(), productRegionPriceId);
+    }
+
+    @Override
+    public int countTotalProducts() {
+        String countQuery = "SELECT count(*) FROM \"product\"";
+        return findOne(countQuery, new SingleColumnRowMapper<>(int.class));
     }
 
     private class ProductRowMapper implements RowMapper<Product> {

@@ -8,6 +8,7 @@ import com.grad.project.nc.persistence.ProductCharacteristicValueDao;
 import com.grad.project.nc.persistence.ProductDao;
 import com.grad.project.nc.persistence.ProductRegionPriceDao;
 import com.grad.project.nc.service.AbstractService;
+import com.grad.project.nc.support.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,16 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
         loadProductHelper(products);
 
         return products;
+    }
+
+    @Override
+    @Transactional
+    public Page<Product> findPaginated(int page, int amount) {
+        int totalPages = productDao.countTotalProducts() / amount + 1;
+        List<Product> products = productDao.findPaginated(page, amount);
+        loadProductHelper(products);
+
+        return new Page<>(products, totalPages);
     }
 
     @Override

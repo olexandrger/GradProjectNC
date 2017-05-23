@@ -5,6 +5,8 @@ import com.grad.project.nc.model.Product;
 import java.util.List;
 
 public interface ProductDao extends CrudDao<Product> {
+    List<Product> findPaginated(int page, int amount);
+
     List<Product> findByRegionId(Long regionId);
 
     List<Product> findActiveByRegionId(Long regionId);
@@ -18,4 +20,6 @@ public interface ProductDao extends CrudDao<Product> {
     List<Product> findByProductTypeId(Long productTypeId);
 
     Product findByProductRegionPriceId(Long productRegionPriceId);
+
+    int countTotalProducts();
 }

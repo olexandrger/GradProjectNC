@@ -1,15 +1,14 @@
 package com.grad.project.nc.controller.api;
 
-import com.grad.project.nc.controller.api.dto.catalog.FrontendCatalogProduct;
 import com.grad.project.nc.controller.api.dto.FrontendProduct;
+import com.grad.project.nc.controller.api.dto.catalog.FrontendCatalogProduct;
+import com.grad.project.nc.model.Product;
 import com.grad.project.nc.service.product.ProductService;
+import com.grad.project.nc.support.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,7 +29,7 @@ public class ProductsController {
 
     //restful endpoint for product catalog
     @RequestMapping(value = "/byRegion/{id}", method = RequestMethod.GET)
-    public Collection<FrontendCatalogProduct> getByRegion(@PathVariable("id") Long id) {
+    public List<FrontendCatalogProduct> getByRegion(@PathVariable("id") Long id) {
         return productService.findActiveProductsByRegionId(id)
                 .stream()
                 .map(FrontendCatalogProduct::fromEntity)
@@ -39,10 +38,26 @@ public class ProductsController {
 
     //restful endpoint created to obtain products for editing (performed by admin)
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public Collection<FrontendProduct> getAll() {
+    public List<FrontendProduct> getAll() {
         return productService.findAll()
                 .stream()
                 .map(FrontendProduct::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @RequestMapping(
+            params = { "page", "amount" },
+            method = RequestMethod.GET
+    )
+    public Page<FrontendProduct> getPaginated(@RequestParam("page") int page, @RequestParam("amount") int amount) {
+        Page<Product> productPage = productService.findPaginated(page, amount);
+
+        List<FrontendProduct> content = productService.findPaginated(page, amount).getContent()
+                .stream()
+                .map(FrontendProduct::fromEntity)
+                .collect(Collectors.toList());
+
+
+        return new Page<>(content, productPage.getTotalPages());
     }
 }

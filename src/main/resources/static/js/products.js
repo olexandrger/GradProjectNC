@@ -5,6 +5,24 @@ var productsCache;
 
 var regionsHtml;
 
+//pagination global variables
+var amount = 10; //amount of items per page
+var startPage = 1;
+var defaultOpts = { //twbs pagination default options
+    visiblePages : 3,
+    initiateStartPageClick: false,
+    hideOnlyOnePage : true,
+    first: '<<',
+    last: '>>',
+    next: '>',
+    prev: '<',
+    onPageClick: function (event, page) {
+        console.log('clicked page #' + page);
+        loadProductPage(page, amount);
+    }
+};
+var $pagination;
+
 function getProductType(productTypeId) {
     return productTypesCache.find(function (productType) {
         return productType.productTypeId == productTypeId;
@@ -100,6 +118,8 @@ function constructNumberOrStringInputElement(measure, value) {
 }
 
 function selectProduct(index) {
+    var activeLinkIndex = productsCache.length - index;
+
     console.log("selecting product with id" + productsCache[index].productId);
 
     var productList = $("#products-list");
@@ -108,7 +128,7 @@ function selectProduct(index) {
     } else {
         productList.find("a").removeClass("active");
     }
-    productList.find("a:nth-child(" + (index + 1) + ")").addClass("active");
+    productList.find("a:nth-child(" + (activeLinkIndex) + ")").addClass("active");
     currentSelected = index;
 
     $("#product-characteristics").empty();
@@ -189,7 +209,7 @@ function saveSelectedProduct() {
                     success: function (data) {
                         console.log("result of GET request to server: " + JSON.stringify(data));
 
-                        $("#products-list").find("a:nth-child(" + (currentSelected + 1) + ")")
+                        $("#products-list").find("a:nth-child(" + (productsCache.length - currentSelected) + ")")
                             .html(data.productName);
                         productsCache[currentSelected] = data;
                     },
@@ -357,31 +377,32 @@ function addProduct() {
     var productName = productNameInput.val();
     productNameInput.val("");
 
-    if (productName != "") {
-        var ref = document.createElement("a");
-        ref.appendChild(document.createTextNode(productName));
-        ref.className = "list-group-item";
-        ref.href = "#";
-        var index = productsCache.length;
-        ref.onclick = function () {
-            selectProduct(index);
-        };
-        productList.append(ref);
-
-        productsCache.push({
-            productId: null,
-            productName: productName,
-            productDescription: null,
-            isActive: false,
-            productTypeId: null,
-            productCharacteristicValues: [],
-            prices: []
-        });
-
+    var ref = document.createElement("a");
+    ref.appendChild(document.createTextNode(productName));
+    ref.className = "list-group-item";
+    ref.href = "#";
+    var index = productsCache.length;
+    ref.onclick = function () {
         selectProduct(index);
-    }
-    else {
-         $("#new-product-alert").remove();
+    };
+    productList.prepend(ref);
+
+    productsCache.push({
+        productId: null,
+        productName: productName,
+        productDescription: null,
+        isActive: false,
+        productTypeId: null,
+        productCharacteristicValues: [],
+        prices: []
+    });
+
+    selectProduct(index);
+}
+
+function checkProductName(productName) {
+    if (productName == "") {
+        $("#new-product-alert").remove();
 
         var alertDiv = $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
             '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
@@ -391,14 +412,33 @@ function addProduct() {
                 alertDiv.remove();
             });
 
-        alertDiv.insertAfter(productList);
+        alertDiv.insertAfter($("#products-list"));
+
+        return false;
     }
+    return true;
+}
+
+function setupAddProductButtonClickEvent() {
+    $('#add-product-button').click(function () {
+        if (!checkProductName($("#new-product-name").val())) {
+            return;
+        }
+
+        if ($pagination.data('twbsPagination').options.totalPages > 1 || productsCache.length >= amount) {
+            loadProductPage(startPage, amount - 1, addProduct);
+        } else {
+            addProduct();
+        }
+    })
 }
 
 function displayLoadedProducts() {
-    productsCache.forEach(function (product, index) {
-        var productList = $("#products-list");
+    var productList = $("#products-list");
+    productList.empty();
 
+    productsCache.reverse();
+    productsCache.forEach(function (product, index) {
         var ref = document.createElement("a");
         ref.appendChild(document.createTextNode(product.productName));
         ref.className = "list-group-item";
@@ -407,7 +447,7 @@ function displayLoadedProducts() {
             selectProduct(index);
         };
 
-        productList.append(ref);
+        productList.prepend(ref);
     });
 }
 
@@ -426,6 +466,35 @@ function loadProducts() {
     });
 }
 
+function loadProductPage(page, amount, callback) {
+    console.log("loading products of page #" + page);
+    var jqxhr = $.ajax({
+        url: '/api/user/products?page=' + page + '&amount=' + amount,
+        success: function (data) {
+            productsCache = data.content;
+            displayLoadedProducts();
+
+            updatePaginationWidget(page, data.totalPages);
+        },
+        error: function () {
+            console.error("Cannot load products");
+        }
+    });
+
+    if (callback != undefined) {
+        jqxhr.done(callback);
+    }
+}
+
+function updatePaginationWidget(currentPage, totalPages) {
+    console.log('updating pagination widget');
+    $pagination.twbsPagination('destroy');
+    $pagination.twbsPagination($.extend({}, defaultOpts, {
+        startPage: currentPage,
+        totalPages: totalPages
+    }));
+}
+
 function loadProductTypes() {
     $.ajax({
         url: "/api/user/productTypes/all",
@@ -440,7 +509,8 @@ function loadProductTypes() {
             });
             productTypesCache = productTypes;
 
-            loadProducts();
+            $pagination = $('#pagination');
+            loadProductPage(startPage, amount);
         },
         error: function () {
             console.error("Cannot load product types");
@@ -471,4 +541,5 @@ function loadRegions() {
 
 $(document).ready(function () {
     loadRegions();
+    setupAddProductButtonClickEvent();
 });
