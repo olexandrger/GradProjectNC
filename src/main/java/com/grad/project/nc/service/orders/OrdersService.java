@@ -1,5 +1,6 @@
 package com.grad.project.nc.service.orders;
 
+import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductOrder;
 import com.grad.project.nc.service.exceptions.IllegalOrderOperationException;
 import com.grad.project.nc.service.exceptions.InsufficientRightsException;
@@ -8,6 +9,7 @@ import com.grad.project.nc.service.exceptions.OrderException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public interface OrdersService {
@@ -46,5 +48,13 @@ public interface OrdersService {
     Collection<ProductOrder> getAllOrders(long size, long offset);
 
     Collection<ProductOrder> getOrdersByProductInstance(long id, long size, long offset);
+
+    ProductOrder find(Long id);
+
+    List<ProductOrder> getByAim(String aim, Long size, Long offset);
+
+    List<ProductOrder> getByStatus(String status, Long size, Long offset);
+
+    List<ProductOrder> getByAimAndStatus(String aim, String status, Long size, Long offset);
 }
 

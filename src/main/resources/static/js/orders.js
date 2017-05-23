@@ -8,6 +8,9 @@ var selectUserId;
 
 var currentUserId;
 
+
+var ordersUrl = "/api/csr/orders/get/all/";
+
 const INSTANCE_STATUS_CREATED = 9;
 const INSTANCE_STATUS_ACTIVATED = 10;
 const INSTANCE_STATUS_SUSPENDED = 11;
@@ -280,9 +283,41 @@ function getLabelName(status) {
     }
 }
 
+// function findById(id) {
+//     ordersUrl = "/api/csr/orders/get/" + id;
+//     ordersListCurrentPage = 0;
+//     loadOrders();
+// }
+
+
+function searchOrders() {
+    ordersUrl = "/api/csr/orders/get/all/";
+    ordersListCurrentPage = 0;
+    loadOrders();
+}
+
 function loadOrders() {
+
+    var params = {
+        size: (ordersListSize + 1),
+        offset: ordersListCurrentPage * ordersListSize
+    };
+
+    var aim =  $("#order-search-aim").val();
+
+    if (aim != 'ALL') {
+        params['aim'] = aim;
+    }
+
+    var status =  $("#order-search-status").val();
+
+    if (status != 'ALL') {
+        params['status'] = status;
+    }
+
     $.ajax({
-        url: "/api/csr/orders/get/all/size/" + (ordersListSize + 1) + "/offset/" + ordersListCurrentPage * ordersListSize,
+        url: ordersUrl,
+        data: params,
         success: function (data) {
             var list = $("#csr-orders-list");
             list.empty();

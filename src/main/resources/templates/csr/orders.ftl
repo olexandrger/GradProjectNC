@@ -34,6 +34,38 @@
 <div class="row">
     <div class="col-sm-5">
 
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="order-search-aim">Aim</label>
+                    <select class="form-control" name="order-search-aim" id="order-search-aim" onchange="searchOrders()">
+                        <option value="ALL" selected>All</option>
+                        <option value="CREATE">Create</option>
+                        <option value="SUSPEND">Suspend</option>
+                        <option value="RESUME">Resume</option>
+                        <option value="DEACTIVATE">Deactivate</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="order-search-status">Status</label>
+                    <select class="form-control" name="order-search-status" id="order-search-status" onchange="searchOrders()">
+                        <option value="ALL" selected>All</option>
+                        <option value="CREATED">Created</option>
+                        <option value="IN_PROGRESS">In progress</option>
+                        <option value="CANCELLED">Cancelled</option>
+                        <option value="COMPLETED">Completed</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <#---->
+        <#--<div class="form-group">-->
+            <#--<button class="btn btn-default btn-block" onclick="searchOrders()">Search</button>-->
+        <#--</div>-->
+
         <div class="list-group" id="csr-orders-list">
         <#--<a href="#" class="list-group-item">First order</a>-->
                 <#--<a href="#" class="list-group-item">Second order</a>-->
