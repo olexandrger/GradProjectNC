@@ -19,6 +19,10 @@ var defaultOpts = { //twbs pagination default options
 };
 var $pagination;
 
+//typeahead global variables
+var prefetchAmount = 50;
+
+
 function getProductType(productTypeId) {
     return productTypesCache.find(function (productType) {
         return productType.productTypeId == productTypeId;
@@ -535,7 +539,33 @@ function loadRegions() {
     });
 }
 
+function setupTypeahead() {
+    // Instantiate the Bloodhound suggestion engine
+    var products = new Bloodhound({
+        datumTokenizer:  Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        identify: function(obj) { return obj.name; },
+        prefetch: '/api/user/products/last?amount=' + prefetchAmount,
+        remote: {
+            wildcard: '%QUERY',
+            url: '/api/user/products/search?query=%QUERY'
+        }
+    });
+
+// Instantiate the Typeahead UI
+    $('.typeahead').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+    }, {
+        name: 'products',
+        display: 'name',
+        source: products
+    });
+}
+
 $(document).ready(function () {
     loadRegions();
     setupAddProductButtonClickEvent();
+    setupTypeahead();
 });
