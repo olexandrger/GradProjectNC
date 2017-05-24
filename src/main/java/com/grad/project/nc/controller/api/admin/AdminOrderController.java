@@ -33,7 +33,7 @@ public class AdminOrderController {
         this.productService = productService;
     }
 
-    @RequestMapping(value = "/get/all/size/{size}/offset/{offset}")
+    @RequestMapping(value = "/get/all/size/{size}/offset/{offset}", method = RequestMethod.GET)
     public Collection<FrontendOrder> getOrders(@PathVariable Long size, @PathVariable Long offset) {
 
         return ordersService.getAllOrders(size, offset).stream().map((item) ->

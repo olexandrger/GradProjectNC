@@ -32,7 +32,7 @@ public class CsrInstanceController {
     Collection<FrontendInstance> findByDomainID(@PathVariable Long id){
         return instanceService.getByDomainId(id)
                 .stream()
-                .filter(instance->{ return instance.getStatus().getCategoryId().longValue() != INSTANCE_STATUS_DEACTIVATED;})
+                .filter(instance-> instance.getStatus().getCategoryId() != INSTANCE_STATUS_DEACTIVATED)
                 .map(FrontendInstance::fromEntity)
                 .collect(Collectors.toCollection(ArrayList::new));
     }

@@ -35,13 +35,7 @@ public class DomainsController {
     //TODO rework after base domains done
     @RequestMapping(path = "/get/all", method = RequestMethod.GET)
     public Collection<FrontendDomain> getUserDomains() {
-        List<FrontendDomain> domains = domainService.findByUserId(((User) SecurityContextHolder.getContext().
-                getAuthentication().getPrincipal()).getUserId()).stream().map(FrontendDomain::fromEntity).collect(Collectors.toList());
-//        for(FrontendDomain domain: domains){
-//            domain.setAddress(domainService.);
-//        }
-
-        return domains;
+        return domainService.findByUserId(userService.getCurrentUser().getUserId()).stream().map(FrontendDomain::fromEntity).collect(Collectors.toList());
     }
 
     @RequestMapping(path = "/get/byId/{id}", method = RequestMethod.GET)
@@ -116,17 +110,4 @@ public class DomainsController {
     public User getAuthorizedUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
-//    @Data
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    private static class DomainAddress {
-//        private Long domainId;
-//        private String domainName;
-//        private Long regionId;
-//        private String city;
-//        private String street;
-//        private String building;
-//        private Integer apartment;
-//    }
 }
