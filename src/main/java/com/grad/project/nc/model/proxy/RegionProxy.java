@@ -27,20 +27,20 @@ public class RegionProxy extends Region {
         this.productRegionPriceDao = productRegionPriceDao;
     }
 
-    @Override
-    public List<Location> getLocations() {
-        if (!locationsLoaded) {
-            this.setLocations(locationDao.findByRegionId(getRegionId()));
-        }
-
-        return super.getLocations();
-    }
-
-    @Override
-    public void setLocations(List<Location> locations) {
-        locationsLoaded = true;
-        super.setLocations(locations);
-    }
+//    @Override
+//    public List<Location> getLocations() {
+//        if (!locationsLoaded) {
+//            this.setLocations(locationDao.findByRegionId(getRegionId()));
+//        }
+//
+//        return super.getLocations();
+//    }
+//
+//    @Override
+//    public void setLocations(List<Location> locations) {
+//        locationsLoaded = true;
+//        super.setLocations(locations);
+//    }
 
     @Override
     public List<ProductRegionPrice> getPrices() {

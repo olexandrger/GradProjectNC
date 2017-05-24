@@ -36,7 +36,7 @@ public class PmgDomainController {
             result.put("status", "found");
             result.put("userId", user.getUserId());
             result.put("domains",
-                    domainService.findByUserId(user.getUserId())
+                    domainService.getAllDomains(user.getUserId())
                             .stream()
                             .map(FrontendDomain::fromEntity)
                             .collect(Collectors.toCollection(ArrayList::new)));

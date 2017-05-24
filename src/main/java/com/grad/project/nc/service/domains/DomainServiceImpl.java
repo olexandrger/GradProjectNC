@@ -1,5 +1,7 @@
 package com.grad.project.nc.service.domains;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grad.project.nc.controller.api.dto.FrontendAddress;
 import com.grad.project.nc.controller.api.dto.FrontendCategory;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
@@ -41,104 +43,82 @@ public class DomainServiceImpl implements DomainService {
         return domainDao.find(id);
     }
 
+
+    //TODO add instances
     @Override
     public void add(Domain domain) {
+        domain.getAddress().getLocation().setRegion(
+                regionDao.findByName(domain.getAddress().getLocation().getRegion().getRegionName()));
         locationDao.add(domain.getAddress().getLocation());
         addressDao.add(domain.getAddress());
+        domain.setDomainType(categoryDao.findCategoryByName(domain.getDomainType().getCategoryName()));
         domainDao.add(domain);
         for (User user : domain.getUsers()) {
             domainDao.addDomainUser(domain.getDomainId(), user.getUserId());
         }
     }
 
+    //TODO delete instances
     @Override
     public void delete(Domain domain) {
+        domain.getAddress().setLocation(locationDao.findAddressLocationById(domain.getAddress().getAddressId()));
         domainDao.deleteDomainUsers(domain.getDomainId());
         domainDao.delete(domain.getDomainId());
         addressDao.delete(domain.getAddress().getAddressId());
-
-        //TODO why result is null??
-        //locationDao.delete(locationDao.findAddressLocationById(domain.getAddress().getAddressId()).getLocationId());
+        locationDao.delete(domain.getAddress().getLocation().getLocationId());
     }
 
+    //TODO get all instances
     @Override
-    public List<Domain> findByUserId(Long id) {
-        return domainDao.findByUserId(id);
+    public List<Domain> getAllDomains(Long id) {
+        List<Domain> domains = domainDao.findByUserId(id);
+        for (Domain domain : domains) {
+            domain.setDomainType(categoryDao.findDomainType(domain.getDomainId()));
+            domain.setAddress(addressDao.findDomainAddressById(domain.getDomainId()));
+            domain.getAddress().setLocation(locationDao.findAddressLocationById(domain.getAddress().getAddressId()));
+            domain.getAddress().getLocation().setRegion(
+                    regionDao.findLocationRegionById(domain.getAddress().getLocation().getLocationId()));
+            domain.setUsers(userDao.findByDomainId(domain.getDomainId()));
+        }
+        return domains;
     }
 
-    @Override
-    public Domain convertFrontendDomainToDomain(FrontendDomain frontendDomain) {
-        Domain domain = new Domain();
-        domain.setDomainName(frontendDomain.getDomainName());
-        domain.setAddress(convertFrontendAddresToAddress(frontendDomain.getAddress()));
-        domain.setDomainType(convertFrontendCategoryToCategory(frontendDomain.getDomainType()));
-        //Commented because of incompatible type error must something like this domain.setUsers(frontendDomain.getUsers().stream().map(FrontendUser::toModel).collect(Collectors.toList()));
-        //domain.setUsers(frontendDomain.getUsers());
-        return domain;
-    }
-
+    //TODO update instances
     @Override
     public void update(Domain domain) {
-        //TODO why don't work updates?
+        domain.getAddress().getLocation().setRegion(
+                regionDao.findByName(domain.getAddress().getLocation().getRegion().getRegionName()));
+        domain.getDomainType().setCategoryId(
+                categoryDao.findCategoryByName(domain.getDomainType().getCategoryName()).getCategoryId());
+        domain.getAddress().setAddressId(addressDao.findDomainAddressById(domain.getDomainId()).getAddressId());
+        domain.getAddress().getLocation().setLocationId(
+                locationDao.findAddressLocationById(domain.getAddress().getAddressId()).getLocationId());
         locationDao.update(domain.getAddress().getLocation());
         addressDao.update(domain.getAddress());
         domainDao.update(domain);
-        System.out.println("location, address, domain updated");
-        //TODO why userDao gives null?
         List<User> oldUsers = userDao.findByDomainId(domain.getDomainId());
         List<User> newUsers = domain.getUsers();
         List<Long> oldUserIds = new ArrayList<>();
         List<Long> newUserIds = new ArrayList<>();
-        System.out.println("old users");
-        System.out.println(oldUsers);
         for (User user : oldUsers) {
             oldUserIds.add(user.getUserId());
-            System.out.println(user.getUserId());
         }
-
-        System.out.println("new users");
-        System.out.println(newUsers);
         for (User user : newUsers) {
             newUserIds.add(user.getUserId());
-            System.out.println(user.getUserId());
         }
-        deleteOldUsers(oldUserIds, newUserIds, domain);
-        addNewUsers(oldUserIds, newUserIds, domain);
+        usersUpdate(domain.getDomainId(), oldUserIds, newUserIds);
     }
 
-    private void deleteOldUsers(List<Long> oldUserIds, List<Long> newUserIds, Domain domain) {
-        System.out.println("user deleting");
-        for (Long id : oldUserIds) {
-            if (!newUserIds.contains(id)) {
-                System.out.println("deleting user with id: "+id);
-                domainDao.deleteDomainUser(domain.getDomainId(), id);
+    private void usersUpdate(Long domainId, List<Long> oldUsersIds, List<Long> newUsersIds) {
+        for (Long userId : oldUsersIds) {
+            if (!newUsersIds.contains(userId)) {
+                domainDao.deleteDomainUser(domainId, userId);
             }
         }
-    }
-
-    private void addNewUsers(List<Long> oldUserIds, List<Long> newUserIds, Domain domain) {
-        System.out.println("user add");
-        for (Long id : newUserIds) {
-            if (!oldUserIds.contains(id)) {
-                System.out.println("adding user with id: "+id);
-                domainDao.addDomainUser(domain.getDomainId(), id);
+        for (Long userId : newUsersIds) {
+            if (!oldUsersIds.contains(userId)) {
+                domainDao.addDomainUser(domainId, userId);
             }
         }
-    }
-
-    private Address convertFrontendAddresToAddress(FrontendAddress frontendAddress) {
-        Location location = new Location();
-        locationService.doRequestForJSONByAddress(frontendAddress.getCity() + " " + frontendAddress.getStreet() + " "
-                + frontendAddress.getBuilding());
-        location.setGooglePlaceId(locationService.getGooglePlaceId());
-        location.setRegion(regionDao.findByName(locationService.getRegionName()));
-        Address address = new Address();
-        address.setApartmentNumber(frontendAddress.getApartment());
-        address.setLocation(location);
-        return address;
-    }
-
-    private Category convertFrontendCategoryToCategory(FrontendCategory frontendCategory) {
-        return categoryDao.find(frontendCategory.getCategoryId());
     }
 }

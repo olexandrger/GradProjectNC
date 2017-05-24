@@ -15,7 +15,7 @@ public class Region {
     private Long regionId;
     private String regionName;
 
-    private List<Location> locations;
+    //private List<Location> locations;
     private List<ProductRegionPrice> prices;
 
     public Region(Long regionId) {

@@ -147,6 +147,14 @@ public class CategoryDaoImpl extends AbstractDao implements CategoryDao {
         return findOne(query, new CategoryRowMapper(), domainId);
     }
 
+    @Override
+    public Category findCategoryByName(String categoryName) {
+        String query = "SELECT c.\"category_id\", c.\"category_name\", c.\"category_type_id\" " +
+                "FROM \"category\" c " +
+                "WHERE c.\"category_name\"=? ";
+        return findOne(query, new CategoryRowMapper(), categoryName);
+    }
+
     private class CategoryRowMapper implements RowMapper<Category> {
         @Override
         public Category mapRow(ResultSet resultSet, int i) throws SQLException {
