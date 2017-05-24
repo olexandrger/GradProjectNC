@@ -1,13 +1,13 @@
 var domains = [];
 var authorizedUser;
-var allUsers = [];
 
 var selected = -1;
 var numberOfAdded = 0;
 
 var map;
+var marker;
 var infowindow;
-var standartGooglePlaceId = "ChIJjw5wVMHZ0UAREED2iIQGAQA";
+var standartGooglePlaceId = "ChIJjw5wVMHZ0UAREED2iIQGAQA"; //Ukraine
 
 function addDomain() {
     var $newDomainName = $("#new-domain-name");
@@ -81,6 +81,7 @@ function addAuthorizedUser() {
 function addUser() {
     var $userEmailInput = $("#user-email-input");
     var email = $userEmailInput.val();
+    $("#new-user-alert").remove();
     if (isUserEmailUnique(email)) {
         $userEmailInput.val("");
         $("#new-user-alert").remove();
@@ -220,7 +221,6 @@ function get$DomainByIndex(index) {
 }
 
 function changeDomainType() {
-    //need changes
     var $domainTypeSelector = $("#domain-type-selector");
     domains[selected].domainType = $domainTypeSelector.val();
 }
@@ -230,6 +230,7 @@ function selectItem(index) {
     console.log("index" + index);
 
     $(".user-info").remove();
+    $("#new-user-alert").remove();
     if (selected == -1) {
         $("#domain-editor").removeClass("hidden");
         $domain = get$DomainByIndex(index);
@@ -265,11 +266,17 @@ function selectItem(index) {
     selected = index;
     if (selected == -1) {
         $("#user-editor").addClass("hidden");
-        $("#domain").addClass("hidden");
+        $("#domain-name-input").attr("readonly", "readonly");
+        $("#domain-type-selector").attr("disabled", "disabled");
+        $("#domain-apartment-input").attr("readonly", "readonly");
+        $("#pac-input").addClass("hidden");
         $("#save-delete-buttons").addClass("hidden");
     } else {
         $("#user-editor").removeClass("hidden");
-        $("#domain").removeClass("hidden");
+        $("#domain-name-input").removeAttr("readonly");
+        $("#domain-type-selector").removeAttr("disabled");
+        $("#domain-apartment-input").removeAttr("readonly");
+        $("#pac-input").removeClass("hidden");
         $("#save-delete-buttons").removeClass("hidden");
     }
 }
@@ -296,13 +303,19 @@ function isUserEmailUnique(email) {
     return unique;
 }
 
-function checkUniqueOfDomainName() {
+function changeDomainName() {
     var $domainNameInput = $("#domain-name-input");
     domainName = $domainNameInput.val();
-    if (isDomainNameUnique(domainName)) {
+    $list = $("#domain-list")
+    if (domainName == "") {
+        $('<div id="domain-name-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'Domain must have not empty name </div>').insertAfter($list);
+    } else if (isDomainNameUnique(domainName)) {
         domains[selected].domainName = domainName;
+        selectItem(selected);
+        $("#domain-name-alert").remove();
     } else {
-        $list = $("#domain-list")
         $('<div id="new-domain-alert" class="alert alert-danger" role="alert">' +
             '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
             'Domain with this name already exists </div>').insertAfter($list);
@@ -328,57 +341,65 @@ function loadUsers(index) {
 function saveDomain() {
     selectItem(selected);
     var domain = domains[selected];
-    var frontendDomain = {
-        domainId: domain.domainId,
-        domainName: domain.domainName,
-        domainType: {
-            categoryId: null,
-            categoryName: domain.domainType
-        },
-        address: {
-            addressId: null,
-            apartment: domain.apartment,
-            location: {
-                locationId: null,
-                googlePlaceId: domain.googlePlaceId,
-                region: {
-                    regionId: null,
-                    regionName: domain.regionName
+    $("#save-domain-alert").remove();
+    if (domain.domainName == "" || domain.domainType == "" || domain.googlePlaceId == "") {
+        $('<div id="save-domain-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'Domain name, domain type and domain location are required </div>').insertAfter($("#domain-list"));
+    } else {
+        var frontendDomain = {
+            domainId: domain.domainId,
+            domainName: domain.domainName,
+            domainType: {
+                categoryId: null,
+                categoryName: domain.domainType
+            },
+            address: {
+                addressId: null,
+                apartment: domain.apartment,
+                location: {
+                    locationId: null,
+                    googlePlaceId: domain.googlePlaceId,
+                    region: {
+                        regionId: null,
+                        regionName: domain.regionName
+                    }
                 }
+            },
+            users: domain.users,
+            productInstances: domain.productInstances
+        };
+        console.log(JSON.stringify(frontendDomain));
+        //console.log($('meta[name=_csrf]').attr("content"));
+        $.ajax({
+            type: "POST",
+            url: "/api/client/domains/update",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content"),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            processData: false,
+            contentType: "application/json",
+            data: JSON.stringify(frontendDomain),
+            //dataType: 'json',
+            success: function (data) {
+                console.log(JSON.stringify(data));
+                console.log(parseInt(data.domainId));
+                if (domains[selected].domainId < 0) {
+                    domains[selected].domainId = parseInt(data.domainId);
+                }
+                console.log(domains[selected].id);
+            },
+            error: function (e) {
+                console.log(JSON.stringify(e));
             }
-        },
-        users: domain.users,
-        productInstances: domain.productInstances
-    };
-    console.log(JSON.stringify(frontendDomain));
-    //console.log($('meta[name=_csrf]').attr("content"));
-    $.ajax({
-        type: "POST",
-        url: "/api/client/domains/update",
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content"),
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        processData: false,
-        contentType: "application/json",
-        data: JSON.stringify(frontendDomain),
-        //dataType: 'json',
-        success: function (data) {
-            console.log(JSON.stringify(data));
-            console.log(parseInt(data.domainId));
-            if (domains[selected].domainId < 0) {
-                domains[selected].domainId = parseInt(data.domainId);
-            }
-            console.log(domains[selected].id);
-        },
-        error: function (e) {
-            console.log(JSON.stringify(e));
-        }
-    });
+        });
+    }
 }
 
 function deleteDomain() {
+    $("#delete-domain-alert").remove();
     $.ajax({
         type: "POST",
         url: "/api/client/domains/delete",
@@ -396,6 +417,9 @@ function deleteDomain() {
         },
         error: function (e) {
             console.log(JSON.stringify(e));
+            $('<div id="delete-domain-alert" class="alert alert-danger" role="alert">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                'Can not delete domain </div>').insertAfter($("#domain-list"));
         }
     });
 }
@@ -428,7 +452,7 @@ function initMap() {
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
     infowindow = new google.maps.InfoWindow();
-    var marker = new google.maps.Marker({
+    marker = new google.maps.Marker({
         map: map
     });
     marker.addListener('click', function () {
@@ -459,10 +483,11 @@ function initMap() {
 
         infowindow.open(map, marker);
         infowindow.setContent(document.getElementById('infowindow-content'));
-        // document.getElementById('place-name').textContent = place.name;
-        // document.getElementById('place-id').textContent = place.place_id;
-        // document.getElementById('place-address').textContent =
-        //     place.formatted_address;
+
+        document.getElementById('place-name').textContent = place.name;
+        document.getElementById('place-id').textContent = place.place_id;
+        document.getElementById('place-address').textContent =
+            place.formatted_address;
 
         console.log('content is setted');
         console.log('place_id' + place.place_id);
@@ -493,30 +518,33 @@ function initMap() {
 function geocodePlaceId(map, infowindow, placeId) {
     console.log('placeId = ' + placeId);
     var geocoder = new google.maps.Geocoder;
+    infowindow.close();
     geocoder.geocode({'placeId': placeId}, function (results, status) {
         if (status === 'OK') {
             if (results[0]) {
                 if (placeId != standartGooglePlaceId) {
                     map.setZoom(11);
-                } else {
-                    map.setZoom(6);
-                }
-                map.setCenter(results[0].geometry.location);
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location
-                });
-                marker.setVisible(true);
+                    map.setCenter(results[0].geometry.location);
+                    marker.setPlace({
+                        placeId: placeId,
+                        location: results[0].geometry.location
+                    })
+                    marker.setVisible(true);
 
-                infowindow.close();
-                infowindow.open(map, marker);
-                //old content
-                //infowindow.setContent(results[0].formatted_address);
-                //new content
-                infowindow.setContent(document.getElementById('infowindow-content'));
-                // document.getElementById('place-name').textContent = results[0].address_components[0].long_name;
-                // document.getElementById('place-id').textContent = placeId;
-                // document.getElementById('place-address').textContent = results[0].formatted_address;
+                    infowindow.open(map, marker);
+                    //old content
+                    //infowindow.setContent(results[0].formatted_address);
+                    //new content
+                    infowindow.setContent(document.getElementById('infowindow-content'));
+
+                    document.getElementById('place-name').textContent = results[0].address_components[0].long_name;
+                    document.getElementById('place-id').textContent = placeId;
+                    document.getElementById('place-address').textContent = results[0].formatted_address;
+                } else {
+                    map.setCenter({lat: 48.379433, lng: 31.16558});
+                    map.setZoom(5);
+                }
+
             } else {
                 window.alert('No results found');
             }
@@ -569,27 +597,7 @@ function loadUserDomains() {
     });
 }
 
-
-//don't need only for tests
-function loadAllUsers() {
-    allUsers.push({
-        userId: 29,
-        email: "melnyk@gmail.com",
-        firstName: "andrey",
-        lastName: "melnyk"
-    });
-
-    allUsers.push({
-        userId: 666,
-        email: "pupkin@gmail.com",
-        firstName: "vasya",
-        lastName: "pupkin"
-    });
-}
-
 $(document).ready(function () {
-    //initMap();
-    loadAllUsers();
     addAuthorizedUser();
     loadUserDomains();
 });

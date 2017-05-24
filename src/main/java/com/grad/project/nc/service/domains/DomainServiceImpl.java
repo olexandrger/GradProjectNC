@@ -44,11 +44,11 @@ public class DomainServiceImpl implements DomainService {
     }
 
 
-    //TODO add instances and region
+    //TODO add instances
     @Override
     public void add(Domain domain) {
-        //TODO region
-        domain.getAddress().getLocation().getRegion().setRegionId(1L);
+        domain.getAddress().getLocation().setRegion(
+                regionDao.findByName(domain.getAddress().getLocation().getRegion().getRegionName()));
         locationDao.add(domain.getAddress().getLocation());
         addressDao.add(domain.getAddress());
         domain.setDomainType(categoryDao.findCategoryByName(domain.getDomainType().getCategoryName()));

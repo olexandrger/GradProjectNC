@@ -44,27 +44,29 @@
                         <li><a data-toggle="tab" href="#user-editor">Users</a></li>
                     </ul>
                     <div class="tab-content">
-                        <div class="col-sm-10 tab-pane hidden fade in active" id="domain">
-                            <div class="form-group col-sm-6">
-                                <label for="domain-name">Domain name</label>
-                                <input type="text" class="form-control" name="domain-name" placeholder="Name"
-                                       id="domain-name-input" onchange="checkUniqueOfDomainName()">
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="domain-type">Domain type</label>
-                                <select class="form-control" name="domain-type-value" id="domain-type-selector"
-                                        onchange="changeDomainType()">
-                                    <option value="PRIVATE">PRIVATE</option>
-                                    <option value="CORPORATIVE">CORPORATIVE</option>
-                                </select>
-                            </div>
-                            <div class="form-group apartment-input col-sm-4">
-                                <label for="domain-address">Apartment</label>
-                                <input type="text" class="form-control" name="apartment" placeholder="Apartment"
-                                       id="domain-apartment-input">
-                            </div>
+                        <div class="col-sm-10 tab-pane fade in active" id="domain">
+
+                                <div class="form-group col-sm-6">
+                                    <label for="domain-name">Domain name</label>
+                                    <input type="text" class="form-control" name="domain-name" placeholder="Name"
+                                           id="domain-name-input" onchange="changeDomainName()" readonly>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label for="domain-type">Domain type</label>
+                                    <select class="form-control" name="domain-type-value" id="domain-type-selector"
+                                            onchange="changeDomainType()" disabled>
+                                        <option value="PRIVATE">PRIVATE</option>
+                                        <option value="CORPORATIVE">CORPORATIVE</option>
+                                    </select>
+                                </div>
+                                <div class="form-group apartment-input col-sm-4">
+                                    <label for="domain-address">Apartment</label>
+                                    <input type="text" class="form-control" name="apartment" placeholder="Apartment"
+                                           id="domain-apartment-input" readonly>
+                                </div>
+
                             <div class="form-group">
-                                <input id="pac-input" class="controls" type="text"
+                                <input id="pac-input" class="controls hidden" type="text"
                                        placeholder="Enter a location">
                                 <div id="map"></div>
                                 <div id="infowindow-content">
@@ -74,7 +76,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group col-sm-12 tab-pane fade" id="user-editor">
+                        <div class="form-group col-sm-12 hidden tab-pane fade" id="user-editor">
                             <label>Users</label>
                             <input type="text" class="form-control" name="user-email" placeholder="E-mail"
                                    id="user-email-input">
