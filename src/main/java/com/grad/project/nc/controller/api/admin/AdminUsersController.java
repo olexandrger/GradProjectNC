@@ -2,6 +2,7 @@ package com.grad.project.nc.controller.api.admin;
 
 import com.grad.project.nc.controller.api.data.RegistrationResponseHolder;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
+import com.grad.project.nc.controller.api.dto.FrontendUser;
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.model.proxy.UserProxy;
 import com.grad.project.nc.persistence.RoleDao;
@@ -39,6 +40,9 @@ public class AdminUsersController {
     @Autowired
     private RoleDao roleDao;
 
+    private static final long USER_ROLE_PMG =4;
+
+    private static final long USER_ROLE_CSR =3;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     @ResponseBody
@@ -95,6 +99,22 @@ public class AdminUsersController {
         return result;
     }
 
+    @RequestMapping(value = "/find/csr", method = RequestMethod.GET)
+    @ResponseBody
+    public Collection<FrontendUser> findCsrs() {
+        return getUsersByrole(USER_ROLE_CSR);
+    }
+
+    @RequestMapping(value = "/find/pmg", method = RequestMethod.GET)
+    @ResponseBody
+    public Collection<FrontendUser> findPmgs() {
+        return getUsersByrole(USER_ROLE_PMG);
+    }
+
+
+    private Collection<FrontendUser> getUsersByrole(long roleId){
+        return userService.findByRoleId(roleId).stream().map(FrontendUser::fromEntity).collect(Collectors.toCollection(ArrayList::new));
+    }
 
     private User mapFrontUserToUser(FrontUser frontUser){
         User user = new User();
@@ -128,10 +148,7 @@ public class AdminUsersController {
 
     }
 
-
-
     @Data
-
     @Builder
     private static   class FrontUser{
         private Long userId;

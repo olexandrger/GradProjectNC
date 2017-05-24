@@ -3,6 +3,7 @@ package com.grad.project.nc.persistence;
 import com.grad.project.nc.model.User;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,4 +46,6 @@ public interface UserDao extends CrudDao<User> {
     public List<User> findSorted(String sort, Long size, Long offset);
 
     public List<User> findUsersByRegionIdSort(int id, String sort, Long size, Long offset);
+
+    public Collection<User> findUsersByRole(long roleId);
     }

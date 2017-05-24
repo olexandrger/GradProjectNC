@@ -17,6 +17,7 @@ public class FrontendOrder {
     private String status;
     private Long statusId;
     private Long responsibleId;
+    private String responsibleEmail;
     private Long domainId;
     private String domain;
     private Long productId;
@@ -35,6 +36,7 @@ public class FrontendOrder {
                 .status(item.getStatus().getCategoryName())
                 .statusId(item.getStatus().getCategoryId())
                 .responsibleId(item.getResponsible() == null ? null : item.getResponsible().getUserId())
+                .responsibleEmail(item.getResponsible() == null ? null : item.getResponsible().getEmail())
                 .openDate(item.getOpenDate())
                 .closeDate(item.getCloseDate())
                 .domainId(item.getProductInstance().getDomain().getDomainId())

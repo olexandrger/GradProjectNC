@@ -105,8 +105,8 @@
 
                 </div>
                 <div class="panel-footer">
-                    <button type="button" class="btn btn-default">Edit Responsible</button>
-                    <button type="button" class="btn btn-default">Assign</button>
+                    <button type="button" class="btn btn-default" id="edit-order-responsible-btn" onclick="editOrderResponsible()">Edit Responsible</button>
+                    <button type="button" class="btn btn-default" id="assign-order-responsible-btn" onclick="assignOrderResponsible()">Assign</button>
                 </div>
             </div>
         </div>
@@ -289,8 +289,8 @@
                     </div>
                 </div>
                 <div class="panel-footer">
-                    <button type="button" class="btn btn-default">Edit Responsible</button>
-                    <button type="button" class="btn btn-default">Assign</button>
+                    <button type="button" class="btn btn-default" id="edit-conplaint-responsible-btn" onclick="editComplaintResponsible()">Edit Responsible</button>
+                    <button type="button" class="btn btn-default" id="assign-complaint-responsible-btn" onclick="assignComplaintResponsible()">Assign</button>
                 </div>
             </div>
         </div>

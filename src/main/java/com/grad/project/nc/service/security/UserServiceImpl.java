@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -229,5 +230,10 @@ public class UserServiceImpl implements UserService{
 
     public String getMessageError() {
         return messageError;
+    }
+
+    @Override
+    public Collection<User> findByRoleId(long roleId) {
+       return userDao.findUsersByRole(roleId);
     }
 }

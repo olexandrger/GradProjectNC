@@ -2,10 +2,7 @@ package com.grad.project.nc.service.orders;
 
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductOrder;
-import com.grad.project.nc.service.exceptions.IllegalOrderOperationException;
-import com.grad.project.nc.service.exceptions.InsufficientRightsException;
-import com.grad.project.nc.service.exceptions.OrderCreationException;
-import com.grad.project.nc.service.exceptions.OrderException;
+import com.grad.project.nc.service.exceptions.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -40,6 +37,8 @@ public interface OrdersService {
     void cancelOrder(long orderId) throws IllegalOrderOperationException, InsufficientRightsException;
 
     void completeOrder(long orderId) throws IllegalOrderOperationException, InsufficientRightsException;
+
+    void setResponsible(long orderId, long responsibleid) throws IncorrectRoleException, IncorrectOrderStateException;
 
     Collection<ProductOrder> getUserOrders(long size, long offset);
 

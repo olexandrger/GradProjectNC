@@ -13,6 +13,7 @@ var selectedComplain = -1;
 var complaintsData;
 var ordersData;
 
+const COMPLAINT_STATUS_CREATED = 5;
 const COMPLAINT_STATUS_UNDER_CONSIDERATION = 6;
 const COMPLAINT_STATUS_CONSIDERATION_COMPLETED = 7;
 
@@ -158,6 +159,7 @@ function loadComplaints() {
 }
 
 function selectOrder(index) {
+    clearOfderForm();
     if (index == -1) {
         $("#order-content-panel").addClass("hidden");
     } else {
@@ -184,8 +186,27 @@ function selectOrder(index) {
         } else {
             $("#selected-order-end-date").val("");
         }
-
+        if (ordersData[selectedOrder].responsibleEmail != null) {
+            responsibles = $("#selected-order-responsible-name");
+            option = document.createElement("option");
+            option.setAttribute("selected", "selected");
+            option.setAttribute("value", ordersData[selectedOrder].responsiblId);
+            option.appendChild(document.createTextNode(ordersData[selectedOrder].responsibleEmail));
+            responsibles.append(option);
+        }
+        addOrderControlButtons();
     }
+}
+
+function clearOfderForm() {
+    $("#selected-order-user-name").val("");
+    $("#selected-order-domain").val("");
+    $("#selected-order-product").val("");
+    $("#selected-order-aim").val("");
+    $("#selected-order-status").val("");
+    $("#selected-order-start-date").val("");
+    $("#selected-order-end-date").val("");
+    $("#selected-order-responsible-name").empty();
 }
 
 function selectComplaint(index) {
@@ -193,7 +214,7 @@ function selectComplaint(index) {
     $("#responsible-info-row").addClass("hidden");
     $("#instance-info-row").addClass("hidden");
     selectedComplain = index;
-    if (index == -1) {
+    if (selectedComplain == -1) {
         $("#no-complain-selected-alert").removeClass("hidden");
         $("#complaint-content-panel").addClass("hidden");
         list.find("a").removeClass("active");
@@ -208,8 +229,10 @@ function selectComplaint(index) {
         userDetails = document.createTextNode(complaintsData[selectedComplain].userName + ", Phpne: " + complaintsData[selectedComplain].userNumber);
         $("#complain-user-details").empty();
         $("#complain-user-details").append(userDetails);
+        responsibles = $("#complain-responsible-email");
+        responsibles.attr("disabled", "disabled");
+        responsibles.empty();
         if (complaintsData[selectedComplain].responsibleEmail != null) {
-            responsibles = $("#complain-responsible-email");
             option = document.createElement("option");
             option.setAttribute("selected", "selected");
             option.setAttribute("value", complaintsData[selectedComplain].responsiblId);
@@ -235,6 +258,7 @@ function selectComplaint(index) {
         $("#selected-complain-title").val(complaintsData[selectedComplain].complainTitle);
         $("#selected-complain-content").val(complaintsData[selectedComplain].content);
         $("#selected-complain-responce").val(complaintsData[selectedComplain].response);
+        addComplaintControlButtons();
     }
 }
 
@@ -268,6 +292,29 @@ function alertSuccess(msg) {
     container.append(alert);
 }
 
+function addOrderControlButtons() {
+    editResponsibleBtn = $("#edit-order-responsible-btn");
+    assignResponsibleBtn = $("#assign-order-responsible-btn");
+    editResponsibleBtn.addClass("hidden");
+    assignResponsibleBtn.addClass("hidden");
+    if (selectedOrder >= 0) {
+        if (ordersData[selectedOrder].statusId == ORDER_STATUS_IN_PROGRESS) {
+            editResponsibleBtn.removeClass("hidden");
+        }
+    }
+}
+
+function addComplaintControlButtons() {
+    editResponsibleBtn = $("#edit-conplaint-responsible-btn");
+    assignResponsibleBtn = $("#assign-complaint-responsible-btn");
+    editResponsibleBtn.addClass("hidden");
+    assignResponsibleBtn.addClass("hidden");
+    if (selectedComplain >= 0) {
+        if (complaintsData[selectedComplain].statusId == COMPLAINT_STATUS_UNDER_CONSIDERATION) {
+            editResponsibleBtn.removeClass("hidden");
+        }
+    }
+}
 function getLabelName(status) {
     if (status == ORDER_STATUS_CREATED) {
         return "label label-info orders-list";
@@ -278,6 +325,133 @@ function getLabelName(status) {
     } else if (status == ORDER_STATUS_COMPLETED) {
         return "label label-success orders-list";
     }
+}
+
+function editOrderResponsible() {
+
+    $.ajax({
+        url: "/api/admin/users/find/csr/",
+        success: function (data) {
+            list = $("#selected-order-responsible-name");
+            list.empty();
+            data.forEach(function (item, i) {
+                option = document.createElement("option");
+                if (item.userId == ordersData[selectedOrder].responsibleId) {
+                    option.setAttribute("selected", "selected");
+                }
+
+                option.setAttribute("value", item.userId);
+                text = item.firstName + " " + item.lastName + " <" + item.email + ">";
+                option.appendChild(document.createTextNode(text));
+                list.append(option);
+            });
+            editResponsibleBtn = $("#edit-order-responsible-btn");
+            assignResponsibleBtn = $("#assign-order-responsible-btn");
+            editResponsibleBtn.addClass("hidden");
+            assignResponsibleBtn.removeClass("hidden");
+            list.removeAttr("disabled");
+        },
+        error: function () {
+            alertError("internal servrt error!")
+        }
+    });
+}
+
+function assignOrderResponsible() {
+
+    $.ajax({
+        url: "/api/admin/orders/set/responsible/",
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        contentType: 'application/json',
+        data: JSON.stringify({
+            orderId:ordersData[selectedOrder].productOrderId,
+            responsibleId:$("#selected-order-responsible-name").val()
+        }),
+        success: function (data) {
+            editResponsibleBtn = $("#edit-order-responsible-btn");
+            assignResponsibleBtn = $("#assign-order-responsible-btn");
+            responsibles = $("#selected-order-responsible-name");
+            responsibles.attr("disabled", "disabled");
+            editResponsibleBtn.removeClass("hidden");
+            assignResponsibleBtn.addClass("hidden");
+            loadOrders();
+            if(data.status=="success"){
+                alertSuccess(data.message);
+            } else {
+                alertError(data.message);
+            }
+        },
+        error: function () {
+            alertError("Inrenal server error!");
+        }
+    });
+
+
+}
+
+function editComplaintResponsible() {
+    $.ajax({
+        url: "/api/admin/users/find/pmg/",
+        success: function (data) {
+            list = $("#complain-responsible-email");
+            list.empty();
+            data.forEach(function (item, i) {
+                option = document.createElement("option");
+                if (item.userId == complaintsData[selectedComplain].responsiblId) {
+                    option.setAttribute("selected", "selected");
+                }
+                option.setAttribute("value", item.userId);
+                text = item.firstName + " " + item.lastName + " <" + item.email + ">";
+                option.appendChild(document.createTextNode(text));
+                list.append(option);
+            });
+
+            editResponsibleBtn = $("#edit-conplaint-responsible-btn");
+            assignResponsibleBtn = $("#assign-complaint-responsible-btn");
+            editResponsibleBtn.addClass("hidden");
+            assignResponsibleBtn.removeClass("hidden");
+            list.removeAttr("disabled");
+            $("#responsible-info-row").removeClass("hidden");
+            $("#complain-responsible-details").empty();
+        },
+        error: function () {
+            alertError("internal servrt error!")
+        }
+    });
+}
+
+function assignComplaintResponsible() {
+    $.ajax({
+        url: "/api/admin/complaint/set/responsible/",
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+        },
+        contentType: 'application/json',
+        data: JSON.stringify({
+            complaintId:complaintsData[selectedComplain].complainId,
+            responsibleId:$("#complain-responsible-email").val()
+        }),
+        success: function (data) {
+            editResponsibleBtn = $("#edit-conplaint-responsible-btn");
+            assignResponsibleBtn = $("#assign-complaint-responsible-btn");
+            editResponsibleBtn.removeClass("hidden");
+            assignResponsibleBtn.addClass("hidden");
+            loadComplaints();
+            if(data.status=="success"){
+                alertSuccess(data.message);
+            } else {
+                alertError(data.message);
+            }
+            },
+        error: function () {
+            alertError("Inrenal server error!");
+        }
+    });
+
 }
 
 $(document).ready(function () {

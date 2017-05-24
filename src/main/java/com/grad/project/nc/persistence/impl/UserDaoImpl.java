@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -145,6 +146,18 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
                 "\t\t\t(select location_id from location where region_id = "+ id + " )))) " + sort + "";
 
         return findMultiplePage(findAllQuery, new UserRowMapper(), size, offset);
+    }
+
+    @Override
+    public Collection<User> findUsersByRole(long roleId) {
+        String findQuery = "SELECT  u.user_id, u.email, u.password, u.first_name, u.last_name, u.phone_number \n" +
+                "FROM \"user\" u\n" +
+                "INNER JOIN user_role ur\n" +
+                "ON u.user_id = ur.user_id\n" +
+                "WHERE ur.role_id = ?;";
+
+
+        return findMultiple(findQuery, new UserRowMapper(), roleId);
     }
 
     @Override
