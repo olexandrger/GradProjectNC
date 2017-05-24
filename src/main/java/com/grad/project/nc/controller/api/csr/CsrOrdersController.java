@@ -11,10 +11,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -177,25 +174,27 @@ public class CsrOrdersController {
         return result;
     }
 
+    private FrontendOrder convertToFrontendOrder(ProductOrder item) {
+        FrontendOrder order = FrontendOrder.fromEntity(item);
+
+        if (ORDER_AIM_CREATE.equals(item.getOrderAim().getCategoryId())) {
+            order.setPossibleDomains(new HashMap<>());
+            item.getUser().getDomains().forEach((domain) -> {
+                order.getPossibleDomains().put(domain.getDomainId(), getFullAddress(domain.getAddress()));
+            });
+
+            order.setPossibleProducts(new HashMap<>());
+            productService.findByProductTypeId(item.getProductInstance().getPrice()
+                    .getProduct().getProductType().getProductTypeId())
+                    .forEach((product -> order.getPossibleProducts()
+                            .put(product.getProductId(), product.getProductName())));
+        }
+
+        return order;
+    }
+
     private Collection<FrontendOrder> convertToFrontendOrders(Collection<ProductOrder> orders) {
-        return orders.stream().map((item) -> {
-            FrontendOrder order = FrontendOrder.fromEntity(item);
-
-            if (ORDER_AIM_CREATE.equals(item.getOrderAim().getCategoryId())) {
-                order.setPossibleDomains(new HashMap<>());
-                item.getUser().getDomains().forEach((domain) -> {
-                    order.getPossibleDomains().put(domain.getDomainId(), getFullAddress(domain.getAddress()));
-                });
-
-                order.setPossibleProducts(new HashMap<>());
-                productService.findByProductTypeId(item.getProductInstance().getPrice()
-                        .getProduct().getProductType().getProductTypeId())
-                        .forEach((product -> order.getPossibleProducts()
-                                .put(product.getProductId(), product.getProductName())));
-            }
-
-            return order;
-        }).collect(Collectors.toList());
+        return orders.stream().map(this::convertToFrontendOrder).collect(Collectors.toList());
     }
 
     @Deprecated
@@ -205,8 +204,13 @@ public class CsrOrdersController {
     }
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public Collection<FrontendOrder> getOrderById(@PathVariable Long id) {
-        return convertToFrontendOrders(Collections.singletonList(ordersService.find(id)));
+    public FrontendOrder getOrderById(@PathVariable Long id) {
+        ProductOrder order = ordersService.find(id);
+        if (order == null) {
+            return null;
+        } else {
+            return convertToFrontendOrder(order);
+        }
     }
 
 
