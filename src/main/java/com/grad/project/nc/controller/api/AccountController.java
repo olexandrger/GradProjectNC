@@ -58,6 +58,7 @@ public class AccountController {
             if (user.getRoles().contains(roleDao.findByName("ROLE_CSR"))) {
                 profileLinks.add(new Link("Orders", "/csr/orders"));
                 profileLinks.add(new Link("Reports", "/csr/reports"));
+                profileLinks.add(new Link("Instances", "/csr/instances"));
                // profileLinks.add(new Link("Complains", "/csr/complains"));
             }
 

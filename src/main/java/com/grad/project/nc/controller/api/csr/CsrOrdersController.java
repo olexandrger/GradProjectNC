@@ -245,4 +245,15 @@ public class CsrOrdersController {
     public interface OrderCreationFunction {
         ProductOrder apply(long instanceId, long userId) throws OrderException;
     }
+
+
+    @RequestMapping(value = "/get/byInstance/{id}/size/{size}/offset/{offset}", method = RequestMethod.GET)
+    public Collection<FrontendOrder> getByProductInstance(@PathVariable Long id, @PathVariable Long size, @PathVariable Long offset) {
+        return ordersService.getOrdersByProductInstance(id, size, offset).stream().map(FrontendOrder::fromEntity).collect(Collectors.toList());
+    }
+
+
+
+
+
 }

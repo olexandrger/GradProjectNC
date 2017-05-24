@@ -31,4 +31,9 @@ public class InstanceServiceImpl implements InstanceService {
     public Collection<ProductInstance> getByDomainId(Long domainId) {
         return productInstanceDao.findByDomainId(domainId);
     }
+
+    @Override
+    public Collection<ProductInstance> getAll() {
+        return productInstanceDao.findAll();
+    }
 }
