@@ -120,7 +120,7 @@ public class CsrOrdersController {
             log.error("Can not create order", e);
 
             result.put("status", "error");
-            result.put("message", "Can not create order with such parameters");
+            result.put("message", "This product is not available in the selected region");
         }
 
         return result;
