@@ -23,7 +23,6 @@ public class CsrOrdersController {
     private OrdersService ordersService;
     private ProductService productService;
 
-    private static final Long ORDER_AIM_CREATE = 13L;
 
     @Autowired
     public CsrOrdersController(OrdersService ordersService, ProductService productService) {
@@ -174,27 +173,12 @@ public class CsrOrdersController {
         return result;
     }
 
-    private FrontendOrder convertToFrontendOrder(ProductOrder item) {
-        FrontendOrder order = FrontendOrder.fromEntity(item);
-
-        if (ORDER_AIM_CREATE.equals(item.getOrderAim().getCategoryId())) {
-            order.setPossibleDomains(new HashMap<>());
-            item.getUser().getDomains().forEach((domain) -> {
-                order.getPossibleDomains().put(domain.getDomainId(), getFullAddress(domain.getAddress()));
-            });
-
-            order.setPossibleProducts(new HashMap<>());
-            productService.findByProductTypeId(item.getProductInstance().getPrice()
-                    .getProduct().getProductType().getProductTypeId())
-                    .forEach((product -> order.getPossibleProducts()
-                            .put(product.getProductId(), product.getProductName())));
-        }
-
-        return order;
-    }
-
     private Collection<FrontendOrder> convertToFrontendOrders(Collection<ProductOrder> orders) {
-        return orders.stream().map(this::convertToFrontendOrder).collect(Collectors.toList());
+        return orders.stream().map(order ->
+                FrontendOrder.fromEntityWithModificationInfo(order,
+                order.getUser().getDomains(),
+                productService.findByProductTypeId(order.getProductInstance().getPrice().getProduct().getProductType().getProductTypeId())
+        )).collect(Collectors.toList());
     }
 
     @Deprecated
@@ -209,7 +193,9 @@ public class CsrOrdersController {
         if (order == null) {
             return null;
         } else {
-            return convertToFrontendOrder(order);
+            return  FrontendOrder.fromEntityWithModificationInfo(order,
+                    order.getUser().getDomains(),
+                    productService.findByProductTypeId(order.getProductInstance().getPrice().getProduct().getProductType().getProductTypeId()));
         }
     }
 
@@ -231,14 +217,6 @@ public class CsrOrdersController {
             orders = ordersService.getAllOrders(size, offset);
         }
         return convertToFrontendOrders(orders);
-    }
-
-    private static String getFullAddress(Address address) {
-        String apt = "";
-        if (address.getApartmentNumber() != null && !address.getApartmentNumber().isEmpty()) {
-            apt = " apt: " + address.getApartmentNumber();
-        }
-        return address.getLocation().getGooglePlaceId() + apt;
     }
 
     @FunctionalInterface
