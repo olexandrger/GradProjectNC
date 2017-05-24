@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -81,7 +80,9 @@ public class ProductsController {
             method = RequestMethod.GET
     )
     public List<TypeaheadItem> fetchProductTypeaheadItemsByQuery(@RequestParam("query") String query) {
-        //TODO implement
-        return null;
+        return productService.findByNameContaining(query)
+                .stream()
+                .map(product -> new TypeaheadItem(product.getProductId(), product.getProductName()))
+                .collect(Collectors.toList());
     }
 }

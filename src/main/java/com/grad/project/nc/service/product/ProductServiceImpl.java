@@ -73,6 +73,12 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
 
     @Override
     @Transactional
+    public List<Product> findByNameContaining(String productName) {
+        return productDao.findByNameContaining(productName);
+    }
+
+    @Override
+    @Transactional
     public Product add(Product product) {
         productDao.add(product);
 

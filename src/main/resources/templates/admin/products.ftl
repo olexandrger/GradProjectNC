@@ -36,17 +36,18 @@
     <div class="row">
         <div class="col-sm-3 col-sm-offset-1">
             <div id="typeahead-box" class="input-group">
-                <input class="typeahead" type="text" placeholder="product name">
-                <span class="input-group-btn"><button id="search-button" type="button" class="btn btn-info"><span class="glyphicon glyphicon-search"></span></button></span>
+                <span class="input-group-addon info"><span class="glyphicon glyphicon-search"></span></span>
+                <input class="typeahead" type="text" placeholder="Search">
+                <button type="button" id="search-clear" class="btn btn-link hide"><i class="glyphicon glyphicon-remove"></i></button>
             </div>
             <div class="list-group" id="products-list"></div>
             <div id="alert-box"></div>
-            <div class="form-group">
+            <div class="input-group">
                 <input type="text" class="form-control" placeholder="New product" id="new-product-name">
                 <span class="input-group-btn">
                         <button id="add-product-button" type="button" class="btn btn-default pull-right">
                             <span class="glyphicon glyphicon-plus"></span>
-                            Add new product
+                            Add product
                         </button>
                 </span>
             </div>

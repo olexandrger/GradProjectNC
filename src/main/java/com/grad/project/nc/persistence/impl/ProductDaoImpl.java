@@ -134,6 +134,16 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
     }
 
     @Override
+    public List<Product> findByNameContaining(String productName) {
+        String query = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
+                "\"product_type_id\" FROM \"product\" WHERE LOWER(\"product_name\") LIKE LOWER(?)";
+
+        String substr = "%" + productName + "%";
+
+        return findMultiple(query, new ProductRowMapper(), substr);
+    }
+
+    @Override
     public List<Product> findByProductTypeId(Long productTypeId) {
         String query = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\" WHERE \"product_type_id\"=?";
