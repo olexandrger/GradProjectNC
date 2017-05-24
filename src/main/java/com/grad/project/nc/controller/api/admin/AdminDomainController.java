@@ -34,7 +34,7 @@ public class AdminDomainController {
             ,@RequestParam("type") String type,@RequestParam("name") String name) {
 
         FrontendDomain frontendDomain = FrontendDomain.builder().domainId(Long.valueOf(("-3")))
-                .domainName( "Mock domain for"+name).address(FrontendAddress.builder().apartment(aptNum).city(address).build()).build();
+                .domainName( "Mock domain for"+name).address(FrontendAddress.builder().apartment(aptNum).build()).build();
 
         //TODO domainService
         //FrontendDomain frontendDomain = domainService.addDomain(address,aptNum,type,name);

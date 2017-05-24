@@ -32,4 +32,6 @@ public interface UserService extends UserDetailsService {
 
     public String getMessageError();
 
+    public Collection<User> findByRoleId(long roleId);
+
     }

@@ -11,6 +11,11 @@ public class CsrPages {
         return "/csr/orders";
     }
 
+    @RequestMapping("/csr/orders/*")
+    public String orderPage() {
+        return "/csr/order";
+    }
+
     @RequestMapping("/csr/reports")
     public String reportsPage() {
         return "/admin/report";

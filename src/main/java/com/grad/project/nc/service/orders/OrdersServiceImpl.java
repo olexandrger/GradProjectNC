@@ -2,21 +2,19 @@ package com.grad.project.nc.service.orders;
 
 import com.grad.project.nc.model.*;
 import com.grad.project.nc.persistence.*;
-import com.grad.project.nc.service.exceptions.IllegalOrderOperationException;
-import com.grad.project.nc.service.exceptions.InsufficientRightsException;
-import com.grad.project.nc.service.exceptions.OrderCreationException;
-import com.grad.project.nc.service.exceptions.OrderException;
+import com.grad.project.nc.service.exceptions.*;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -32,6 +30,9 @@ public class OrdersServiceImpl implements OrdersService {
     private CategoryDao categoryDao;
     private UserService userService;
     private EmailService emailService;
+    private RoleDao roleDao;
+
+    private static final long USER_ROLE_CSR = 3L;
 
     private static final long INSTANCE_STATUS_CREATED = 9L;
     private static final long INSTANCE_STATUS_ACTIVATED = 10L;
@@ -49,24 +50,39 @@ public class OrdersServiceImpl implements OrdersService {
     private static final long ORDER_STATUS_CANCELLED = 3L;
     private static final long ORDER_STATUS_COMPLETED = 4L;
 
+//    @Autowired
+//    public OrdersServiceImpl(UserDao userDao, ProductOrderDao orderDao, ProductRegionPriceDao productRegionPriceDao,
+//                             DomainDao domainDao, ProductInstanceDao productInstanceDao, CategoryDao categoryDao,
+//                             UserService userService, EmailService emailService) {
+//        this.userDao = userDao;
+//        this.orderDao = orderDao;
+//        this.productRegionPriceDao = productRegionPriceDao;
+//        this.domainDao = domainDao;
+//        this.productInstanceDao = productInstanceDao;
+//        this.categoryDao = categoryDao;
+//
+//        this.userService = userService;
+//        this.emailService = emailService;
+//    }
+
     @Autowired
     public OrdersServiceImpl(UserDao userDao, ProductOrderDao orderDao, ProductRegionPriceDao productRegionPriceDao,
                              DomainDao domainDao, ProductInstanceDao productInstanceDao, CategoryDao categoryDao,
-                             UserService userService, EmailService emailService) {
+                             UserService userService, EmailService emailService, RoleDao roleDao) {
         this.userDao = userDao;
         this.orderDao = orderDao;
         this.productRegionPriceDao = productRegionPriceDao;
         this.domainDao = domainDao;
         this.productInstanceDao = productInstanceDao;
         this.categoryDao = categoryDao;
-
         this.userService = userService;
         this.emailService = emailService;
+        this.roleDao = roleDao;
     }
 
     private boolean hasCsrAuthority(User user) {
-        for (GrantedAuthority userAuthority: user.getAuthorities()) {
-            for (GrantedAuthority authority: CSR_AUTHORITIES) {
+        for (GrantedAuthority userAuthority : user.getAuthorities()) {
+            for (GrantedAuthority authority : CSR_AUTHORITIES) {
                 if (authority.getAuthority().equals(userAuthority.getAuthority())) {
                     return true;
                 }
@@ -290,6 +306,22 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    public void setResponsible(long orderId, long responsibleid) throws IncorrectRoleException, IncorrectOrderStateException {
+        ProductOrder order = orderDao.find(orderId);
+        User responsible = userDao.find(responsibleid);
+        if (!isCsr(responsible)) {
+            throw new IncorrectRoleException("User " + responsible.getFirstName()
+                    + " " + responsible.getLastName() + " <" + responsible.getEmail() + ">"
+                    + " is not a member of group " + roleDao.find(USER_ROLE_CSR).getRoleName());
+        }
+        if(order.getStatus().getCategoryId().longValue()!=ORDER_STATUS_IN_PROGRESS){
+            throw new IncorrectOrderStateException("Can not change order in state "+ order.getStatus().getCategoryName());
+        }
+        order.setResponsible(responsible);
+        orderDao.update(order);
+    }
+
+    @Override
     public List<ProductOrder> getUserOrders(long size, long offset) {
         return orderDao.findByUserId(userService.getCurrentUser().getUserId(), size, offset);
     }
@@ -346,5 +378,11 @@ public class OrdersServiceImpl implements OrdersService {
             orderDao.update(order);
             return order;
         }
+    }
+
+    private boolean isCsr(User user) {
+        return user.getRoles().stream().anyMatch(role -> {
+            return role.getRoleId().longValue() == USER_ROLE_CSR;
+        });
     }
 }

@@ -11,10 +11,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -26,7 +23,6 @@ public class CsrOrdersController {
     private OrdersService ordersService;
     private ProductService productService;
 
-    private static final Long ORDER_AIM_CREATE = 13L;
 
     @Autowired
     public CsrOrdersController(OrdersService ordersService, ProductService productService) {
@@ -120,7 +116,7 @@ public class CsrOrdersController {
             log.error("Can not create order", e);
 
             result.put("status", "error");
-            result.put("message", "Can not create order with such parameters");
+            result.put("message", "This product is not available in the selected region");
         }
 
         return result;
@@ -178,24 +174,11 @@ public class CsrOrdersController {
     }
 
     private Collection<FrontendOrder> convertToFrontendOrders(Collection<ProductOrder> orders) {
-        return orders.stream().map((item) -> {
-            FrontendOrder order = FrontendOrder.fromEntity(item);
-
-            if (ORDER_AIM_CREATE.equals(item.getOrderAim().getCategoryId())) {
-                order.setPossibleDomains(new HashMap<>());
-                item.getUser().getDomains().forEach((domain) -> {
-                    order.getPossibleDomains().put(domain.getDomainId(), getFullAddress(domain.getAddress()));
-                });
-
-                order.setPossibleProducts(new HashMap<>());
-                productService.findByProductTypeId(item.getProductInstance().getPrice()
-                        .getProduct().getProductType().getProductTypeId())
-                        .forEach((product -> order.getPossibleProducts()
-                                .put(product.getProductId(), product.getProductName())));
-            }
-
-            return order;
-        }).collect(Collectors.toList());
+        return orders.stream().map(order ->
+                FrontendOrder.fromEntityWithModificationInfo(order,
+                order.getUser().getDomains(),
+                productService.findByProductTypeId(order.getProductInstance().getPrice().getProduct().getProductType().getProductTypeId())
+        )).collect(Collectors.toList());
     }
 
     @Deprecated
@@ -205,8 +188,15 @@ public class CsrOrdersController {
     }
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public Collection<FrontendOrder> getOrderById(@PathVariable Long id) {
-        return convertToFrontendOrders(Collections.singletonList(ordersService.find(id)));
+    public FrontendOrder getOrderById(@PathVariable Long id) {
+        ProductOrder order = ordersService.find(id);
+        if (order == null) {
+            return null;
+        } else {
+            return  FrontendOrder.fromEntityWithModificationInfo(order,
+                    order.getUser().getDomains(),
+                    productService.findByProductTypeId(order.getProductInstance().getPrice().getProduct().getProductType().getProductTypeId()));
+        }
     }
 
 
@@ -227,14 +217,6 @@ public class CsrOrdersController {
             orders = ordersService.getAllOrders(size, offset);
         }
         return convertToFrontendOrders(orders);
-    }
-
-    private static String getFullAddress(Address address) {
-        String apt = "";
-        if (address.getApartmentNumber() != null && !address.getApartmentNumber().isEmpty()) {
-            apt = " apt: " + address.getApartmentNumber();
-        }
-        return address.getLocation().getGooglePlaceId() + apt;
     }
 
     @FunctionalInterface

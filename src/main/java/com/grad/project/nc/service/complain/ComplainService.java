@@ -1,10 +1,7 @@
 package com.grad.project.nc.service.complain;
 
 import com.grad.project.nc.model.Complain;
-import com.grad.project.nc.service.exceptions.IncompleteComplaintDataExceptions;
-import com.grad.project.nc.service.exceptions.IncorrectComplaintStateException;
-import com.grad.project.nc.service.exceptions.InsufficientRightsException;
-import com.grad.project.nc.service.exceptions.ProhibitedComplaintActionExcrption;
+import com.grad.project.nc.service.exceptions.*;
 
 import java.util.Collection;
 
@@ -18,4 +15,5 @@ public interface ComplainService {
     //public void updadeComplainResponse(long complainId, long userId, String response) throws IncorrectComplaintStateException;
     public void completeComplaint(long userId, long complainId, String responce) throws IncorrectComplaintStateException, IncompleteComplaintDataExceptions;
     public Collection<Complain> findByInstanceId(Long instanceId, long size, long offset);
+    public void setResponsible(long responsibleId, long complaintId) throws IncorrectRoleException, IncorrectComplaintStateException;
 }

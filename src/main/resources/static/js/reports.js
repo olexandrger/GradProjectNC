@@ -1,4 +1,12 @@
-var reportData;
+var reportMetadata;
+
+function wrapLinks(text) {
+    return text.replace(/(https?\:\/\/[^\s]+)/mg,  '<a href="$1" target="_blank">$1</a>');
+}
+
+function wrapRelativeLinks(link, text) {
+    return link.replace(/(\/[^\s]+)/mg,  '<a href="$1" target="_blank">' + text + '</a>');
+}
 
 function showErrorMessage(message) {
     console.log(message);
@@ -64,9 +72,11 @@ function generateReport() {
                 report.data.forEach(function (row) {
                     currentRow = document.createElement("tr");
 
-                    row.forEach(function (value) {
+                    row.forEach(function (value, index) {
                         var td = document.createElement("td");
-                        td.appendChild(document.createTextNode(value));
+                        // td.appendChild(document.createTextNode(value));
+                        td.innerHTML = wrapLinks(value);
+                        // td.innerHTML = wrapRelativeLinks(value, report.header[index]);
                         currentRow.appendChild(td);
                     });
 
@@ -95,7 +105,7 @@ function loadReportParams() {
     var reportId = $("#report-select").val();
     var report;
 
-    reportData.forEach(function (item) {
+    reportMetadata.forEach(function (item) {
         if (item.id == reportId) {
             report = item;
         }
@@ -135,7 +145,7 @@ function loadReports() {
         method: "GET",
         contentType: 'application/json',
         success: function (data) {
-            reportData = data;
+            reportMetadata = data;
             var select = $("#report-select");
             select.empty();
             data.forEach(function(data) {

@@ -1,9 +1,8 @@
 package com.grad.project.nc.controller.api.dto;
 
-import com.grad.project.nc.model.Address;
-import com.grad.project.nc.model.Category;
-import com.grad.project.nc.model.Domain;
-import com.grad.project.nc.model.User;
+import com.grad.project.nc.controller.api.dto.instance.FrontendInstance;
+import com.grad.project.nc.controller.api.dto.instance.FrontendInstanceProduct;
+import com.grad.project.nc.model.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,19 +14,20 @@ import java.util.stream.Collectors;
 public class FrontendDomain {
     private Long domainId;
     private String domainName;
-    private Long regionId;
-    private FrontendAddress address;
     private FrontendCategory domainType;
+    private FrontendAddress address;
     private List<FrontendUser> users;
+    //TODO instances
+    private List<FrontendInstance> productInstances;
 
     public static FrontendDomain fromEntity(Domain domain) {
         return builder()
                 .domainId(domain.getDomainId())
                 .domainName(domain.getDomainName())
-                .regionId(domain.getAddress().getLocation().getRegion().getRegionId())
-                .address(FrontendAddress.fromEntity(domain.getAddress()))
                 .domainType(FrontendCategory.fromEntity(domain.getDomainType()))
+                .address(FrontendAddress.fromEntity(domain.getAddress()))
                 .users(domain.getUsers().stream().map(FrontendUser::fromEntity).collect(Collectors.toList()))
+                .productInstances(domain.getProductInstances().stream().map(FrontendInstance::fromEntity).collect(Collectors.toList()))
                 .build();
     }
 
@@ -41,7 +41,9 @@ public class FrontendDomain {
                         .stream()
                         .map(user -> user.toModel())
                         .collect(Collectors.toList()))
-                //.productInstances()
+//                .productInstances(getProductInstances()
+//                        .stream()
+//                        .map(productInstance -> productInstance.toModel()))
                 .build();
     }
 }

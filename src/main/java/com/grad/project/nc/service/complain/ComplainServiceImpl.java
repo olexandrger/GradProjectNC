@@ -1,16 +1,10 @@
 package com.grad.project.nc.service.complain;
 
-import com.grad.project.nc.model.Category;
-import com.grad.project.nc.model.Complain;
-import com.grad.project.nc.model.ProductInstance;
-import com.grad.project.nc.model.User;
-import com.grad.project.nc.persistence.CategoryDao;
-import com.grad.project.nc.persistence.ComplainDao;
-import com.grad.project.nc.persistence.ProductInstanceDao;
-import com.grad.project.nc.persistence.UserDao;
+import com.grad.project.nc.model.*;
+import com.grad.project.nc.persistence.*;
 import com.grad.project.nc.service.exceptions.IncompleteComplaintDataExceptions;
 import com.grad.project.nc.service.exceptions.IncorrectComplaintStateException;
-import com.grad.project.nc.service.exceptions.InsufficientRightsException;
+import com.grad.project.nc.service.exceptions.IncorrectRoleException;
 import com.grad.project.nc.service.exceptions.ProhibitedComplaintActionExcrption;
 import com.grad.project.nc.service.notifications.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +24,9 @@ public class ComplainServiceImpl implements ComplainService {
     private ProductInstanceDao productInstanceDao;
     private CategoryDao categoryDao;
     private EmailService emailService;
+    private RoleDao roleDao;
+
+    public static final long USER_ROLE_PMG = 4L;
 
     private static final long COMPLAIN_REASON_SERVICE_PROBLEMS = 17L;
     private static final long COMPLAIN_REASON_ORDER_PROBLEMS = 18L;
@@ -41,12 +38,13 @@ public class ComplainServiceImpl implements ComplainService {
     //private static final long COMPLAIN_STATUS_REJECTED = 8L;
 
     @Autowired
-    public ComplainServiceImpl(ComplainDao complainDao, UserDao userDao, ProductInstanceDao productInstanceDao, CategoryDao categoryDao, EmailService emailService) {
+    public ComplainServiceImpl(ComplainDao complainDao, UserDao userDao, ProductInstanceDao productInstanceDao, CategoryDao categoryDao, EmailService emailService, RoleDao roleDao) {
         this.complainDao = complainDao;
         this.userDao = userDao;
         this.productInstanceDao = productInstanceDao;
         this.categoryDao = categoryDao;
         this.emailService = emailService;
+        this.roleDao = roleDao;
     }
 
     @Override
@@ -56,7 +54,7 @@ public class ComplainServiceImpl implements ComplainService {
 
     @Override
     public Complain newComplain(long userId, long instanceId, long reasonId, String title, String content) throws ProhibitedComplaintActionExcrption, IncompleteComplaintDataExceptions {
-        if(title == null || title.length()<1){
+        if (title == null || title.length() < 1) {
             throw new IncompleteComplaintDataExceptions("Subject can not be empty!");
         }
         Category created = categoryDao.find(COMPLAIN_STATUS_CREATED);
@@ -65,8 +63,8 @@ public class ComplainServiceImpl implements ComplainService {
 
         Category reason = categoryDao.find(reasonId);
 
-        if(productInstance!=null && !userIsContainedInInstance(user, productInstance)){
-           throw new ProhibitedComplaintActionExcrption("You do not belong to the domain of this product");
+        if (productInstance != null && !userIsContainedInInstance(user, productInstance)) {
+            throw new ProhibitedComplaintActionExcrption("You do not belong to the domain of this product");
         }
         Complain complain = new Complain();
 
@@ -123,7 +121,7 @@ public class ComplainServiceImpl implements ComplainService {
         if (complain.getResponsible().getUserId().longValue() != userId) {
             throw new IncorrectComplaintStateException("You can not change a complaint, assigned to another responsible!");
         }
-        if(responce==null || responce.length()<1){
+        if (responce == null || responce.length() < 1) {
             throw new IncompleteComplaintDataExceptions("You can not close a complaint without response!");
         }
         complain.setStatus(categoryDao.find(COMPLAIN_STATUS_CONSIDERATION_COMPLETED));
@@ -138,14 +136,37 @@ public class ComplainServiceImpl implements ComplainService {
         return complainDao.findByInstanceId(instanceId, size, offset);
     }
 
+    @Override
+    public void setResponsible(long responsibleId, long complaintId) throws IncorrectRoleException, IncorrectComplaintStateException {
+        Complain complain = complainDao.find(complaintId);
+        User responsible = userDao.find(responsibleId);
+        if (!isPmg(responsible)) {
+            throw new IncorrectRoleException("User " + responsible.getFirstName()
+                    + " " + responsible.getLastName() + " <" + responsible.getEmail() + ">"
+                    + " is not a member of group "+roleDao.find(USER_ROLE_PMG).getRoleName());
+        }
+        if(complain.getStatus().getCategoryId().longValue()!=COMPLAIN_STATUS_UNDER_CONSIDERATION){
+            throw new IncorrectComplaintStateException("Can not changecomplaint in state "+ complain.getStatus().getCategoryName());
+        }
+        complain.setResponsible(responsible);
+        complainDao.update(complain);
+    }
 
-    private boolean userIsContainedInInstance(User user, ProductInstance productInstance){
-        for(User currentUser:productInstance.getDomain().getUsers()){
-            if(currentUser.getUserId().equals(user.getUserId())){
+
+    private boolean userIsContainedInInstance(User user, ProductInstance productInstance) {
+        for (User currentUser : productInstance.getDomain().getUsers()) {
+            if (currentUser.getUserId().equals(user.getUserId())) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean isPmg(User user) {
+        return  user.getRoles().stream().anyMatch(role -> {
+            return role.getRoleId().longValue()==USER_ROLE_PMG;
+        });
+
     }
 
 

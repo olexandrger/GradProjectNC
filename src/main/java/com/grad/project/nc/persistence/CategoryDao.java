@@ -20,4 +20,6 @@ public interface CategoryDao extends CrudDao<Category> {
     Category findProductInstanceStatus(Long productInstanceId);
 
     Category findDomainType(Long domainId);
+
+    Category findCategoryByName(String categoryName);
 }
