@@ -37,7 +37,7 @@
         <div class="col-sm-3 col-sm-offset-1">
             <div id="typeahead-box" class="input-group">
                 <input class="typeahead" type="text" placeholder="product name">
-                <span class="input-group-btn"><button id="search-button" type="button" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button></span>
+                <span class="input-group-btn"><button id="search-button" type="button" class="btn btn-info"><span class="glyphicon glyphicon-search"></span></button></span>
             </div>
             <div class="list-group" id="products-list"></div>
             <div id="alert-box"></div>

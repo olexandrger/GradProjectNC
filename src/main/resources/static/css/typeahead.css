@@ -50,3 +50,25 @@
 #typeahead-box {
     margin-bottom: 20px;
 }
+
+@media (max-width: 1199px) {
+    .tt-input,
+    .tt-hint {
+        width: 172.5px;
+    }
+
+    .tt-menu {
+        width: 212.5px;
+    }
+}
+
+@media (max-width: 991px) {
+    .tt-input,
+    .tt-hint {
+        width: 117.5px;
+    }
+
+    .tt-menu {
+        width: 157.5px;
+    }
+}
