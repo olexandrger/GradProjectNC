@@ -4,6 +4,7 @@ package com.grad.project.nc.controller.api.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
+import com.grad.project.nc.controller.api.dto.FrontendUser;
 import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.model.User;
 import com.grad.project.nc.service.domains.DomainService;
@@ -32,16 +33,9 @@ public class DomainsController {
         this.userService = userService;
     }
 
-    //TODO rework after base domains done
     @RequestMapping(path = "/get/all", method = RequestMethod.GET)
     public Collection<FrontendDomain> getUserDomains() {
-        List<FrontendDomain> domains = domainService.findByUserId(((User) SecurityContextHolder.getContext().
-                getAuthentication().getPrincipal()).getUserId()).stream().map(FrontendDomain::fromEntity).collect(Collectors.toList());
-//        for(FrontendDomain domain: domains){
-//            domain.setAddress(domainService.);
-//        }
-
-        return domains;
+        return domainService.getAllDomains(userService.getCurrentUser().getUserId()).stream().map(FrontendDomain::fromEntity).collect(Collectors.toList());
     }
 
     @RequestMapping(path = "/get/byId/{id}", method = RequestMethod.GET)
@@ -52,7 +46,6 @@ public class DomainsController {
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public Map<String, String> deleteDomain(@RequestBody Map<String, Long> domainId) {
         Map<String, String> result = new HashMap<>();
-        //System.out.println(domainId.get("id"));
         try {
             Domain domain = domainService.find(domainId.get("id"));
             if (domain != null) {
@@ -74,16 +67,8 @@ public class DomainsController {
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     public Map<String, String> updateDomain(@RequestBody FrontendDomain frontendDomain) {
         Map<String, String> result = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            System.out.println(mapper.writeValueAsString(frontendDomain));
-        } catch (JsonProcessingException e) {
-            //e.printStackTrace();
-            System.out.println("frontend error");
-        }
-        try {
-            Domain domain = domainService.convertFrontendDomainToDomain(frontendDomain);
-            System.out.println(domain.getDomainType().getCategoryId());
+            Domain domain = frontendDomain.toModel();
             if (domainService.find(frontendDomain.getDomainId()) == null) {
                 domainService.add(domain);
                 result.put("status", "success");
@@ -91,12 +76,12 @@ public class DomainsController {
                 result.put("domainId", domain.getDomainId().toString());
             } else {
                 domainService.update(domain);
-                System.out.println("in controller");
                 result.put("status", "success");
                 result.put("message", "Domain updated succesfully");
             }
             return result;
         } catch (DataAccessException exception) {
+            exception.printStackTrace();
             result.put("status", "error");
             result.put("message", "Can not add domain to database");
             return result;
@@ -104,29 +89,13 @@ public class DomainsController {
     }
 
     @RequestMapping(path = "/get/user", method = RequestMethod.GET)
-    public User getUserByEmail(@RequestParam(name = "email") String email) {
-        try {
-            return userService.findByEMail(email);
-        } catch (DataAccessException exception) {
-            return null;
-        }
+    public FrontendUser getUserByEmail(@RequestParam(name = "email") String email) {
+        User user = userService.findByEMail(email);
+        return user != null ? FrontendUser.fromEntity(user) : null;
     }
 
     @RequestMapping(path = "/get/user/authorized", method = RequestMethod.GET)
-    public User getAuthorizedUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public FrontendUser getAuthorizedUser() {
+        return FrontendUser.fromEntity((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
-
-//    @Data
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    private static class DomainAddress {
-//        private Long domainId;
-//        private String domainName;
-//        private Long regionId;
-//        private String city;
-//        private String street;
-//        private String building;
-//        private Integer apartment;
-//    }
 }

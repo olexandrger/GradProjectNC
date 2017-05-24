@@ -20,6 +20,7 @@ public class FrontendCategory {
     public Category toModel() {
         return Category.builder()
                 .categoryId(getCategoryId())
+                .categoryName(getCategoryName())
                 .build();
     }
 }

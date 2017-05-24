@@ -1,50 +1,48 @@
 var domains = [];
 var authorizedUser;
-var allUsers = [];
 
 var selected = -1;
 var numberOfAdded = 0;
+
+var map;
+var marker;
+var infowindow;
+var standartGooglePlaceId = "ChIJjw5wVMHZ0UAREED2iIQGAQA"; //Ukraine
 
 function addDomain() {
     var $newDomainName = $("#new-domain-name");
     var domainName = $newDomainName.val();
     var $list = $("#domain-list");
-    $("#new-domain-alert").remove();
-    if (domainName == "") {
+    if (isDomainNameUnique(domainName)) {
+        $("#new-domain-alert").remove();
+        if (domainName == "") {
+            $('<div id="new-domain-alert" class="alert alert-danger" role="alert">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                'Can not add empty name </div>').insertAfter($list);
+        } else {
+            $list.append($('<a class="list-group-item active" onclick = selectItem(getIndexOfDomainByName(this.innerText))>' + domainName + '</a>'));
+            var id = -(++numberOfAdded);
+            var index = domains.length;
+
+            domains.push({
+                domainId: id,
+                domainName: domainName,
+                domainType: "",
+                regionName: "",
+                googlePlaceId: "",
+                apartment: "",
+                users: [],
+                productInstances: []
+            });
+            addAuthorizedUser();
+            selectItem(index);
+        }
+        $newDomainName.val("");
+    } else {
         $('<div id="new-domain-alert" class="alert alert-danger" role="alert">' +
             '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-            'Can not add empty name </div>').insertAfter($list);
-    } else {
-        $list.append($('<a class="list-group-item active" onclick = selectItem(getIndexOfDomainByName(this.innerText))>'+domainName+'</a>'));
-        var id = -(++numberOfAdded);
-        var index = domains.length;
-
-        // var $domain = document.createElement("a");
-        // //need get id from DB
-        // var id = -(++numberOfAdded);
-        // $domain.appendChild(document.createTextNode(domainName));
-        // $domain.className = "list-group-item";
-        // var index = domains.length;
-        // $domain.onclick = function () {
-        //     selectItem(getIndexOfDomainByName(domainName));
-        // };
-        // $list.append($domain);
-
-        domains.push({
-            id: id,
-            name: domainName,
-            type: "",
-            region: "",
-            city: "",
-            street: "",
-            building: "",
-            apartment: "",
-            users: []
-        });
-        addAuthorizedUser();
-        selectItem(index);
+            'Not unique name of domain </div>').insertAfter($list);
     }
-    $newDomainName.val("");
 }
 
 function addAuthorizedUser() {
@@ -65,7 +63,9 @@ function addAuthorizedUser() {
                 lastName: data.lastName
             };
             $addUser(authorizedUser);
-            domains[selected].users.push(authorizedUser);
+            if (selected != -1) {
+                domains[selected].users.push(authorizedUser);
+            }
             console.log("authorizedUser in ajax");
             console.log(JSON.stringify(authorizedUser));
         },
@@ -81,35 +81,42 @@ function addAuthorizedUser() {
 function addUser() {
     var $userEmailInput = $("#user-email-input");
     var email = $userEmailInput.val();
-    $userEmailInput.val("");
     $("#new-user-alert").remove();
-    $.ajax({
-        type: "GET",
-        url: "/api/client/domains/get/user?email=" + email,
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-        },
-        dataType: 'json',
-        success: function (data) {
-            console.log(JSON.stringify(data));
-            user = {
-                userId: data.userId,
-                email: data.email,
-                firstName: data.firstName,
-                lastName: data.lastName
-            };
-            $addUser(user);
-            domains[selected].users.push(user);
-            console.log("user in ajax");
-            console.log(JSON.stringify(user));
-        },
-        error: function (e) {
-            console.log(JSON.stringify(e));
-            $('<div id="new-user-alert" class="alert alert-danger" role="alert">' +
-                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                'Can not find user with this e-mail </div>').insertBefore($('table'));
-        }
-    });
+    if (isUserEmailUnique(email)) {
+        $userEmailInput.val("");
+        $("#new-user-alert").remove();
+        $.ajax({
+            type: "GET",
+            url: "/api/client/domains/get/user?email=" + email,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log(JSON.stringify(data));
+                user = {
+                    userId: data.userId,
+                    email: data.email,
+                    firstName: data.firstName,
+                    lastName: data.lastName
+                };
+                $addUser(user);
+                domains[selected].users.push(user);
+                console.log("user in ajax");
+                console.log(JSON.stringify(user));
+            },
+            error: function (e) {
+                console.log(JSON.stringify(e));
+                $('<div id="new-user-alert" class="alert alert-danger" role="alert">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                    'Can not find user with this e-mail </div>').insertBefore($('table'));
+            }
+        });
+    } else {
+        $('<div id="new-user-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'This user already in table </div>').insertBefore($('table'));
+    }
 }
 
 function $addUser(user) {
@@ -201,7 +208,7 @@ function getIndexOf$Domain($domain) {
 function getIndexOfDomainByName(name) {
     var index;
     domains.forEach(function (domain, i) {
-        if (name == domain.name) {
+        if (name == domain.domainName) {
             index = i;
         }
     });
@@ -214,9 +221,8 @@ function get$DomainByIndex(index) {
 }
 
 function changeDomainType() {
-    //need changes
     var $domainTypeSelector = $("#domain-type-selector");
-    domains[selected].type = $domainTypeSelector.val();
+    domains[selected].domainType = $domainTypeSelector.val();
 }
 
 function selectItem(index) {
@@ -224,7 +230,8 @@ function selectItem(index) {
     console.log("index" + index);
 
     $(".user-info").remove();
-    if(selected == -1){
+    $("#new-user-alert").remove();
+    if (selected == -1) {
         $("#domain-editor").removeClass("hidden");
         $domain = get$DomainByIndex(index);
         $domain.addClass("active");
@@ -234,84 +241,86 @@ function selectItem(index) {
         $domain[0].textContent = $("#domain-name-input").val();
         $domain = get$DomainByIndex(index);
         $domain.addClass("active");
-        domains[selected].name = $("#domain-name-input").val();
-        domains[selected].type = $("#domain-type-selector").val();
-        domains[selected].city = $("#domain-city-input").val();
-        domains[selected].street = $("#domain-street-input").val();
-        domains[selected].building = $("#domain-building-input").val();
+        domains[selected].domainName = $("#domain-name-input").val();
+        domains[selected].domainType = $("#domain-type-selector").val();
         domains[selected].apartment = $("#domain-apartment-input").val();
         //saveUsers(selected);
     }
-    if(index != -1){
-        $("#domain-name-input").val(domains[index].name);
-        $("#domain-type-selector").val(domains[index].type);
-        $("#domain-city-input").val(domains[index].city);
-        $("#domain-street-input").val(domains[index].street);
-        $("#domain-building-input").val(domains[index].building);
+    if (index != -1) {
+        if (domains[index].googlePlaceId == "") {
+            geocodePlaceId(map, infowindow, standartGooglePlaceId);
+        } else {
+            geocodePlaceId(map, infowindow, domains[index].googlePlaceId);
+        }
+        $("#domain-name-input").val(domains[index].domainName);
+        $("#domain-type-selector").val(domains[index].domainType);
         $("#domain-apartment-input").val(domains[index].apartment);
         loadUsers(index);
     } else {
+        geocodePlaceId(map, infowindow, standartGooglePlaceId);
         $("#domain-name-input").val("");
         $("#domain-type-selector").val("");
-        $("#domain-city-input").val("");
-        $("#domain-street-input").val("");
-        $("#domain-building-input").val("");
         $("#domain-apartment-input").val("");
     }
 
     selected = index;
     if (selected == -1) {
         $("#user-editor").addClass("hidden");
+        $("#domain-name-input").attr("readonly", "readonly");
+        $("#domain-type-selector").attr("disabled", "disabled");
+        $("#domain-apartment-input").attr("readonly", "readonly");
+        $("#pac-input").addClass("hidden");
+        $("#save-delete-buttons").addClass("hidden");
     } else {
         $("#user-editor").removeClass("hidden");
+        $("#domain-name-input").removeAttr("readonly");
+        $("#domain-type-selector").removeAttr("disabled");
+        $("#domain-apartment-input").removeAttr("readonly");
+        $("#pac-input").removeClass("hidden");
+        $("#save-delete-buttons").removeClass("hidden");
     }
+}
 
+function isDomainNameUnique(domainName) {
+    var unique = true;
+    domains.forEach(function (domain, i) {
+        if (domain.domainName == domainName) {
+            unique = false;
+        }
+    })
+    console.log(unique);
+    return unique;
+}
 
-    // console.log("Selected " + selected);
-    // console.log("index" + index);
-    // if (selected == -1) {
-    //     $("#domain-editor").removeClass("hidden");
-    // }
-    // if (index == -1) {
-    //     $("#domain-editor").addClass("hidden");
-    // }
-    // $(".user-info").remove();
-    //
-    // var $domain = get$DomainByIndex(selected);
-    // //console.log($domain != null);
-    // if ($domain != null) {
-    //     $domain.removeClass("active");
-    //     $domain = get$DomainByIndex(index);
-    //     $domain.addClass("active");
-    //     //save prev active domain
-    //     if (selected != -1) {
-    //         domains[selected].name = $("#domain-name-input").val();
-    //         domains[selected].type = $("#domain-type-selector").val();
-    //         domains[selected].region = $("#domain-region-input").val();
-    //         domains[selected].city = $("#domain-city-input").val();
-    //         domains[selected].street = $("#domain-street-input").val();
-    //         domains[selected].building = $("#domain-building-input").val();
-    //         domains[selected].apartment = $("#domain-apartment-input").val();
-    //         saveUsers(selected);
-    //     }
-    // }
-    //
-    // //load new active domain
-    // $("#domain-name-input").val(domains[index].name);
-    // $("#domain-type-selector").val(domains[index].type);
-    // $("#domain-region-input").val(domains[index].region);
-    // $("#domain-city-input").val(domains[index].city);
-    // $("#domain-street-input").val(domains[index].street);
-    // $("#domain-building-input").val(domains[index].building);
-    // $("#domain-apartment-input").val(domains[index].apartment);
-    // loadUsers(index);
-    //
-    // selected = index;
-    // if (selected == -1) {
-    //     $("#user-editor").addClass("hidden");
-    // } else {
-    //     $("#user-editor").removeClass("hidden");
-    // }
+function isUserEmailUnique(email) {
+    var unique = true;
+    domains[selected].users.forEach(function (user, i) {
+        if (user.email == email) {
+            unique = false;
+        }
+    })
+    console.log(unique);
+    return unique;
+}
+
+function changeDomainName() {
+    var $domainNameInput = $("#domain-name-input");
+    domainName = $domainNameInput.val();
+    $list = $("#domain-list")
+    if (domainName == "") {
+        $('<div id="domain-name-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'Domain must have not empty name </div>').insertAfter($list);
+    } else if (isDomainNameUnique(domainName)) {
+        domains[selected].domainName = domainName;
+        selectItem(selected);
+        $("#domain-name-alert").remove();
+    } else {
+        $('<div id="new-domain-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'Domain with this name already exists </div>').insertAfter($list);
+        $domainNameInput.val(domains[selected].domainName);
+    }
 }
 
 function saveUsers(index) {
@@ -332,51 +341,65 @@ function loadUsers(index) {
 function saveDomain() {
     selectItem(selected);
     var domain = domains[selected];
-    var frontendDomain = {
-        domainId: domain.id,
-        domainName: domain.name,
-        regionId: domain.region,
-        address: {
-            city: domain.city,
-            street: domain.street,
-            building: domain.building,
-            apartment: domain.apartment
-        },
-        domainType: {
-            categoryId: 6,
-            categoryName: domain.type
-        },
-        users: domain.users
-    };
-    console.log(JSON.stringify(frontendDomain));
-    //console.log($('meta[name=_csrf]').attr("content"));
-    $.ajax({
-        type: "POST",
-        url: "/api/client/domains/update",
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content"),
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        processData: false,
-        contentType: "application/json",
-        data: JSON.stringify(frontendDomain),
-        //dataType: 'json',
-        success: function (data) {
-            console.log(JSON.stringify(data));
-            console.log(parseInt(data.domainId));
-            if (domains[selected].id < 0) {
-                domains[selected].id = parseInt(data.domainId);
+    $("#save-domain-alert").remove();
+    if (domain.domainName == "" || domain.domainType == "" || domain.googlePlaceId == "") {
+        $('<div id="save-domain-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            'Domain name, domain type and domain location are required </div>').insertAfter($("#domain-list"));
+    } else {
+        var frontendDomain = {
+            domainId: domain.domainId,
+            domainName: domain.domainName,
+            domainType: {
+                categoryId: null,
+                categoryName: domain.domainType
+            },
+            address: {
+                addressId: null,
+                apartment: domain.apartment,
+                location: {
+                    locationId: null,
+                    googlePlaceId: domain.googlePlaceId,
+                    region: {
+                        regionId: null,
+                        regionName: domain.regionName
+                    }
+                }
+            },
+            users: domain.users,
+            productInstances: domain.productInstances
+        };
+        console.log(JSON.stringify(frontendDomain));
+        //console.log($('meta[name=_csrf]').attr("content"));
+        $.ajax({
+            type: "POST",
+            url: "/api/client/domains/update",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content"),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            processData: false,
+            contentType: "application/json",
+            data: JSON.stringify(frontendDomain),
+            //dataType: 'json',
+            success: function (data) {
+                console.log(JSON.stringify(data));
+                console.log(parseInt(data.domainId));
+                if (domains[selected].domainId < 0) {
+                    domains[selected].domainId = parseInt(data.domainId);
+                }
+                console.log(domains[selected].id);
+            },
+            error: function (e) {
+                console.log(JSON.stringify(e));
             }
-            console.log(domains[selected].id);
-        },
-        error: function (e) {
-            console.log(JSON.stringify(e));
-        }
-    });
+        });
+    }
 }
 
 function deleteDomain() {
+    $("#delete-domain-alert").remove();
     $.ajax({
         type: "POST",
         url: "/api/client/domains/delete",
@@ -385,7 +408,7 @@ function deleteDomain() {
         },
         processData: false,
         contentType: "application/json",
-        data: JSON.stringify({id: domains[selected].id}),
+        data: JSON.stringify({id: domains[selected].domainId}),
         //dataType: 'json',
         success: function (data) {
             delete$Domain();
@@ -394,6 +417,9 @@ function deleteDomain() {
         },
         error: function (e) {
             console.log(JSON.stringify(e));
+            $('<div id="delete-domain-alert" class="alert alert-danger" role="alert">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                'Can not delete domain </div>').insertAfter($("#domain-list"));
         }
     });
 }
@@ -402,12 +428,130 @@ function delete$Domain() {
     domains.splice(selected, 1);
     $("#domain-list>.active").remove();
     selected = -1;
-    selectItem(domains.length-1);
+    selectItem(domains.length - 1);
 
     // domains.splice(selected, 1);
     // $("#domain-list>.active").remove();
     // selected = -1;
     // selectItem(selected);
+}
+
+function initMap() {
+    console.log('iniMap()');
+
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 48.379433, lng: 31.16558},
+        zoom: 5
+    });
+
+    var input = document.getElementById('pac-input');
+
+    var autocomplete = new google.maps.places.Autocomplete(input);
+    autocomplete.bindTo('bounds', map);
+
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    infowindow = new google.maps.InfoWindow();
+    marker = new google.maps.Marker({
+        map: map
+    });
+    marker.addListener('click', function () {
+        infowindow.open(map, marker);
+    });
+
+    autocomplete.addListener('place_changed', function () {
+        infowindow.close();
+        var place = autocomplete.getPlace();
+        if (!place.geometry) {
+            return;
+        }
+
+        if (place.geometry.viewport) {
+            map.fitBounds(place.geometry.viewport);
+        } else {
+            map.setCenter(place.geometry.location);
+            map.setZoom(17);
+        }
+
+        // Set the position of the marker using the place ID and location.
+        marker.setPlace({
+            placeId: place.place_id,
+            location: place.geometry.location
+        });
+        marker.setVisible(true);
+
+
+        infowindow.open(map, marker);
+        infowindow.setContent(document.getElementById('infowindow-content'));
+
+        document.getElementById('place-name').textContent = place.name;
+        document.getElementById('place-id').textContent = place.place_id;
+        document.getElementById('place-address').textContent =
+            place.formatted_address;
+
+        console.log('content is setted');
+        console.log('place_id' + place.place_id);
+        console.log('standart place:' + place.place_id == standartGooglePlaceId);
+
+        //writting info to domains
+        if (place.place_id != standartGooglePlaceId) {
+            domains[selected].googlePlaceId = place.place_id;
+            place.address_components.forEach(function (component, i) {
+                if (component.types.indexOf("administrative_area_level_1") != -1) {
+                    switch (component.long_name) {
+                        case 'Kyiv city':
+                            domains[selected].regionName = 'Kyivs\'ka oblast';
+                            break;
+                        case 'Sevastopol\' city':
+                            domains[selected].regionName = 'Crimea';
+                            break;
+                        default:
+                            console.log(component.long_name);
+                            domains[selected].regionName = component.long_name;
+                    }
+                }
+            })
+        }
+    });
+}
+
+function geocodePlaceId(map, infowindow, placeId) {
+    console.log('placeId = ' + placeId);
+    var geocoder = new google.maps.Geocoder;
+    infowindow.close();
+    geocoder.geocode({'placeId': placeId}, function (results, status) {
+        if (status === 'OK') {
+            if (results[0]) {
+                if (placeId != standartGooglePlaceId) {
+                    map.setZoom(11);
+                    map.setCenter(results[0].geometry.location);
+                    marker.setPlace({
+                        placeId: placeId,
+                        location: results[0].geometry.location
+                    })
+                    marker.setVisible(true);
+
+                    infowindow.open(map, marker);
+                    //old content
+                    //infowindow.setContent(results[0].formatted_address);
+                    //new content
+                    infowindow.setContent(document.getElementById('infowindow-content'));
+
+                    document.getElementById('place-name').textContent = results[0].address_components[0].long_name;
+                    document.getElementById('place-id').textContent = placeId;
+                    document.getElementById('place-address').textContent = results[0].formatted_address;
+                } else {
+                    map.setCenter({lat: 48.379433, lng: 31.16558});
+                    map.setZoom(5);
+                }
+
+            } else {
+                window.alert('No results found');
+            }
+        } else {
+            window.alert('Geocoder failed due to: ' + status);
+        }
+    });
 }
 
 function loadUserDomains() {
@@ -420,15 +564,14 @@ function loadUserDomains() {
             console.log(JSON.stringify(data));
             data.forEach(function (domain, i) {
                 domains.push({
-                    id: domain.domainId,
-                    name: domain.domainName,
-                    type: domain.domainType.categoryName,
-                    region: domain.regionId,
-                    city: domain.address.city,
-                    street: domain.address.street,
-                    building: domain.address.building,
+                    domainId: domain.domainId,
+                    domainName: domain.domainName,
+                    domainType: domain.domainType.categoryName,
+                    regionName: domain.address.location.region.regionName,
+                    googlePlaceId: domain.address.location.googlePlaceId,
                     apartment: domain.address.apartment,
-                    users: domain.users != null ? domain.users : []
+                    users: domain.users != null ? domain.users : [],
+                    productInstances: domain.productInstances != null ? domain.productInstances : []
                 });
                 numberOfAdded++;
                 //add to html
@@ -438,7 +581,7 @@ function loadUserDomains() {
                 var $domain = document.createElement("a");
                 //need get id from DB
                 var id = -(++numberOfAdded);
-                var domainName = domains[i].name;
+                var domainName = domains[i].domainName;
                 $domain.appendChild(document.createTextNode(domainName));
                 $domain.className = "list-group-item";
                 var index = domains.length;
@@ -454,25 +597,7 @@ function loadUserDomains() {
     });
 }
 
-
-//don't need only for tests
-function loadAllUsers() {
-    allUsers.push({
-        userId: 29,
-        email: "melnyk@gmail.com",
-        firstName: "andrey",
-        lastName: "melnyk"
-    });
-
-    allUsers.push({
-        userId: 666,
-        email: "pupkin@gmail.com",
-        firstName: "vasya",
-        lastName: "pupkin"
-    });
-}
-
 $(document).ready(function () {
-    loadAllUsers();
+    addAuthorizedUser();
     loadUserDomains();
 });

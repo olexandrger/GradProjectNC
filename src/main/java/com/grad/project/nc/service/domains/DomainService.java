@@ -8,13 +8,11 @@ import java.util.List;
 public interface DomainService {
     Domain find(Long id);
 
-    List<Domain> findByUserId(Long id);
+    List<Domain> getAllDomains(Long id);
 
     void add(Domain domain);
 
     void update(Domain domain);
 
     void delete(Domain domain);
-
-    Domain convertFrontendDomainToDomain(FrontendDomain frontendDomain);
 }
