@@ -1,10 +1,7 @@
 package com.grad.project.nc.controller.api.dto.instance;
 
 
-import com.grad.project.nc.controller.api.dto.FrontendCategory;
-import com.grad.project.nc.controller.api.dto.FrontendComplain;
-import com.grad.project.nc.controller.api.dto.FrontendDomain;
-import com.grad.project.nc.controller.api.dto.FrontendOrder;
+import com.grad.project.nc.controller.api.dto.*;
 import com.grad.project.nc.model.ProductInstance;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +18,7 @@ public class FrontendInstance {
     private FrontendInstancePrice price;
     private FrontendInstanceProduct product;
 //    private FrontendDomain domain;
+    private FrontendAddress address;
     private FrontendCategory status;
 
     private List<FrontendOrder> productOrders;
@@ -31,6 +29,7 @@ public class FrontendInstance {
                 .price(FrontendInstancePrice.fromEntity(instance.getPrice()))
                 .product(FrontendInstanceProduct.fromEntity(instance.getPrice().getProduct()))
 //                .domain(FrontendDomain.fromEntity(instance.getDomain()))
+                .address(FrontendAddress.fromEntity(instance.getDomain().getAddress()))
                 .status(FrontendCategory.fromEntity(instance.getStatus()))
                 .productOrders(instance.getProductOrders().stream().map(FrontendOrder::fromEntity).collect(Collectors.toList()))
                 .build();

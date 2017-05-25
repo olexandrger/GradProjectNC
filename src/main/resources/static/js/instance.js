@@ -109,7 +109,7 @@ function loadInstance() {
             $("#instance-product-name").html(data.product.productName);
             $("#instance-status").html(data.status.categoryName);
             $("#instance-product-type").html(data.product.productType.productTypeName);
-            var address = data.domain.address;
+            var address = data.address;
             $("#instance-address").html(
                 address.street + ", " + address.building +
                 (address.apartment == undefined ? "" : " " + address.apartment)
