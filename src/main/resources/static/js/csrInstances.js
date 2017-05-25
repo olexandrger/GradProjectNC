@@ -121,7 +121,7 @@ function loadAllInstances() {
 
                     console.log(item);
                     var ref = document.createElement("a");
-                    var orderName = item.product.productName +" for "+ item.domain.domainName;
+                    var orderName = item.product.productName +" for "+ item.instanceId;
                     ref.appendChild(document.createTextNode(orderName));
                     ref.className = "list-group-item";
                     ref.href = "#";

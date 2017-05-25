@@ -139,6 +139,8 @@ public class OrdersServiceImpl implements OrdersService {
 
         Domain domain = domainDao.find(domainId);
 
+        log.info("dfhgsrtusffffffffffffffffffffffffffffffffffffffffffffffffj" +domainId );
+
         ProductRegionPrice price = productRegionPriceDao.find(
                 domain.getAddress().getLocation().getRegion().getRegionId(), productId);
 
