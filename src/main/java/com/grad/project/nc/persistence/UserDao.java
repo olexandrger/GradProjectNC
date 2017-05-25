@@ -27,6 +27,10 @@ public interface UserDao extends CrudDao<User> {
 
     List<User> findUsersByRegionId(int id);
 
+    public List<User> findByPhoneSorted(String sort, Long size, Long offset, String phone);
+
+    public List<User> findUsersByRegionIdAndPhoneSort(int id, String sort, Long size, Long offset, String phone);
+
     User findResponsibleByComplainId(Long complainId);
 
     User updateWithoutPassword(User user);

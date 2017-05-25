@@ -264,6 +264,7 @@ public class OrdersServiceImpl implements OrdersService {
         order.setStatus(categoryDao.find(ORDER_STATUS_CANCELLED));
         order.setCloseDate(OffsetDateTime.now());
 
+
         if (order.getOrderAim().getCategoryId() == ORDER_AIM_CREATE) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_DEACTIVATED));
             productInstanceDao.update(order.getProductInstance());

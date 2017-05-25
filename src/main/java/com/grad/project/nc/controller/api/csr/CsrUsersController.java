@@ -1,12 +1,10 @@
 package com.grad.project.nc.controller.api.csr;
 
 import com.grad.project.nc.controller.api.dto.FrontendUser;
+import com.grad.project.nc.model.User;
 import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -44,5 +42,30 @@ public class CsrUsersController {
             return userService.findAllUsersSorted(sort, size, offset).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
         }
         return userService.findUsersByRegionIdSorted(region, sort, size, offset).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/find/all", method = RequestMethod.GET)
+    Collection<FrontendUser> getUsersByParams(@RequestParam(value = "size") Long size,
+                                              @RequestParam(value = "offset") Long offset,
+                                              @RequestParam(value = "regionId") int regionId,
+                                              @RequestParam(value = "sort") String sort,
+                                              @RequestParam(value = "phone", required = false) String phone
+                                              ){
+        Collection<FrontendUser> frontendUser;
+        if (regionId == 0){
+            if (phone.length() > 0){
+                frontendUser = userService.findAllUsersByPhoneSorted(sort, size, offset, phone).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+            }else {
+                frontendUser = userService.findAllUsersSorted(sort, size, offset).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+            }
+        }
+        else {
+            if (phone.length() > 0){
+                frontendUser = userService.findUsersByRegionIdAndPhoneSorted(regionId, sort, size, offset, phone).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+            }else {
+                frontendUser = userService.findUsersByRegionIdSorted(regionId, sort, size, offset).stream().map(FrontendUser::fromEntity).collect(Collectors.toList());
+            }
+        }
+        return frontendUser;
     }
 }

@@ -10,15 +10,23 @@ import java.util.Collection;
  * Created by Alex on 5/16/2017.
  */
 public interface DiscountService {
-     Collection<Discount> getDiscounts();
-     Collection<Discount> getDiscountsPage(Long size, Long offset);
-     Collection<Region> getRegions();
-     Collection<ProductRegionPrice> getProductsRegionPricesForRegion(Long regionId);
-     Boolean add(Discount discount);
-     Boolean update(Discount discount);
+    Collection<Discount> getDiscounts();
 
-     String getStatus();
-     String getMessage();
-     Long getAddedDiscountId();
+    Collection<Discount> getDiscountsPage(Long size, Long offset);
 
+    Collection<Region> getRegions();
+
+    Collection<ProductRegionPrice> getProductsRegionPricesForRegion(Long regionId);
+
+    Boolean add(Discount discount);
+
+    Boolean update(Discount discount);
+
+    String getStatus();
+
+    String getMessage();
+
+    Long getAddedDiscountId();
+
+    Discount findLargestDiscountByPriceId(Long priceId);
 }

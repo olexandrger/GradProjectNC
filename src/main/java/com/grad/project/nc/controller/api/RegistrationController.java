@@ -2,6 +2,7 @@ package com.grad.project.nc.controller.api;
 
 import com.grad.project.nc.controller.api.data.RegistrationResponseHolder;
 import com.grad.project.nc.model.User;
+import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.AutoLoginService;
 import com.grad.project.nc.service.security.RegistrationService;
@@ -49,14 +50,15 @@ public class RegistrationController {
 
         RegistrationResponseHolder registrationResponse = new RegistrationResponseHolder();
 
-        if (!registrationService.register(user)) {
-            registrationResponse.setMessage(registrationService.getMessageError());
-        } else {
+        try {
+            registrationService.validation(user);
+            registrationService.register(user);
             registrationResponse.setMessage("You've been registered successfully");
             emailService.sendRegistrationEmail(user);
             autoLoginService.autologin(user.getEmail(), user.getPassword());
+        } catch (IncorrectUserDataException e) {
+            registrationResponse.setMessage(e.getMessage());
         }
-
         registrationResponse.setStatus(registrationService.getStatus());
 
         return registrationResponse;

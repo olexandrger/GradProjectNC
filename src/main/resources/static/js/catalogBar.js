@@ -1,6 +1,6 @@
 function loadCategories() {
     $.ajax({
-        url: "/api/user/productTypes/all",
+        url: "/api/user/productTypes/active",
         success: function (data) {
             console.log("Product types loaded");
             var productTypeList = $("#catalog-product-types-list");

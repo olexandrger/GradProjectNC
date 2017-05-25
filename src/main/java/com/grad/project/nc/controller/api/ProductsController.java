@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,7 +31,7 @@ public class ProductsController {
     //restful endpoint for product catalog
     @RequestMapping(value = "/byRegion/{id}", method = RequestMethod.GET)
     public List<FrontendCatalogProduct> getByRegion(@PathVariable("id") Long id) {
-        return productService.findActiveProductsByRegionId(id)
+        return productService.findCatalogProductsByRegionId(id)
                 .stream()
                 .map(FrontendCatalogProduct::fromEntity)
                 .collect(Collectors.toList());
@@ -54,7 +53,7 @@ public class ProductsController {
     public Page<FrontendProduct> getPaginated(@RequestParam("page") int page, @RequestParam("amount") int amount) {
         Page<Product> productPage = productService.findPaginated(page, amount);
 
-        List<FrontendProduct> content = productService.findPaginated(page, amount).getContent()
+        List<FrontendProduct> content = productPage.getContent()
                 .stream()
                 .map(FrontendProduct::fromEntity)
                 .collect(Collectors.toList());
@@ -81,7 +80,9 @@ public class ProductsController {
             method = RequestMethod.GET
     )
     public List<TypeaheadItem> fetchProductTypeaheadItemsByQuery(@RequestParam("query") String query) {
-        //TODO implement
-        return null;
+        return productService.findByNameContaining(query)
+                .stream()
+                .map(product -> new TypeaheadItem(product.getProductId(), product.getProductName()))
+                .collect(Collectors.toList());
     }
 }

@@ -1,3 +1,11 @@
+var ordersListSize = 10;
+var ordersListCurrentPage = 0;
+var ordersData;
+const ORDER_STATUS_CREATED = "CREATED";
+const ORDER_STATUS_IN_PROGRESS = "IN_PROGRESS";
+const ORDER_STATUS_CANCELLED = "CANCELLED";
+const ORDER_STATUS_COMPLETED = "COMPLETED";
+
 function saveChange() {
     var user = {};
     user.firstName = $("#mf1").val();
@@ -104,6 +112,225 @@ function showInfo(data) {
 }
 
 
+function selectOrder(index) {
+    if (index == -1) {
+        $("#order-main").addClass("hidden");
+    } else {
+        $("#order-main").removeClass("hidden");
+    }
+
+    selectedOrder = index;
+
+    var list = $("#csr-orders-list");
+
+    list.find("a").removeClass("active");
+    list.find("a:nth-child(" + (index + 1) + ")").addClass("active");
+
+    if (selectedOrder != -1) {
+        list.find("a:nth-child(" + (index + 1) + ")").find("span").text(ordersData[selectedOrder].status);
+
+        var span = list.find("a:nth-child(" + (index + 1) + ")").find("span").get(0);
+        span.className = "label orders-list ";
+        span.className += getLabelName(ordersData[selectedOrder].status);
+
+        $("#order-user-name").val(ordersData[selectedOrder].userName);
+        $("#order-aim").val(ordersData[selectedOrder].orderAim);
+        $("#order-status").val(ordersData[selectedOrder].status);
+        $("#order-start-date").val(moment.unix(ordersData[selectedOrder].openDate).format("LLL"));
+        if (ordersData[selectedOrder].closeDate != null) {
+            $("#order-end-date").val(moment.unix(ordersData[selectedOrder].closeDate).format("LLL"));
+        } else {
+            $("#order-end-date").val("");
+        }
+
+        var domainSelector = $('#order-domain');
+        var productSelector = $('#order-product');
+
+
+        if (ordersData[selectedOrder].orderAim == ORDER_AIM_CREATE && ordersData[selectedOrder].status == ORDER_STATUS_CREATED) {
+            domainSelector.prop("disabled", false);
+            productSelector.prop("disabled", false);
+        } else {
+            domainSelector.prop("disabled", true);
+            productSelector.prop("disabled", true);
+        }
+
+        if (ordersData[selectedOrder].possibleDomains == null) {
+            domainSelector.get(0).parentNode.style.display = "none";
+        } else {
+            domainSelector.get(0).parentNode.style.display = "block";
+            domainSelector.empty();
+            for (var domainId in ordersData[selectedOrder].possibleDomains) {
+                var domainHtml = "<option value='" + domainId + "' " +
+                    (domainId == ordersData[selectedOrder].domainId ? "selected" : "") + " >" +
+                    ordersData[selectedOrder].possibleDomains[domainId] +
+                    "</option>";
+                domainSelector.append($(domainHtml));
+            }
+        }
+
+        if (ordersData[selectedOrder].possibleProducts == null) {
+            productSelector.get(0).parentNode.style.display = "none";
+        } else {
+            productSelector.get(0).parentNode.style.display = "block";
+            productSelector.empty();
+            for (var productId in ordersData[selectedOrder].possibleProducts) {
+
+                var productHtml = "<option value='" + productId + "' " +
+                    (productId == ordersData[selectedOrder].productId ? "selected" : "") + " >" +
+                    ordersData[selectedOrder].possibleProducts[productId] +
+                    "</option>";
+                productSelector.append($(productHtml));
+            }
+        }
+
+
+        $(".order-button").addClass("hidden");
+
+        if (!(ordersData[selectedOrder].responsibleId == null || ordersData[selectedOrder].responsibleId == currentUserId)) {
+            domainSelector.prop("disabled", true);
+            productSelector.prop("disabled", true);
+        } else {
+            if (ordersData[selectedOrder].status == ORDER_STATUS_CREATED) {
+                $("#order-button-start").removeClass("hidden");
+                $("#order-button-cancel").removeClass("hidden");
+
+                if (ordersData[selectedOrder].orderAim == ORDER_AIM_CREATE) {
+                    $("#order-button-update").removeClass("hidden");
+                }
+            }
+            if (ordersData[selectedOrder].status == ORDER_STATUS_IN_PROGRESS) {
+                $("#order-button-complete").removeClass("hidden");
+                $("#order-button-cancel").removeClass("hidden");
+            }
+        }
+
+    }
+}
+
+function loadOrders() {
+    $.ajax({
+        url: "/api/client/orders/get/all/size/" + (ordersListSize + 1) + "/offset/" + ordersListCurrentPage * ordersListSize,
+        success: function (data) {
+            var list = $("#csr-orders-list");
+            list.empty();
+
+            console.log(data)
+            ordersData = data;
+
+            data.forEach(function (item, i) {
+                if (i < ordersListSize) {
+                    var ref = document.createElement("a");
+                    var orderName = item.orderAim + " " + item.productName + " #" + item.productOrderId;
+                    ref.appendChild(document.createTextNode(orderName));
+                    var span = document.createElement("span");
+                    span.className = "label orders-list ";
+                    span.className += getLabelName(item.status);
+                    span.appendChild(document.createTextNode(item.status));
+                    ref.appendChild(span);
+                    ref.className = "list-group-item";
+                    ref.href = "#";
+                    ref.onclick = function () {
+                        selectOrder(i);
+                    };
+
+                    list.append(ref);
+                }
+            });
+
+            var prevPage = $("#orders-page-previous");
+            var nextPage = $("#orders-page-next");
+            nextPage.addClass("hidden");
+            prevPage.addClass("hidden");
+            if (ordersListCurrentPage > 0) {
+                prevPage.removeClass("hidden");
+            }
+            if (data.length > ordersListSize) {
+                nextPage.removeClass("hidden");
+            }
+
+            selectOrder(-1);
+        },
+        error: function () {
+            console.error("Cannot load list product types");
+        }
+    });
+}
+
+function getLabelName(status) {
+    if (status == ORDER_STATUS_CREATED) {
+        return "label label-info orders-list";
+    } else if (status == ORDER_STATUS_IN_PROGRESS) {
+        return "label label-primary orders-list";
+    } else if (status == ORDER_STATUS_CANCELLED) {
+        return "label label-danger orders-list";
+    } else if (status == ORDER_STATUS_COMPLETED) {
+        return "label label-success orders-list";
+    }
+}
+
+function nextPage() {
+    ordersListCurrentPage++;
+    loadOrders();
+}
+
+function previousPage() {
+    ordersListCurrentPage--;
+    loadOrders();
+}
+
 $(document).ready(function () {
     loadInfo();
 });
+
+function loadAllInstances() {
+
+    $.ajax({
+        url: "/api/csr/instances/find/all",
+        success: function(data) {
+
+            var list = $("#instances-list");
+            list.empty();
+
+            instances = data;
+            data.forEach(function(item, i) {
+
+                console.log(item);
+                var ref = document.createElement("a");
+                var orderName = item.product.productName +" for "+ item.instanceId;
+                ref.appendChild(document.createTextNode(orderName));
+                ref.className = "list-group-item";
+                ref.href = "#";
+                ref.onclick = function () {
+                    selectInstance(i);
+                };
+                list.append(ref);
+
+            });
+
+
+        },
+        error: function () {
+            console.error("Cannot load list of users");
+        }
+    });
+
+}
+
+function selectInstance(i) {
+    instanceId = instances[i].instanceId;
+
+    location.href = "/client/instance/" + instanceId;
+/*
+    //clearDataFields();
+    console.log(JSON.stringify(instances[i].instanceId));
+    currentSelected = i;
+    loadInfo(instances[i].instanceId)
+
+    var ordersTable = $("#instance-orders-table");
+    ordersTable.find(".order-row").remove();
+    ordersPageNumber = 0;
+*/
+
+
+}

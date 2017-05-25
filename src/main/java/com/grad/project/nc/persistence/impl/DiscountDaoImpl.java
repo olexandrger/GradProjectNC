@@ -89,6 +89,18 @@ public class DiscountDaoImpl extends AbstractDao implements DiscountDao {
     }
 
     @Override
+    public Discount findLargestDiscountByPriceId(Long priceId) {
+        String findQuery = "SELECT d.\"discount_id\", d.\"discount_title\", d.\"discount\", " +
+                "d.\"start_date\", d.\"end_date\" FROM \"discount\" d " +
+                "JOIN \"discount_price\" dp " +
+                "ON d.\"discount_id\" = dp.\"discount_id\" AND dp.\"price_id\" = ? " +
+                "WHERE d.\"start_date\" < NOW() AND d.\"end_date\" > NOW() " +
+                "ORDER BY d.\"discount\" DESC LIMIT 1";
+
+        return findOne(findQuery, new DiscountRowMapper(), priceId);
+    }
+
+    @Override
     public Discount find(Long id) {
         String findOneQuery = "SELECT \"discount_id\", \"discount_title\", \"discount\", " +
                 "\"start_date\", \"end_date\" FROM \"discount\" WHERE \"discount_id\" = ?";

@@ -539,6 +539,23 @@ function loadRegions() {
     });
 }
 
+function getProductById(id) {
+    $.ajax({
+        type: 'GET',
+        url: '/api/user/products/get/' + id,
+        success: function (data) {
+            console.log("result of GET request to server: " + JSON.stringify(data));
+            productsCache = [data];
+
+            displayLoadedProducts();
+            selectProduct(0);
+        },
+        error: function (data) {
+            console.log("Error occurred. Cannot GET specified resource");
+        }
+    });
+}
+
 function setupTypeahead() {
     // Instantiate the Bloodhound suggestion engine
     var products = new Bloodhound({
@@ -552,8 +569,11 @@ function setupTypeahead() {
         }
     });
 
+    var $typeahead = $('.typeahead');
+    var $searchClear = $('#search-clear');
+
 // Instantiate the Typeahead UI
-    $('.typeahead').typeahead({
+    $typeahead.typeahead({
         hint: true,
         highlight: true,
         minLength: 1
@@ -561,6 +581,17 @@ function setupTypeahead() {
         name: 'products',
         display: 'name',
         source: products
+    }).on('typeahead:selected', function (obj, datum) {
+        $searchClear.removeClass('hide');
+        getProductById(datum.id);
+    });
+
+    //setup search clear button
+    $searchClear.click(function () {
+        $typeahead.typeahead('val', '');
+        $(this).addClass('hide');
+        var currentPage = +$pagination.find('li.active > a').text();
+        loadProductPage(currentPage, amount);
     });
 }
 

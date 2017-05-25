@@ -319,13 +319,13 @@
                                 <div class="form-group">
                                     <label for="new-region">Region</label>
                                     <select class="form-control" name="new-region" id="new-region"
-                                            onchange="loadUsers()">
+                                            onchange="clearPhoneField(); sortById(); loadUsers();">
                                     </select>
                                 </div>
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="phone" id="find-by-phone">
                                     <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" onclick="loadByPhone()">Find by phone<span class="glyphicon "></span></button></span>
+                                        <button type="button" class="btn btn-default" onclick="searchUsers()">Find by phone<span class="glyphicon "></span></button></span>
                                 </div>
                                 <div class="btn-group btn-group-justified" role="group">
                                     <div class="btn-group" role="group">

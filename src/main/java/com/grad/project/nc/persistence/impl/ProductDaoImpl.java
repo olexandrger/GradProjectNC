@@ -88,10 +88,10 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
 
     @Override
     public List<Product> findLastN(int n) {
-        String findAllQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
+        String findQuery = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
                 "\"product_type_id\" FROM \"product\" ORDER BY product_id DESC LIMIT ?";
 
-        return findMultiple(findAllQuery, new ProductRowMapper(), n);
+        return findMultiple(findQuery, new ProductRowMapper(), n);
     }
 
     @Override
@@ -118,6 +118,8 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
     public List<Product> findActiveByRegionId(Long regionId) {
         String query = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
                 "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
+                "JOIN \"product_type\" pt " +
+                "ON pt.\"product_type_id\" = p.\"product_type_id\" AND pt.\"is_active\" = true " +
                 "JOIN \"product_region_price\" prp " +
                 "ON p.\"product_id\" = prp.\"product_id\" " +
                 "WHERE prp.\"region_id\" =? AND p.\"is_active\" = true";
@@ -131,6 +133,16 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
                 "\"product_type_id\" FROM \"product\" WHERE \"product_name\"=?";
 
         return findOne(query, new ProductRowMapper(), productName);
+    }
+
+    @Override
+    public List<Product> findByNameContaining(String productName) {
+        String query = "SELECT \"product_id\", \"product_name\", \"product_description\", \"is_active\", " +
+                "\"product_type_id\" FROM \"product\" WHERE LOWER(\"product_name\") LIKE LOWER(?)";
+
+        String substr = "%" + productName + "%";
+
+        return findMultiple(query, new ProductRowMapper(), substr);
     }
 
     @Override
