@@ -39,6 +39,6 @@ public class InstanceServiceImpl implements InstanceService {
 
     @Override
     public Collection<ProductInstance> getByUserId(Long id) {
-        return productInstanceDao.findByUserId(id);
+         return productInstanceDao.findByUserId(id);
     }
 }
