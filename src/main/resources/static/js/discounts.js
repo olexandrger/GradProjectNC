@@ -284,6 +284,7 @@ function changeRegion() {
     var regionId= document.getElementById("discount-region-selector").value;
     $("#discount-product-selector").empty();
 
+
     $.ajax({
             type: 'GET',
             url: '/api/admin/discounts/productPricesForRegion',
