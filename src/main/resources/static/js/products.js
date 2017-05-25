@@ -582,14 +582,14 @@ function setupTypeahead() {
         display: 'name',
         source: products
     }).on('typeahead:selected', function (obj, datum) {
-        $searchClear.toggleClass('hide');
+        $searchClear.removeClass('hide');
         getProductById(datum.id);
     });
 
     //setup search clear button
     $searchClear.click(function () {
         $typeahead.typeahead('val', '');
-        $(this).toggleClass('hide');
+        $(this).addClass('hide');
         var currentPage = +$pagination.find('li.active > a').text();
         loadProductPage(currentPage, amount);
     });

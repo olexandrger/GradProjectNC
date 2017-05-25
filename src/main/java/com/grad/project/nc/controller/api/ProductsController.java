@@ -53,7 +53,7 @@ public class ProductsController {
     public Page<FrontendProduct> getPaginated(@RequestParam("page") int page, @RequestParam("amount") int amount) {
         Page<Product> productPage = productService.findPaginated(page, amount);
 
-        List<FrontendProduct> content = productService.findPaginated(page, amount).getContent()
+        List<FrontendProduct> content = productPage.getContent()
                 .stream()
                 .map(FrontendProduct::fromEntity)
                 .collect(Collectors.toList());
