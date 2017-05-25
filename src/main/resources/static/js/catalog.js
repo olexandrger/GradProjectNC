@@ -130,8 +130,14 @@ function loadDomainsData() {
 }
 
 function catalogChangeDomain(domainId) {
+
     //TODO display address
-    var price = getRegionalPrice(catalogDomains[domainId].regionId);
+    //Maybe this is wright
+     var price = getRegionalPrice(catalogDomains[domainId].address.location.region.regionId);
+
+
+
+
     if (price == "") {
         price = "Product unavailable in this region";
         $('#new-product-order-modal-submit').addClass("disabled");
@@ -144,7 +150,9 @@ function catalogChangeDomain(domainId) {
 
 function catalogSubmitOrder() {
 
-    var selectedDomainIndex = $("#catalog-domain-selector").val()[0];
+    //TODO Maybe this is wright
+    var selectedDomainIndex =document.getElementById("catalog-domain-selector").value;
+
 
     $.ajax({
         url: "/api/client/orders/new/create",

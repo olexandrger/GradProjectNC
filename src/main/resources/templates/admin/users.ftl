@@ -261,7 +261,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="domain-name">Name</label>
-                                                <input type="text" class="form-control" name="domain-name" placeholder="Domain name" id="domain-name-input" >
+                                                <input type="text" class="form-control" name="domain-name" placeholder="Domain name" id="domain-name-input" disabled >
                                             </div>
 
                                             <div class="form-group">

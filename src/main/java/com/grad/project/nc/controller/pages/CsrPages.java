@@ -21,4 +21,9 @@ public class CsrPages {
         return "/admin/report";
     }
 
+    @RequestMapping("/csr/instances")
+    public String instancesPage() {
+        return "/csr/csrInstances";
+    }
+
 }

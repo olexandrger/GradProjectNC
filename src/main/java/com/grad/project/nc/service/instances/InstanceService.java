@@ -8,5 +8,6 @@ public interface InstanceService {
     ProductInstance getById(Long id);
     boolean isInstanceOwnedBy(long instanceId, long userId);
     Collection<ProductInstance> getByDomainId(Long domainId);
+    Collection<ProductInstance> getAll();
 
 }
