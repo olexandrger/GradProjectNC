@@ -55,7 +55,7 @@ public class AdminUsersController {
             registrationResponse.setMessage(registrationService.getMessageError());
         } else {
             registrationResponse.setMessage("You've been registered successfully");
-            //emailService.sendRegistrationEmail(user);
+            emailService.sendRegistrationEmail(user);
         }
 
         registrationResponse.setStatus(registrationService.getStatus());
