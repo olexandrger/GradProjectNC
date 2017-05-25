@@ -118,6 +118,8 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
     public List<Product> findActiveByRegionId(Long regionId) {
         String query = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
                 "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
+                "JOIN \"product_type\" pt " +
+                "ON pt.\"product_type_id\" = p.\"product_type_id\" AND pt.\"is_active\" = true " +
                 "JOIN \"product_region_price\" prp " +
                 "ON p.\"product_id\" = prp.\"product_id\" " +
                 "WHERE prp.\"region_id\" =? AND p.\"is_active\" = true";

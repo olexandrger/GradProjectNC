@@ -103,6 +103,14 @@ public class ProductTypeDaoImpl extends AbstractDao implements ProductTypeDao {
     }
 
     @Override
+    public List<ProductType> findByActiveStatus(boolean isActive) {
+        String findQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
+                "\"is_active\" FROM \"product_type\" WHERE \"is_active\" = ?";
+
+        return findMultiple(findQuery, new ProductTypeRowMapper(), isActive);
+    }
+
+    @Override
     public List<ProductType> findPaginated(int page, int amount) {
         int offset = (page - 1) * amount;
         String findPaginatedQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +

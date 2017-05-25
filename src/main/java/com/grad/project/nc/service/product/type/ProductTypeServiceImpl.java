@@ -36,6 +36,14 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
 
     @Override
     @Transactional
+    public List<ProductType> findActive() {
+        List<ProductType> productTypes = productTypeDao.findByActiveStatus(true);
+        productTypes.forEach(pt -> pt.getProductCharacteristics().forEach(ProductCharacteristic::getDataType));
+        return productTypes;
+    }
+
+    @Override
+    @Transactional
     public List<ProductType> findLastN(int n) {
         return productTypeDao.findLastN(n);
     }

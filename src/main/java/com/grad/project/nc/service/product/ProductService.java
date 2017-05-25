@@ -16,5 +16,5 @@ public interface ProductService extends CrudService<Product> {
 
     List<Product> findByProductTypeId(Long productTypeId);
 
-    List<Product> findActiveProductsByRegionId(Long regionId);
+    List<Product> findCatalogProductsByRegionId(Long regionId);
 }

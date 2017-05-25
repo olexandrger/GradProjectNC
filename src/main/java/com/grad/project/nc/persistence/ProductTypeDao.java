@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface ProductTypeDao extends CrudDao<ProductType> {
 
+    List<ProductType> findByActiveStatus(boolean isActive);
+
     List<ProductType> findPaginated(int page, int amount);
 
     ProductType findByProductId(Long productId);

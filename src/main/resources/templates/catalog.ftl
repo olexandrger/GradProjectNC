@@ -15,6 +15,7 @@
 
 
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/catalog.css">
     <script src="/js/catalog.js"></script>
     <script src="https://momentjs.com/downloads/moment.js"></script>
 </head>
@@ -50,6 +51,13 @@
             <div class="row">
                 <div class="col-sm-12">
                     <a class="btn btn-primary active hidden" onclick="catalogCreateOrder()"  id="catalog-new-order-button">Order</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <ul id="pagination" class="pagination-xs"></ul>
+                    </div>
                 </div>
             </div>
         </div>

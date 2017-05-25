@@ -3,7 +3,6 @@ package com.grad.project.nc.service.discount;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.Region;
-import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.DiscountDao;
 import com.grad.project.nc.persistence.ProductRegionPriceDao;
 import com.grad.project.nc.persistence.RegionDao;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -20,8 +20,8 @@ import java.util.Collection;
 @Service
 public class DiscountServiceImpl implements DiscountService {
 
-    private CrudDao<Region> regionsDao;
-    private CrudDao<Discount> discountDao;
+    private RegionDao regionDao;
+    private DiscountDao discountDao;
     private ProductRegionPriceDao productRegionPriceDao;
 
     private String status;
@@ -33,8 +33,8 @@ public class DiscountServiceImpl implements DiscountService {
     private final String DISCOUNT_DATE = "Error! Start date must be before end date!";
 
     @Autowired
-    public DiscountServiceImpl(RegionDao regionsDao, DiscountDao discountDao, ProductRegionPriceDao productRegionPriceDao) {
-        this.regionsDao = regionsDao;
+    public DiscountServiceImpl(RegionDao regionDao, DiscountDao discountDao, ProductRegionPriceDao productRegionPriceDao) {
+        this.regionDao = regionDao;
         this.discountDao = discountDao;
         this.productRegionPriceDao = productRegionPriceDao;
     }
@@ -55,7 +55,7 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public Collection<Region> getRegions() {
 
-        return regionsDao.findAll();
+        return regionDao.findAll();
     }
 
 
@@ -167,5 +167,11 @@ public class DiscountServiceImpl implements DiscountService {
 
     public Long getAddedDiscountId() {
         return addedDiscountId;
+    }
+
+    @Override
+    @Transactional
+    public Discount findLargestDiscountByPriceId(Long priceId) {
+        return discountDao.findLargestDiscountByPriceId(priceId);
     }
 }

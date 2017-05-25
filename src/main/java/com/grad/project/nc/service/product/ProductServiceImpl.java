@@ -3,33 +3,37 @@ package com.grad.project.nc.service.product;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductCharacteristicValue;
 import com.grad.project.nc.model.ProductRegionPrice;
-import com.grad.project.nc.persistence.CrudDao;
-import com.grad.project.nc.persistence.ProductCharacteristicValueDao;
-import com.grad.project.nc.persistence.ProductDao;
-import com.grad.project.nc.persistence.ProductRegionPriceDao;
+import com.grad.project.nc.persistence.*;
 import com.grad.project.nc.service.AbstractService;
 import com.grad.project.nc.support.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ProductServiceImpl extends AbstractService<Product> implements ProductService {
 
-    private ProductDao productDao;
-    private ProductRegionPriceDao productRegionPriceDao;
-    private ProductCharacteristicValueDao productCharacteristicValueDao;
+    private final ProductDao productDao;
+    private final ProductRegionPriceDao productRegionPriceDao;
+    private final ProductCharacteristicValueDao productCharacteristicValueDao;
+
+    private final DiscountDao discountDao;
 
     @Autowired
     public ProductServiceImpl(ProductDao productDao,
                               ProductRegionPriceDao productRegionPriceDao,
-                              ProductCharacteristicValueDao productCharacteristicValueDao) {
+                              ProductCharacteristicValueDao productCharacteristicValueDao,
+                              DiscountDao discountDao) {
         this.productDao = productDao;
         this.productRegionPriceDao = productRegionPriceDao;
         this.productCharacteristicValueDao = productCharacteristicValueDao;
+        this.discountDao = discountDao;
     }
 
     @Override
@@ -164,9 +168,14 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
 
     @Override
     @Transactional
-    public List<Product> findActiveProductsByRegionId(Long regionId) {
+    public List<Product> findCatalogProductsByRegionId(Long regionId) {
         List<Product> products = productDao.findActiveByRegionId(regionId);
         loadProductHelper(products);
+
+        products.forEach(p -> p.getPrices()
+                .forEach(price ->
+                        price.setDiscounts(Collections.singletonList(discountDao
+                                .findLargestDiscountByPriceId(price.getPriceId())))));
 
         return products;
     }

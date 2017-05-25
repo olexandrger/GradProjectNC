@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface ProductTypeService extends CrudService<ProductType> {
 
+    List<ProductType> findActive();
+
     List<ProductType> findLastN(int n);
 
     List<ProductType> findByNameContaining(String productTypeName);

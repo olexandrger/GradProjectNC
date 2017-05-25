@@ -1,6 +1,5 @@
 package com.grad.project.nc.controller.api.dto.catalog;
 
-import com.grad.project.nc.controller.api.dto.FrontendPrice;
 import com.grad.project.nc.model.Product;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +18,7 @@ public class FrontendCatalogProduct {
     private Long productTypeId;
 
     private List<FrontendCatalogCharacteristicValue> productCharacteristicValues;
-    private List<FrontendPrice> prices;
+    private List<FrontendCatalogPrice> prices;
 
     public static FrontendCatalogProduct fromEntity(Product product) {
         return FrontendCatalogProduct.builder()
@@ -34,7 +33,7 @@ public class FrontendCatalogProduct {
                         .collect(Collectors.toList()))
                 .prices(product.getPrices()
                         .stream()
-                        .map(FrontendPrice::fromEntity)
+                        .map(FrontendCatalogPrice::fromEntity)
                         .collect(Collectors.toList()))
                 .build();
 

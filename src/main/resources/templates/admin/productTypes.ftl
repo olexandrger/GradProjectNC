@@ -66,12 +66,12 @@
                                   placeholder="Description" id="product-type-description-input"></textarea>
                     </div>
                     <div class="form-group">
-                        <label class="radio" for="product-type-status">Status</label>
+                        <label class="radio" for="product-type-status">Active status</label>
                         <div class="radio">
                             <label><input type="radio" value="true" name="product-type-status">Active</label>
                         </div>
                         <div class="radio">
-                            <label><input type="radio" value="false" name="product-type-status">Suspended</label>
+                            <label><input type="radio" value="false" name="product-type-status">Inactive</label>
                         </div>
                     </div>
                     <div class="form-group">

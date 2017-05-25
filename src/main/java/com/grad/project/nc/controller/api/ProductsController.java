@@ -31,7 +31,7 @@ public class ProductsController {
     //restful endpoint for product catalog
     @RequestMapping(value = "/byRegion/{id}", method = RequestMethod.GET)
     public List<FrontendCatalogProduct> getByRegion(@PathVariable("id") Long id) {
-        return productService.findActiveProductsByRegionId(id)
+        return productService.findCatalogProductsByRegionId(id)
                 .stream()
                 .map(FrontendCatalogProduct::fromEntity)
                 .collect(Collectors.toList());
