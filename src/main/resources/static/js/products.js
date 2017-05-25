@@ -164,7 +164,11 @@ function saveSelectedProduct() {
     var newProduct = {};
 
     newProduct.productId = productsCache[currentSelected].productId;
-    newProduct.productName = $("#product-name-input").val();
+    var productName = extractProductName();
+    if (productName == null) {
+        return
+    }
+    newProduct.productName = productName;
     newProduct.productDescription = $("#product-description-input").val();
     newProduct.isActive = ($('input[name=product-status]:checked').val() == 'true');
 
@@ -244,6 +248,26 @@ function saveSelectedProduct() {
                 .insertAfter($("#new-product-alert-place"));
         }
     });
+}
+
+function extractProductName() {
+    var productName = $("#product-name-input").val();
+    if (productName == '') {
+        $("#empty-product-name-alert").remove();
+        console.log("Error: Product name cannot be empty");
+
+        $('<div id="empty-product-name-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            "Please, specify product name, it cannot be empty</div>")
+            .delay(2000)
+            .fadeOut(function () {
+                $(this).remove();
+            })
+            .insertAfter($('#product-name-input'));
+
+        return null;
+    }
+    return productName;
 }
 
 function extractProductTypeId() {
