@@ -107,20 +107,74 @@ function addProductCharacteristic(id, name, measure, dataTypeId) {
         '</div>';
 
     var element = $(productCharacteristicHTML);
-    $("#product-type-values").append(element);
+    $("#characteristic-box").append(element);
 
     if (dataTypeId != undefined) {
         element.find('select[name="characteristic-dataTypeId"]').val(dataTypeId);
     }
 }
 
+function extractProductTypeName() {
+    var productTypeName = $("#product-type-name-input").val();
+    if (productTypeName == '') {
+        $("#empty-product-type-name-alert").remove();
+        console.log("Error: Product type name cannot be empty");
+
+        $('<div id="empty-product-type-name-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            "Please, specify product type name, it cannot be empty</div>")
+            .delay(2000)
+            .fadeOut(function () {
+                $(this).remove();
+            })
+            .insertAfter($('#product-type-name-input'));
+
+        return null;
+    }
+    return productTypeName;
+}
+
+function checkCharacteristicsNameInputs() {
+    var checkResult = true;
+    $("#product-type-values").find(".product-characteristic-input").each(function () {
+        if ($(this).find("input[name='characteristic-productName']").val() == '') {
+            checkResult = false;
+        }
+    });
+
+    if (!checkResult) {
+        $("#empty-product-type-char-name-measure-alert").remove();
+        console.log("Error: Product type characteristic name cannot be empty");
+
+        $('<div id="empty-product-type-char-name-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            "Please, specify product type characteristics names, it cannot be empty</div>")
+            .delay(2000)
+            .fadeOut(function () {
+                $(this).remove();
+            })
+            .insertAfter($('#characteristic-box:last-child'));
+    }
+
+    return checkResult;
+}
+
 function saveSelectedProductType() {
     var newProductType = {};
 
     newProductType.productTypeId = productTypesCache[currentSelected].productTypeId;
-    newProductType.productTypeName = $("#product-type-name-input").val();
+
+    var productTypeName = extractProductTypeName();
+    if (productTypeName == null) {
+        return;
+    }
+    newProductType.productTypeName = productTypeName;
     newProductType.productTypeDescription = $("#product-type-description-input").val();
     newProductType.isActive = ($('input[name=product-type-status]:checked').val() == 'true');
+
+    if (!checkCharacteristicsNameInputs()) {
+        return;
+    }
 
     newProductType.productCharacteristics = [];
     $("#product-type-values").find(".product-characteristic-input").each(function () {
