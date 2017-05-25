@@ -80,6 +80,7 @@
                             <span class="glyphicon glyphicon-plus"></span>Add
                         </a>
                     </div>
+                    <div id="characteristic-box"></div>
                 </div>
             </div>
             <div class="row">
