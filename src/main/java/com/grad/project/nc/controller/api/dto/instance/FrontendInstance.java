@@ -20,7 +20,7 @@ public class FrontendInstance {
     private Long instanceId;
     private FrontendInstancePrice price;
     private FrontendInstanceProduct product;
-    private FrontendDomain domain;
+//    private FrontendDomain domain;
     private FrontendCategory status;
 
     private List<FrontendOrder> productOrders;
@@ -30,7 +30,7 @@ public class FrontendInstance {
                 .instanceId(instance.getInstanceId())
                 .price(FrontendInstancePrice.fromEntity(instance.getPrice()))
                 .product(FrontendInstanceProduct.fromEntity(instance.getPrice().getProduct()))
-                .domain(FrontendDomain.fromEntity(instance.getDomain()))
+//                .domain(FrontendDomain.fromEntity(instance.getDomain()))
                 .status(FrontendCategory.fromEntity(instance.getStatus()))
                 .productOrders(instance.getProductOrders().stream().map(FrontendOrder::fromEntity).collect(Collectors.toList()))
                 .build();
