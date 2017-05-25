@@ -42,28 +42,29 @@
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#domain">Main information</a></li>
                         <li><a data-toggle="tab" href="#user-editor">Users</a></li>
+                        <li><a data-toggle="tab" href="#instances">Instances</a></li>
                     </ul>
                     <div class="tab-content">
                         <div class="col-sm-10 tab-pane fade in active" id="domain">
 
-                                <div class="form-group col-sm-6">
-                                    <label for="domain-name">Domain name</label>
-                                    <input type="text" class="form-control" name="domain-name" placeholder="Name"
-                                           id="domain-name-input" onchange="changeDomainName()" readonly>
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label for="domain-type">Domain type</label>
-                                    <select class="form-control" name="domain-type-value" id="domain-type-selector"
-                                            onchange="changeDomainType()" disabled>
-                                        <option value="PRIVATE">PRIVATE</option>
-                                        <option value="CORPORATIVE">CORPORATIVE</option>
-                                    </select>
-                                </div>
-                                <div class="form-group apartment-input col-sm-4">
-                                    <label for="domain-address">Apartment</label>
-                                    <input type="text" class="form-control" name="apartment" placeholder="Apartment"
-                                           id="domain-apartment-input" readonly>
-                                </div>
+                            <div class="form-group col-sm-6">
+                                <label for="domain-name">Domain name</label>
+                                <input type="text" class="form-control" name="domain-name" placeholder="Name"
+                                       id="domain-name-input" onchange="changeDomainName()" readonly>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="domain-type">Domain type</label>
+                                <select class="form-control" name="domain-type-value" id="domain-type-selector"
+                                        onchange="changeDomainType()" disabled>
+                                    <option value="PRIVATE">PRIVATE</option>
+                                    <option value="CORPORATIVE">CORPORATIVE</option>
+                                </select>
+                            </div>
+                            <div class="form-group apartment-input col-sm-4">
+                                <label for="domain-address">Apartment</label>
+                                <input type="text" class="form-control" name="apartment" placeholder="Apartment"
+                                       id="domain-apartment-input" readonly>
+                            </div>
 
                             <div class="form-group">
                                 <input id="pac-input" class="controls hidden" type="text"
@@ -91,6 +92,22 @@
                                         <th>First name</th>
                                         <th>Last name</th>
                                         <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 hidden tab-pane fade" id="instances">
+                            <div class="table-responsive" id="instance-table">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Product name</th>
+                                        <th>Status</th>
+                                        <th>Price</th>
+                                        <th>Link</th>
                                     </tr>
                                     </thead>
                                     <tbody>

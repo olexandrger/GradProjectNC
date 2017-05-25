@@ -24,17 +24,20 @@ public class DomainServiceImpl implements DomainService {
     private CategoryDao categoryDao;
     private RegionDao regionDao;
     private UserDao userDao;
+    private ProductInstanceDao productInstanceDao;
+    private ProductRegionPriceDao productRegionPriceDao;
     private LocationService locationService;
 
     @Autowired
-    public DomainServiceImpl(DomainDao domainDao, LocationDao locationDao, AddressDao addressDao,
-                             CategoryDao categoryDao, RegionDao regionDao, UserDao userDao, LocationService locationService) {
+    public DomainServiceImpl(DomainDao domainDao, LocationDao locationDao, AddressDao addressDao, CategoryDao categoryDao,
+                             RegionDao regionDao, UserDao userDao, ProductInstanceDao productInstanceDao, LocationService locationService) {
         this.domainDao = domainDao;
         this.locationDao = locationDao;
         this.addressDao = addressDao;
         this.categoryDao = categoryDao;
         this.regionDao = regionDao;
         this.userDao = userDao;
+        this.productInstanceDao = productInstanceDao;
         this.locationService = locationService;
     }
 
@@ -43,8 +46,6 @@ public class DomainServiceImpl implements DomainService {
         return domainDao.find(id);
     }
 
-
-    //TODO add instances
     @Override
     public void add(Domain domain) {
         domain.getAddress().getLocation().setRegion(
@@ -58,7 +59,6 @@ public class DomainServiceImpl implements DomainService {
         }
     }
 
-    //TODO delete instances
     @Override
     public void delete(Domain domain) {
         domain.getAddress().setLocation(locationDao.findAddressLocationById(domain.getAddress().getAddressId()));
@@ -68,7 +68,6 @@ public class DomainServiceImpl implements DomainService {
         locationDao.delete(domain.getAddress().getLocation().getLocationId());
     }
 
-    //TODO get all instances
     @Override
     public List<Domain> getAllDomains(Long id) {
         List<Domain> domains = domainDao.findByUserId(id);
@@ -79,11 +78,14 @@ public class DomainServiceImpl implements DomainService {
             domain.getAddress().getLocation().setRegion(
                     regionDao.findLocationRegionById(domain.getAddress().getLocation().getLocationId()));
             domain.setUsers(userDao.findByDomainId(domain.getDomainId()));
+            domain.setProductInstances(productInstanceDao.findByDomainId(domain.getDomainId()));
+            for (ProductInstance productInstance : domain.getProductInstances()) {
+                productInstance.setStatus(categoryDao.findProductInstanceStatus(productInstance.getInstanceId()));
+            }
         }
         return domains;
     }
 
-    //TODO update instances
     @Override
     public void update(Domain domain) {
         domain.getAddress().getLocation().setRegion(
