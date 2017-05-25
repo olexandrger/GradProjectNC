@@ -76,7 +76,7 @@ function registerByAdmin() {
                         if (data.status == 'success') {
                             console.log("Registration success! " + JSON.stringify(data));
                             alert = $('<div id="registration-header-alert1" class="alert alert-success" role="alert">' +
-                                "User registered successfully" + "</div>");
+                                data.message + "</div>");
                         } else {
                             console.log("Registration error! " + JSON.stringify(data));
                             alert = $('<div id="registration-header-alert1" class="alert alert-danger" role="alert">' +

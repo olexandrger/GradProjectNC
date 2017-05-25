@@ -171,24 +171,16 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Boolean updateGeneralInformation(User user) {
-        try {
-            userDao.updateGeneralInformation(user);
-        } catch (DataAccessException e) {
-            return false;
-        }
-        return true;
+    public User updateGeneralInformation(User user) {
+        userDao.updateGeneralInformation(user);
+        return user;
     }
 
     @Override
-    public Boolean updatePassword(User user) {
-        try {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            userDao.updatePassword(user);
-        } catch (DataAccessException e) {
-            return false;
-        }
-        return true;
+    public User updatePassword(User user) {
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userDao.updatePassword(user);
+        return user;
     }
 
     @Override

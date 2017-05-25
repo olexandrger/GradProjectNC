@@ -16,9 +16,9 @@ public interface UserService extends UserDetailsService {
 
     Boolean update(User user);
 
-    Boolean updateGeneralInformation(User user);
+    User updateGeneralInformation(User user);
 
-    Boolean updatePassword(User user);
+    User updatePassword(User user);
 
     public List<User> findAllUsers();
 
@@ -34,4 +34,4 @@ public interface UserService extends UserDetailsService {
 
     public Collection<User> findByRoleId(long roleId);
 
-    }
+}

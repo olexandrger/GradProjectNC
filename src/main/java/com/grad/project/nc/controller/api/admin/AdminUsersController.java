@@ -7,6 +7,7 @@ import com.grad.project.nc.model.*;
 import com.grad.project.nc.model.proxy.UserProxy;
 import com.grad.project.nc.persistence.RoleDao;
 import com.grad.project.nc.persistence.UserDao;
+import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.RegistrationService;
 import com.grad.project.nc.service.security.UserService;
@@ -51,13 +52,13 @@ public class AdminUsersController {
         RegistrationResponseHolder registrationResponse = new RegistrationResponseHolder();
         log.info("Registering " + frontUser.getRoles().toString());
 
-        if (!registrationService.register(user)) {
-            registrationResponse.setMessage(registrationService.getMessageError());
-        } else {
-            registrationResponse.setMessage("You've been registered successfully");
-            emailService.sendRegistrationEmail(user);
+        try {
+            registrationService.validation(user);
+            registrationService.register(user);
+            registrationResponse.setMessage("User registered successfully");
+        } catch (IncorrectUserDataException e) {
+            registrationResponse.setMessage(e.getMessage());
         }
-
         registrationResponse.setStatus(registrationService.getStatus());
         return registrationResponse;
     }
