@@ -279,6 +279,9 @@ function previousPage() {
     loadOrders();
 }
 
+
+
+
 $(document).ready(function () {
     loadInfo();
 });
@@ -286,7 +289,7 @@ $(document).ready(function () {
 function loadAllInstances() {
 
     $.ajax({
-        url: "/api/csr/instances/find/all",
+        url: "/api/client/instance/find/byUser/",
         success: function(data) {
 
             var list = $("#instances-list");

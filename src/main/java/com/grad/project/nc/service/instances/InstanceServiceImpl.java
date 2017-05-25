@@ -36,4 +36,9 @@ public class InstanceServiceImpl implements InstanceService {
     public Collection<ProductInstance> getAll() {
         return productInstanceDao.findAll();
     }
+
+    @Override
+    public Collection<ProductInstance> getByUserId(Long id) {
+         return productInstanceDao.findByUserId(id);
+    }
 }
