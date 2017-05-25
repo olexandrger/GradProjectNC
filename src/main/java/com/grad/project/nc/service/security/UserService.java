@@ -26,6 +26,10 @@ public interface UserService extends UserDetailsService {
 
     public List<User> findAllUsersSorted(String sort, Long size, Long offset);
 
+    public List<User> findAllUsersByPhoneSorted(String sort, Long size, Long offset, String phone);
+
+    public List<User> findUsersByRegionIdAndPhoneSorted(int id, String sort, Long size, Long offset, String phone);
+
     public List<User> findUsersByRegionIdSorted(int id, String sort, Long size, Long offset);
 
     public String getStatus();

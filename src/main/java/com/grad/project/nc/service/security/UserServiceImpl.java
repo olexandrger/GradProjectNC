@@ -199,8 +199,18 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public List<User> findAllUsersByPhoneSorted(String sort, Long size, Long offset, String phone){
+        return userDao.findByPhoneSorted(sortSql(sort), size, offset, phone);
+    }
+
+    @Override
     public List<User> findUsersByRegionIdSorted(int id, String sort, Long size, Long offset){
         return userDao.findUsersByRegionIdSort(id, sortSql(sort), size, offset);
+    }
+
+    @Override
+    public List<User> findUsersByRegionIdAndPhoneSorted(int id, String sort, Long size, Long offset, String phone){
+        return userDao.findUsersByRegionIdAndPhoneSort(id, sortSql(sort), size, offset, phone);
     }
 
     public String sortSql(String sort){

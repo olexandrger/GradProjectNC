@@ -2,9 +2,10 @@
  * Created by Alex on 5/8/2017.
  */
 var regions;
-var sort;
+var sort = "user_id";
 var usersListSize = 10;
 var usersListCurrentPage = 0;
+var usersUrl = "/api/csr/users/find/all";
 var usersDataList;
 var userData;
 var userData1 = {};
@@ -588,13 +589,40 @@ function loadRegions() {
     });
 }
 
+function searchUsers() {
+    console.log("searchUsers");
+    usersUrl = "/api/csr/users/find/all";
+    usersListCurrentPage = 0;
+    loadUsers();
+}
+
+function clearPhoneField() {
+    console.log("clearPhoneField");
+    $("#find-by-phone").val('');
+    console.log($("#find-by-phone"))
+}
+
 function loadUsers() {
+    console.log("loadUsers");
+
     hideUserInfo();
     var regionId = $("#new-region").val();
+    var phone = $("#find-by-phone").val();
+    var params = {
+        size: (usersListSize + 1),
+        offset: usersListCurrentPage * usersListSize,
+        regionId: regionId,
+        sort: sort,
+        phone: phone
+    };
+
+
+
     console.log("Users Loaded ")
     console.log(regionId);
     $.ajax({
-        url: "/api/csr/users/find/all/size/"+ (usersListSize + 1) +"/offset/" + usersListCurrentPage * usersListSize + "/region/" + regionId + "/sort/"+ sort + "/",
+        url: usersUrl,
+        data: params,
         success: function(data) {
 
             var list = $("#csr-users-list");
@@ -635,6 +663,8 @@ function loadUsers() {
 }
 
 function selectUser(i){
+    console.log("selectUser");
+
     unhideaUserInfo();
     selectedUser = usersDataList[i];
     console.log('yee ' + i);
@@ -650,30 +680,35 @@ function selectUser(i){
 }
 
 function editUser(){
+    console.log("editUser");
     $('a[href$=tab2]').click();
     $("#tab2-email").val($("#userEmail").val());
     getUser()
 }
 
 function hideUserInfo(){
+    console.log("hideUserInfo");
     $("#user-info").attr("hidden", "true");
 }
 
 function unhideaUserInfo(){
+    console.log("unhideaUserInfo");
     $("#user-info").removeAttr("hidden");
 }
 
-
 function sortByPhone() {
+    console.log("sortByPhone");
     sort = "phone";
 }
 
 function sortByLastName() {
+    console.log("sortByLastName");
     sort = "lastname";
 }
 
 function sortById() {
-    sort = "lastname";
+    console.log("sortById");
+    sort = "user_id";
 }
 
 function nextPage() {
