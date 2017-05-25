@@ -119,6 +119,18 @@ function addUser() {
     }
 }
 
+function $addInstance(instance) {
+    console.log('$addInstance');
+    console.log(JSON.stringify(instance));
+    var $instanceTableBody = $("#instance-table>table>tbody");
+    $instanceTableBody.append($('<tr class="instance-info">\n\
+                                    <td>' + instance.product.productName + '</td>\n\
+                                    <td>' + instance.status.categoryName + '</td>\n\
+                                    <td>' + instance.price.price + '</td>\n\
+                                    <td><a href="/api/csr/orders/get/byInstance/' + instance.instanceId + '/size/5/offset/0">more information</a></td>\n\
+                                </tr>'));
+}
+
 function $addUser(user) {
     var $userTableBody = $("#user-table>table>tbody");
     if (user.email == authorizedUser.email) {
@@ -230,6 +242,7 @@ function selectItem(index) {
     console.log("index" + index);
 
     $(".user-info").remove();
+    $(".instance-info").remove();
     $("#new-user-alert").remove();
     if (selected == -1) {
         $("#domain-editor").removeClass("hidden");
@@ -256,6 +269,7 @@ function selectItem(index) {
         $("#domain-type-selector").val(domains[index].domainType);
         $("#domain-apartment-input").val(domains[index].apartment);
         loadUsers(index);
+        loadInstances(index);
     } else {
         geocodePlaceId(map, infowindow, standartGooglePlaceId);
         $("#domain-name-input").val("");
@@ -266,6 +280,7 @@ function selectItem(index) {
     selected = index;
     if (selected == -1) {
         $("#user-editor").addClass("hidden");
+        $("#instances").addClass("hidden");
         $("#domain-name-input").attr("readonly", "readonly");
         $("#domain-type-selector").attr("disabled", "disabled");
         $("#domain-apartment-input").attr("readonly", "readonly");
@@ -273,6 +288,7 @@ function selectItem(index) {
         $("#save-delete-buttons").addClass("hidden");
     } else {
         $("#user-editor").removeClass("hidden");
+        $("#instances").removeClass("hidden");
         $("#domain-name-input").removeAttr("readonly");
         $("#domain-type-selector").removeAttr("disabled");
         $("#domain-apartment-input").removeAttr("readonly");
@@ -338,6 +354,16 @@ function loadUsers(index) {
     }
 }
 
+function loadInstances(index) {
+    if (domains[index].productInstances != undefined) {
+        console.log('adding instances');
+        for (var i = 0; i < domains[index].productInstances.length; i++) {
+            console.log(i);
+            $addInstance(domains[index].productInstances[i]);
+        }
+    }
+}
+
 function saveDomain() {
     selectItem(selected);
     var domain = domains[selected];
@@ -390,6 +416,9 @@ function saveDomain() {
                     domains[selected].domainId = parseInt(data.domainId);
                 }
                 console.log(domains[selected].id);
+                $('<div id="save-domain-alert" class="alert alert-success" role="alert">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+                    'Domain successfully saved </div>').insertAfter($("#domain-list"));
             },
             error: function (e) {
                 console.log(JSON.stringify(e));
@@ -546,10 +575,10 @@ function geocodePlaceId(map, infowindow, placeId) {
                 }
 
             } else {
-                window.alert('No results found');
+                console.log('No results found');
             }
         } else {
-            window.alert('Geocoder failed due to: ' + status);
+            console.log('Geocoder failed due to: ' + status);
         }
     });
 }
@@ -574,17 +603,11 @@ function loadUserDomains() {
                     productInstances: domain.productInstances != null ? domain.productInstances : []
                 });
                 numberOfAdded++;
-                //add to html
-                //var $newDomainName = $("#new-domain-name");
-                //var domainName = $newDomainName.val();
                 var $list = $("#domain-list");
                 var $domain = document.createElement("a");
-                //need get id from DB
-                var id = -(++numberOfAdded);
                 var domainName = domains[i].domainName;
                 $domain.appendChild(document.createTextNode(domainName));
                 $domain.className = "list-group-item";
-                var index = domains.length;
                 $domain.onclick = function () {
                     selectItem(getIndexOfDomainByName(domainName));
                 };

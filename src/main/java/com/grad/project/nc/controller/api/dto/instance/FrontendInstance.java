@@ -30,7 +30,7 @@ public class FrontendInstance {
                 .instanceId(instance.getInstanceId())
                 .price(FrontendInstancePrice.fromEntity(instance.getPrice()))
                 .product(FrontendInstanceProduct.fromEntity(instance.getPrice().getProduct()))
-                .domain(FrontendDomain.fromEntity(instance.getDomain()))
+                //.domain(FrontendDomain.fromEntity(instance.getDomain()))
                 .status(FrontendCategory.fromEntity(instance.getStatus()))
                 .productOrders(instance.getProductOrders().stream().map(FrontendOrder::fromEntity).collect(Collectors.toList()))
                 .build();

@@ -1,14 +1,13 @@
 package com.grad.project.nc.controller.api.client;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
 import com.grad.project.nc.controller.api.dto.FrontendUser;
 import com.grad.project.nc.model.Domain;
 import com.grad.project.nc.model.User;
 import com.grad.project.nc.service.domains.DomainService;
 import com.grad.project.nc.service.security.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/client/domains")
 public class DomainsController {
