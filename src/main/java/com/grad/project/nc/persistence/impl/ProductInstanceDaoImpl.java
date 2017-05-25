@@ -68,6 +68,14 @@ public class ProductInstanceDaoImpl extends AbstractDao implements ProductInstan
     }
 
     @Override
+    public List<ProductInstance> findByUserId(Long id) {
+        String findAllQuery = "SELECT \"instance_id\", \"price_id\", \"domain_id\", \"status_id\" " +
+                "FROM \"product_instance\" WHERE domain_id IN (SELECT domain_id FROM user_domain WHERE user_id = " + id + ")";
+
+        return findMultiple(findAllQuery, new ProductInstanceRowMapper());
+    }
+
+    @Override
     public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"product_instance\" WHERE \"instance_id\"=?";
 

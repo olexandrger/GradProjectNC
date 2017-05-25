@@ -12,4 +12,6 @@ public interface ProductInstanceDao extends CrudDao<ProductInstance> {
     List<ProductInstance> findByDomainId(Long domainId);
 
     List<ProductInstance> findByProductRegionPriceId(Long productRegionPriceId);
-}
+
+    List<ProductInstance> findByUserId(Long id);
+    }
