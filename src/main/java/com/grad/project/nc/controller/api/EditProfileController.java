@@ -1,6 +1,7 @@
 package com.grad.project.nc.controller.api;
 
 import com.grad.project.nc.model.User;
+import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
 import com.grad.project.nc.service.profile.ProfileService;
 import com.grad.project.nc.service.security.AutoLoginService;
 import com.grad.project.nc.service.security.UserService;
@@ -22,8 +23,7 @@ public class EditProfileController {
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     public User dataTypes() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user;
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
@@ -36,11 +36,15 @@ public class EditProfileController {
 
         user.setUserId(oldUser.getUserId());
 
-        if (profileService.updateGeneralInformation(user)) {
+        try {
+            profileService.validationGeneralInformation(user);
+            profileService.updateGeneralInformation(user);
             loginService.autologin(user.getEmail(), oldUser.getPassword());
+            response.put("message", "Changes saved");
+        } catch (IncorrectUserDataException e) {
+            response.put("message", e.getMessage());
         }
         response.put("status", profileService.getStatus());
-        response.put("message", profileService.getMessage());
 
         return response;
     }
@@ -52,10 +56,14 @@ public class EditProfileController {
 
         Map<String, String> response = new HashMap<>();
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        profileService.updatePassword(user, currentPassword, newPassword);
 
+        try {
+            profileService.updatePassword(user, currentPassword, newPassword);
+            response.put("message", "Your password has been changed");
+        } catch (IncorrectUserDataException e) {
+            response.put("message", e.getMessage());
+        }
         response.put("status", profileService.getStatus());
-        response.put("message", profileService.getMessage());
 
         return response;
     }

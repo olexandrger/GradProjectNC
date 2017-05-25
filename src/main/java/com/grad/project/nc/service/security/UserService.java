@@ -16,15 +16,19 @@ public interface UserService extends UserDetailsService {
 
     Boolean update(User user);
 
-    Boolean updateGeneralInformation(User user);
+    User updateGeneralInformation(User user);
 
-    Boolean updatePassword(User user);
+    User updatePassword(User user);
 
     public List<User> findAllUsers();
 
     public List<User> findUsersByRegionId(int id);
 
     public List<User> findAllUsersSorted(String sort, Long size, Long offset);
+
+    public List<User> findAllUsersByPhoneSorted(String sort, Long size, Long offset, String phone);
+
+    public List<User> findUsersByRegionIdAndPhoneSorted(int id, String sort, Long size, Long offset, String phone);
 
     public List<User> findUsersByRegionIdSorted(int id, String sort, Long size, Long offset);
 
@@ -34,4 +38,4 @@ public interface UserService extends UserDetailsService {
 
     public Collection<User> findByRoleId(long roleId);
 
-    }
+}
