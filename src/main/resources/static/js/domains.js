@@ -127,7 +127,7 @@ function $addInstance(instance) {
                                     <td>' + instance.product.productName + '</td>\n\
                                     <td>' + instance.status.categoryName + '</td>\n\
                                     <td>' + instance.price.price + '</td>\n\
-                                    <td><a href="/api/csr/orders/get/byInstance/' + instance.instanceId + '/size/5/offset/0">more information</a></td>\n\
+                                    <td><a href="/api/client/instance/get/byId/' + instance.instanceId + '">more information</a></td>\n\
                                 </tr>'));
 }
 
