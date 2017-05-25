@@ -4,33 +4,51 @@ var dataTypesHTML;
 
 var currentSelected = -1;
 
+//pagination global variables
+var amount = 10; //amount of items per page
+var startPage = 1;
+var defaultOpts = { //twbs pagination default options
+    visiblePages : 7,
+    initiateStartPageClick: false,
+    hideOnlyOnePage : true,
+    onPageClick: function (event, page) {
+        console.log('clicked page #' + page);
+        loadProductTypePage(page, amount);
+    }
+};
+var $pagination;
+
+//typeahead global variables
+var prefetchAmount = 50;
+
 function addProductType() {
     var productTypeList = $("#product-types-list");
     var productTypeNameInputText = $("#new-product-type-name");
     var productTypeName = productTypeNameInputText.val();
     productTypeNameInputText.val("");
 
-    if (productTypeName != "") {
-        var ref = document.createElement("a");
-        ref.appendChild(document.createTextNode(productTypeName));
-        ref.className = "list-group-item";
-        var index = productTypesCache.length;
-        ref.onclick = function () {
-            selectItem(index);
-        };
-        productTypeList.append(ref);
-
-        productTypesCache.push({
-            productTypeId: null,
-            productTypeName: productTypeName,
-            productTypeDescription: null,
-            isActive: false,
-            productCharacteristics: []
-        });
-
+    var ref = document.createElement("a");
+    ref.appendChild(document.createTextNode(productTypeName));
+    ref.className = "list-group-item";
+    var index = productTypesCache.length;
+    ref.onclick = function () {
         selectItem(index);
+    };
+    productTypeList.prepend(ref);
 
-    } else {
+    productTypesCache.push({
+        productTypeId: null,
+        productTypeName: productTypeName,
+        productTypeDescription: null,
+        isActive: false,
+        productCharacteristics: []
+    });
+
+    selectItem(index);
+}
+
+function checkProductTypeName(productTypeName) {
+    if (productTypeName == "") {
         $('#new-product-type-alert').remove();
 
         var alertDiv = $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
@@ -41,8 +59,25 @@ function addProductType() {
                 alertDiv.remove();
             });
 
-        alertDiv.insertAfter(productTypeList);
+        alertDiv.appendTo($("#alert-box"));
+
+        return false;
     }
+    return true;
+}
+
+function setupAddProductTypeButtonClickEvent() {
+    $('#add-product-type-button').click(function () {
+        if (!checkProductTypeName($("#new-product-type-name").val())) {
+            return;
+        }
+
+        if ($pagination.data('twbsPagination').options.totalPages > 1 || productTypesCache.length >= amount) {
+            loadProductTypePage(startPage, amount - 1, addProductType);
+        } else {
+            addProductType();
+        }
+    })
 }
 
 function removeProductCharacteristic(element) {
@@ -126,7 +161,7 @@ function saveSelectedProductType() {
                     success: function (data) {
                         console.log("result of GET request to server: " + JSON.stringify(data));
 
-                        $("#product-types-list").find("a:nth-child(" + (currentSelected + 1) + ")")
+                        $("#product-types-list").find("a:nth-child(" + (productTypesCache.length - currentSelected) + ")")
                             .html(data.productTypeName);
                         productTypesCache[currentSelected] = data;
                     },
@@ -165,6 +200,8 @@ function saveSelectedProductType() {
 }
 
 function selectItem(index) {
+    var activeLinkIndex = productTypesCache.length - index;
+
     console.log("Selecting product type with id: " + productTypesCache[index].productTypeId);
 
     var productTypeList = $("#product-types-list");
@@ -173,7 +210,7 @@ function selectItem(index) {
     } else {
         productTypeList.find("a").removeClass("active");
     }
-    productTypeList.find("a:nth-child(" + (index + 1) + ")").addClass("active");
+    productTypeList.find("a:nth-child(" + (activeLinkIndex) + ")").addClass("active");
     currentSelected = index;
 
     $(".product-characteristic-input").remove();
@@ -191,6 +228,53 @@ function selectItem(index) {
             characteristic.dataType.categoryId
         );
     });
+}
+
+function displayLoadedProductTypes() {
+    var productTypesList = $("#product-types-list");
+    productTypesList.empty();
+
+    productTypesCache.reverse();
+    productTypesCache.forEach(function (productType, index) {
+        var ref = document.createElement("a");
+        ref.appendChild(document.createTextNode(productType.productTypeName));
+        ref.className = "list-group-item";
+        ref.href = "#";
+        ref.onclick = function () {
+            selectItem(index);
+        };
+
+        productTypesList.prepend(ref);
+    });
+}
+
+function loadProductTypePage(page, amount, callback) {
+    console.log("loading product types page #" + page);
+    var jqxhr = $.ajax({
+        url: '/api/user/productTypes?page=' + page + '&amount=' + amount,
+        success: function (data) {
+            productTypesCache = data.content;
+            displayLoadedProductTypes();
+
+            updatePaginationWidget(page, data.totalPages);
+        },
+        error: function () {
+            console.error("Cannot load products");
+        }
+    });
+
+    if (callback != undefined) {
+        jqxhr.done(callback);
+    }
+}
+
+function updatePaginationWidget(currentPage, totalPages) {
+    console.log('updating pagination widget');
+    $pagination.twbsPagination('destroy');
+    $pagination.twbsPagination($.extend({}, defaultOpts, {
+        startPage: currentPage,
+        totalPages: totalPages
+    }));
 }
 
 function loadProductTypes() {
@@ -236,7 +320,8 @@ function loadDataTypes() {
             console.log('data types are loaded');
             dataTypesHTML = createDataTypesHTML(data);
 
-            loadProductTypes();
+            $pagination = $('#pagination');
+            loadProductTypePage(startPage, amount);
         },
         error: function () {
             console.error("Cannot load dataTypes");
@@ -244,6 +329,64 @@ function loadDataTypes() {
     });
 }
 
+function getProductTypeById(id) {
+    $.ajax({
+        type: 'GET',
+        url: '/api/user/productTypes/get/' + id,
+        success: function (data) {
+            console.log("result of GET request to server: " + JSON.stringify(data));
+            productTypesCache = [data];
+
+            displayLoadedProductTypes();
+            selectItem(0);
+        },
+        error: function (data) {
+            console.log("Error occurred. Cannot GET specified resource");
+        }
+    });
+}
+
+function setupTypeahead() {
+    // Instantiate the Bloodhound suggestion engine
+    var productTypes = new Bloodhound({
+        datumTokenizer:  Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        identify: function(obj) { return obj.name; },
+        prefetch: '/api/user/productTypes/last?amount=' + prefetchAmount,
+        remote: {
+            wildcard: '%QUERY',
+            url: '/api/user/productTypes/search?query=%QUERY'
+        }
+    });
+
+    var $typeahead = $('.typeahead');
+    var $searchClear = $('#search-clear');
+
+// Instantiate the Typeahead UI
+    $typeahead.typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+    }, {
+        name: 'productTypes',
+        display: 'name',
+        source: productTypes
+    }).on('typeahead:selected', function (obj, datum) {
+        $searchClear.removeClass('hide');
+        getProductTypeById(datum.id);
+    });
+
+    //setup search clear button
+    $searchClear.click(function () {
+        $typeahead.typeahead('val', '');
+        $(this).addClass('hide');
+        var currentPage = +$pagination.find('li.active > a').text();
+        loadProductTypePage(currentPage, amount);
+    });
+}
+
 $(document).ready(function () {
     loadDataTypes();
+    setupAddProductTypeButtonClickEvent();
+    setupTypeahead();
 });

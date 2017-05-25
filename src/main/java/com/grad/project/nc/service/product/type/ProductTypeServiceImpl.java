@@ -1,6 +1,7 @@
 package com.grad.project.nc.service.product.type;
 
 import com.grad.project.nc.model.Category;
+import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.persistence.CategoryDao;
@@ -8,6 +9,7 @@ import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.ProductCharacteristicDao;
 import com.grad.project.nc.persistence.ProductTypeDao;
 import com.grad.project.nc.service.AbstractService;
+import com.grad.project.nc.support.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,27 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
         this.categoryDao = categoryDao;
         this.productTypeDao = productTypeDao;
         this.productCharacteristicDao = productCharacteristicDao;
+    }
+
+    @Override
+    @Transactional
+    public List<ProductType> findLastN(int n) {
+        return productTypeDao.findLastN(n);
+    }
+
+    @Override
+    @Transactional
+    public List<ProductType> findByNameContaining(String productTypeName) {
+        return productTypeDao.findByNameContaining(productTypeName);
+    }
+
+    @Override
+    public Page<ProductType> findPaginated(int page, int amount) {
+        int totalPages = productTypeDao.countTotalProducts() / amount + 1;
+        List<ProductType> productTypes = productTypeDao.findPaginated(page, amount);
+        productTypes.forEach(pt -> pt.getProductCharacteristics().forEach(ProductCharacteristic::getDataType));
+
+        return new Page<>(productTypes, totalPages);
     }
 
     @Override

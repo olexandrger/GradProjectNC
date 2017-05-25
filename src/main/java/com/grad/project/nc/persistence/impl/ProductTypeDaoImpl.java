@@ -8,6 +8,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -76,19 +77,38 @@ public class ProductTypeDaoImpl extends AbstractDao implements ProductTypeDao {
     }
 
     @Override
-    public List<ProductType> findFirstN(int n) {
-        String findAllQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
-                "\"is_active\" FROM \"product_type\"ORDER BY product_type_id LIMIT " + n;
+    public List<ProductType> findByNameContaining(String productTypeName) {
+        String findQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
+                "\"is_active\" FROM \"product_type\" WHERE LOWER(\"product_type_name\") LIKE LOWER(?)";
 
-        return findMultiple(findAllQuery, new ProductTypeRowMapper());
+        String substr = "%" + productTypeName + "%";
+
+        return findMultiple(findQuery, new ProductTypeRowMapper(), substr);
+    }
+
+    @Override
+    public List<ProductType> findFirstN(int n) {
+        String findQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
+                "\"is_active\" FROM \"product_type\" ORDER BY \"product_type_id\" LIMIT ?";
+
+        return findMultiple(findQuery, new ProductTypeRowMapper(), n);
     }
 
     @Override
     public List<ProductType> findLastN(int n) {
-        String findAllQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
-                "\"is_active\" FROM \"product_type\"ORDER BY product_type_id OFFSET " + n;
+        String findQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
+                "\"is_active\" FROM \"product_type\" ORDER BY \"product_type_id\" DESC LIMIT ?";
 
-        return findMultiple(findAllQuery, new ProductTypeRowMapper());
+        return findMultiple(findQuery, new ProductTypeRowMapper(), n);
+    }
+
+    @Override
+    public List<ProductType> findPaginated(int page, int amount) {
+        int offset = (page - 1) * amount;
+        String findPaginatedQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
+                "\"is_active\" FROM \"product_type\" ORDER BY \"product_type_id\" DESC LIMIT ? OFFSET ?";
+
+        return findMultiple(findPaginatedQuery, new ProductTypeRowMapper(), amount, offset);
     }
 
     @Override
@@ -101,6 +121,12 @@ public class ProductTypeDaoImpl extends AbstractDao implements ProductTypeDao {
                 "WHERE p.\"product_id\" = ?";
 
         return findOne(query, new ProductTypeRowMapper(), productId);
+    }
+
+    @Override
+    public int countTotalProducts() {
+        String countQuery = "SELECT count(*) FROM \"product_type\"";
+        return findOne(countQuery, new SingleColumnRowMapper<>(int.class));
     }
 
     private class ProductTypeRowMapper implements RowMapper<ProductType> {
