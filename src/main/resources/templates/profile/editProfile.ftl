@@ -129,6 +129,10 @@
                 <div class=" col-sm-5 col-sm-offset-1">
                     </br>
                     <div class="list-group" id="instances-list"></div>
+                    <ul class="pager">
+                        <li class="previous hidden" id="instances-page-previous"><a href="#" onclick="previousInstancesPage()">Previous</a></li>
+                        <li class="next hidden" id="instances-page-next"><a href="#" onclick="nextInstancesPage()">Next</a></li>
+                    </ul>
                 </div>
             </div>
             </div>

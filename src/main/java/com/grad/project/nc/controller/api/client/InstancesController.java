@@ -42,10 +42,10 @@ public class InstancesController {
         }
     }
 
-    @RequestMapping(value = "/find/byUser/", method = RequestMethod.GET)
-    Collection<FrontendInstance> findByUserId(){
+    @RequestMapping(value = "/find/byUser/size/{size}/offset/{offset}", method = RequestMethod.GET)
+    Collection<FrontendInstance> findByUserId(@PathVariable Long size, @PathVariable Long offset){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return instanceService.getByUserId(user.getUserId())
+        return instanceService.getByUserId(user.getUserId(), size, offset)
                 .stream()
                 .filter(instance->{ return instance.getStatus().getCategoryId().longValue() != INSTANCE_STATUS_DEACTIVATED;})
                 .map(FrontendInstance::fromEntity)

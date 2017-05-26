@@ -9,6 +9,6 @@ public interface InstanceService {
     boolean isInstanceOwnedBy(long instanceId, long userId);
     Collection<ProductInstance> getByDomainId(Long domainId);
     Collection<ProductInstance> getAll();
-    Collection<ProductInstance> getByUserId(Long id);
+    Collection<ProductInstance> getByUserId(Long id, Long size, Long offset);
 
     }

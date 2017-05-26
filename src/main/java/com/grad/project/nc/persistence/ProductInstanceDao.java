@@ -13,5 +13,5 @@ public interface ProductInstanceDao extends CrudDao<ProductInstance> {
 
     List<ProductInstance> findByProductRegionPriceId(Long productRegionPriceId);
 
-    List<ProductInstance> findByUserId(Long id);
+    List<ProductInstance> findByUserId(Long id, Long size, Long offset);
     }

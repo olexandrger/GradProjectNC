@@ -1,5 +1,7 @@
 var ordersListSize = 10;
 var ordersListCurrentPage = 0;
+var instancesListSize = 10;
+var instancesListCurrentPage = 0;
 var ordersData;
 const ORDER_STATUS_CREATED = "CREATED";
 const ORDER_STATUS_IN_PROGRESS = "IN_PROGRESS";
@@ -233,7 +235,6 @@ function loadOrders() {
                     ref.onclick = function () {
                         selectOrder(i);
                     };
-
                     list.append(ref);
                 }
             });
@@ -281,7 +282,6 @@ function previousPage() {
 
 
 
-
 $(document).ready(function () {
     loadInfo();
 });
@@ -289,18 +289,16 @@ $(document).ready(function () {
 function loadAllInstances() {
 
     $.ajax({
-        url: "/api/client/instance/find/byUser/",
+        url: "/api/client/instance/find/byUser/size/" + (instancesListSize + 1) + "/offset/" + instancesListCurrentPage * instancesListSize,
         success: function(data) {
-
             var list = $("#instances-list");
             list.empty();
-
             instances = data;
             data.forEach(function(item, i) {
-
-                console.log(item);
+                if (i < ordersListSize){
+                    console.log(item);
                 var ref = document.createElement("a");
-                var orderName = item.product.productName +" for "+ item.instanceId;
+                var orderName = item.product.productName + " for " + item.instanceId;
                 ref.appendChild(document.createTextNode(orderName));
                 ref.className = "list-group-item";
                 ref.href = "#";
@@ -308,32 +306,38 @@ function loadAllInstances() {
                     selectInstance(i);
                 };
                 list.append(ref);
-
+                }
             });
+            var prevPage = $("#instances-page-previous");
+            var nextPage = $("#instances-page-next");
+            nextPage.addClass("hidden");
+            prevPage.addClass("hidden");
+            if (instancesListCurrentPage > 0) {
+                prevPage.removeClass("hidden");
+            }
+            if (data.length > instancesListSize) {
+                nextPage.removeClass("hidden");
+            }
 
-
+            selectOrder(-1);
         },
         error: function () {
             console.error("Cannot load list of users");
         }
     });
+}
 
+function nextInstancesPage() {
+    instancesListCurrentPage++;
+    loadAllInstances();
+}
+
+function previousInstancesPage() {
+    instancesListCurrentPage--;
+    loadAllInstances();
 }
 
 function selectInstance(i) {
     instanceId = instances[i].instanceId;
-
     location.href = "/client/instance/" + instanceId;
-/*
-    //clearDataFields();
-    console.log(JSON.stringify(instances[i].instanceId));
-    currentSelected = i;
-    loadInfo(instances[i].instanceId)
-
-    var ordersTable = $("#instance-orders-table");
-    ordersTable.find(".order-row").remove();
-    ordersPageNumber = 0;
-*/
-
-
 }
