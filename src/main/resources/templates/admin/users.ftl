@@ -329,7 +329,7 @@
                                 </div>
                                 <div class="btn-group btn-group-justified" role="group">
                                     <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-primary" onclick="sortByPhone(); loadUsers()">Sort by phone</button>
+                                    <button type="button" class="btn btn-primary" onclick="sortByEmail(); loadUsers()">Sort by email</button>
                                     </div>
                                     <div class="btn-group" role="group">
                                     <button type="button" class="btn btn-primary" onclick="sortByLastName(), loadUsers()">Sort by last name</button>

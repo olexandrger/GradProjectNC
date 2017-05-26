@@ -696,9 +696,9 @@ function unhideaUserInfo(){
     $("#user-info").removeAttr("hidden");
 }
 
-function sortByPhone() {
-    console.log("sortByPhone");
-    sort = "phone";
+function sortByEmail() {
+    console.log("sortByEmail");
+    sort = "email";
 }
 
 function sortByLastName() {

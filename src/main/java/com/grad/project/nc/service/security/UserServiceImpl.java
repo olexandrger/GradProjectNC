@@ -215,8 +215,8 @@ public class UserServiceImpl implements UserService{
 
     public String sortSql(String sort){
         String sql = " order by ";
-        if(sort.equals("phone")){
-            sql += "phone_number";
+        if(sort.equals("email")){
+            sql += "email";
         }else
         if (sort.equals("lastname")){
             sql += "last_name";
