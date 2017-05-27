@@ -55,6 +55,7 @@ public class AdminUsersController {
         try {
             registrationService.validation(user);
             registrationService.register(user);
+            emailService.sendRegistrationEmail(user);
             registrationResponse.setMessage("User registered successfully");
         } catch (IncorrectUserDataException e) {
             registrationResponse.setMessage(e.getMessage());

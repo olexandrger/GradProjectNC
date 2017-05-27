@@ -7,6 +7,9 @@ var complaintListSize = 5;
 var complaintListCurrentPage = 0;
 var  instances = [];
 var currentSelected;
+var instancesListSize = 10;
+var instancesListCurrentPage = 0;
+var byStatus = "active";
 
 const MIN_SUBJECT_LENGTH = 5;
 const CATEGORY_TYPE_COMPLAIN_REASON = 5;
@@ -107,21 +110,42 @@ function loadInfo(id) {
     loadComplaints();
 }
 
+
+
+function nextInstancesPage() {
+    instancesListCurrentPage++;
+    loadAllInstances();
+}
+
+function previousInstancesPage() {
+    instancesListCurrentPage--;
+    loadAllInstances();
+}
+
+
 function loadAllInstances() {
 
+    var statusId= document.getElementById("instance-status123").value;
+
+    console.log(statusId);
+    var url1 = "/api/csr/instances/all/size/" + (instancesListSize + 1) + "/offset/" + instancesListCurrentPage * instancesListSize;
+
+    if(statusId != "ALL"){
+        url1 = "/api/csr/instances/all/size/" + (instancesListSize + 1) + "/offset/" + instancesListCurrentPage * instancesListSize + "/status/" + statusId;
+    }
+
+
     $.ajax({
-        url: "/api/csr/instances/find/all",
+        url: url1 ,
         success: function(data) {
-
             var list = $("#instances-list");
-            //list.empty();
-
+            list.empty();
             instances = data;
             data.forEach(function(item, i) {
-
+                if (i < instancesListSize){
                     console.log(item);
                     var ref = document.createElement("a");
-                    var orderName = item.product.productName +" for "+ item.instanceId;
+                    var orderName = "Instance №"+ item.instanceId+ " for "+item.product.productName + ", " + item.price.region.regionName  ;
                     ref.appendChild(document.createTextNode(orderName));
                     ref.className = "list-group-item";
                     ref.href = "#";
@@ -129,19 +153,29 @@ function loadAllInstances() {
                         selectInstance(i);
                     };
                     list.append(ref);
-
+                }
             });
+            var prevPage = $("#instances-page-previous");
+            var nextPage = $("#instances-page-next");
+            nextPage.addClass("hidden");
+            prevPage.addClass("hidden");
+            if (instancesListCurrentPage > 0) {
+                prevPage.removeClass("hidden");
+            }
+            if (data.length > instancesListSize) {
+                nextPage.removeClass("hidden");
+            }
 
-
+            //selectOrder(-1);
         },
         error: function () {
-            console.error("Cannot load list of users");
+            console.error("Cannot load list of instances");
         }
     });
-
 }
 
 function selectInstance(i) {
+    $("#instanceInfo").removeClass("hidden");
     instanceId = instances[i].instanceId;
 
     //clearDataFields();
@@ -161,6 +195,15 @@ const INSTANCE_STATUS_SUSPENDED = "SUSPENDED";
 const INSTANCE_STATUS_DEACTIVATED = "DEACTIVATED";
 const INSTANCE_STATUS_CREATED = "CREATED";
 
+
+function calculateDiscountPrice(priceObj) {
+    var tmpPrice = priceObj.price;
+    var discountObj = priceObj.discount;
+    if (discountObj != null) {
+        return tmpPrice - tmpPrice * discountObj.discount / 100;
+    }
+    return tmpPrice;
+}
 function loadInstance() {
     $.ajax({
         url: "/api/csr/instances/get/byId/" + instanceId,
@@ -175,6 +218,7 @@ function loadInstance() {
                 (address.apartment == undefined ? "" : " " + address.apartment)
                 + "<br/>" + address.city + ", " + data.price.region.regionName);
             $("#instance-product-price").html(data.price.price);
+            $("#instance-product-discount-price").html(calculateDiscountPrice(data.price));
 
             $("#instance-complain-button").removeClass("hidden");
             $("#instance-suspend-button").addClass("hidden");

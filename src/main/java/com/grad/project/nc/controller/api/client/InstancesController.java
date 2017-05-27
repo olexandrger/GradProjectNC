@@ -1,8 +1,14 @@
 package com.grad.project.nc.controller.api.client;
 
+import com.grad.project.nc.controller.api.dto.FrontendDiscount;
+import com.grad.project.nc.controller.api.dto.catalog.FrontendCatalogDiscount;
 import com.grad.project.nc.controller.api.dto.instance.FrontendInstance;
+import com.grad.project.nc.controller.api.dto.instance.FrontendInstanceAddress;
+import com.grad.project.nc.model.ProductInstance;
 import com.grad.project.nc.model.User;
+import com.grad.project.nc.service.discount.DiscountService;
 import com.grad.project.nc.service.instances.InstanceService;
+import com.grad.project.nc.service.locations.LocationService;
 import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -26,17 +32,23 @@ public class InstancesController {
     private static final long INSTANCE_STATUS_DEACTIVATED = 12;
 
 
+
     @Autowired
     public InstancesController(InstanceService instanceService, UserService userService) {
         this.instanceService = instanceService;
         this.userService = userService;
+
     }
 
     @RequestMapping(value = "/get/byId/{id}", method = RequestMethod.GET)
     public FrontendInstance getInstance(@PathVariable Long id) {
         User user = userService.getCurrentUser();
         if (user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CSR")) || instanceService.isInstanceOwnedBy(id, user.getUserId())) {
-            return FrontendInstance.fromEntity(instanceService.getById(id));
+
+            FrontendInstance frontendInstance = FrontendInstance.fromEntity(instanceService.getById(id));
+            frontendInstance = instanceService.setAddressAndDiscount(frontendInstance);
+
+            return frontendInstance;
         } else {
             throw new AccessDeniedException("You can not access this instance");
         }
@@ -48,7 +60,13 @@ public class InstancesController {
         return instanceService.getByUserId(user.getUserId(), size, offset)
                 .stream()
                 .filter(instance->{ return instance.getStatus().getCategoryId().longValue() != INSTANCE_STATUS_DEACTIVATED;})
-                .map(FrontendInstance::fromEntity)
+                .map(instance -> {
+                    FrontendInstance frontendInstance =FrontendInstance.fromEntity(instance);
+                    //frontendInstance = instanceService.setAddressAndDiscount(frontendInstance);
+                    return frontendInstance;
+                })
                 .collect(Collectors.toCollection(ArrayList::new));
     }
+
+
 }

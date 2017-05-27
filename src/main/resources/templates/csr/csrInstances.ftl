@@ -29,11 +29,33 @@
 
 
     <div class=" col-sm-3 col-sm-offset-1">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label for="order-search-aim123">Status</label>
+                    <select class="form-control" name="order-search-aim123" id="instance-status123" onchange="loadAllInstances()">
+                        <option value="ALL" selected>All</option>
+                        <option value="9">Created</option>
+                        <option value="10">Activated</option>
+                        <option value="11">Suspended</option>
+                        <option value="12">Deactivated</option>
+                    </select>
+                </div>
+            </div>
+
+
+        </div>
+
         <div class="list-group" id="instances-list"></div>
+        <ul class="pager">
+            <li class="previous hidden" id="instances-page-previous"><a href="#" onclick="previousInstancesPage()">Previous</a></li>
+            <li class="next hidden" id="instances-page-next"><a href="#" onclick="nextInstancesPage()">Next</a></li>
+        </ul>
 
     </div>
 
-    <div class="col-sm-7 " id="instanceInfo">
+    <div class="col-sm-7 hidden " id="instanceInfo">
     <div id="complaint-modal" class="modal fade" role="dialog">
 
     </div>
@@ -47,6 +69,7 @@
                         <p>Product type: <span id="instance-product-type"></span></p>
                         <address>Address: <p class="tab" id="instance-address"></p></address>
                         <p>Price: <span id="instance-product-price"></span></p>
+                        <p>Discount price: <span id="instance-product-discount-price"></span></p>
                     </div>
                 </div>
                 <div class="col-sm-3 pull-down" style="margin-bottom: 5px">

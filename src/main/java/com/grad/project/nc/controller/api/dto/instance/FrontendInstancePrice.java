@@ -1,6 +1,7 @@
 package com.grad.project.nc.controller.api.dto.instance;
 
 import com.grad.project.nc.controller.api.dto.FrontendRegion;
+import com.grad.project.nc.controller.api.dto.catalog.FrontendCatalogDiscount;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductRegionPrice;
 import lombok.Builder;
@@ -13,7 +14,13 @@ public class FrontendInstancePrice {
     private FrontendRegion region;
     private double price;
 
+    private FrontendCatalogDiscount discount;
+
     public static FrontendInstancePrice fromEntity(ProductRegionPrice price) {
+
+
+
+
         return FrontendInstancePrice.builder()
                 .priceId(price.getPriceId())
                 .region(FrontendRegion.fromEntity(price.getRegion()))

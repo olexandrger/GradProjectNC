@@ -101,6 +101,14 @@ const INSTANCE_STATUS_SUSPENDED = "SUSPENDED";
 const INSTANCE_STATUS_DEACTIVATED = "DEACTIVATED";
 const INSTANCE_STATUS_CREATED = "CREATED";
 
+function calculateDiscountPrice(priceObj) {
+    var tmpPrice = priceObj.price;
+    var discountObj = priceObj.discount;
+    if (discountObj != null) {
+        return tmpPrice - tmpPrice * discountObj.discount / 100;
+    }
+    return tmpPrice;
+}
 function loadInstance() {
     $.ajax({
         url: "/api/client/instance/get/byId/" + instanceId,
@@ -115,6 +123,7 @@ function loadInstance() {
                 (address.apartment == undefined ? "" : " " + address.apartment)
                 + "<br/>" + address.city + ", " + data.price.region.regionName);
             $("#instance-product-price").html(data.price.price);
+            $("#instance-product-discount-price").html(calculateDiscountPrice(data.price));
 
             $("#instance-complain-button").removeClass("hidden");
             $("#instance-suspend-button").addClass("hidden");

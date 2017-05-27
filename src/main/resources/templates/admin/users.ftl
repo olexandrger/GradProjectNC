@@ -70,7 +70,7 @@
                                         <input type="checkbox" id="adminchbx">Admin
                                     </label>
                                     <label class="checkbox-inline">
-                                        <input type="checkbox" id="client">Client
+                                        <input type="checkbox" id="client" checked>Client
                                     </label>
                                     <label class="checkbox-inline">
                                         <input type="checkbox" id="csrchbx">CSR
@@ -86,7 +86,7 @@
                                         <div class="btn-group inline" >
 
                                             <button type="button" class="btn btn-success" onclick="registerByAdmin()" >Register</button>
-                                        <button type="button" class="btn btn-default btn hidden" onclick="redirectToDomains()" id="add-domain-btn-reg">Add user to existing domain</button>
+
                                         </div>
                                     </div>
                                 </div>
@@ -100,59 +100,7 @@
 
                                 </div>
 
-                            <#--<div class="form-group">
-                                <a class="btn btn-success" onclick="addNewDomain()">
-                                    <span class="glyphicon glyphicon-floppy-disk"></span>Add domain
-                                </a>
-                            </div>
-                            <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
-                                <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
-                                <#--</a>-->
 
-
-                               <#-- <p>User domain info:</p>
-                                <div  id="domain-editor2">
-
-                                    <div class="row">
-                                        <div class="col-sm-12" id="product-type-values2">
-
-                                            <div class="form-group">
-                                                <label for="domain-name">Name</label>
-                                                <input type="text" class="form-control" name="domain-name-input2" placeholder="Domain name" id="domain-name-input2" >
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="domain-type">Type</label>
-                                                <input type="text" class="form-control" name="domain-type-input2" placeholder="Domain type" id="domain-type-input2" >
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <label for="domain-address">Address</label>
-                                                <input type="text" class="form-control" name="domain-address-input2" placeholder="Domain address" id="domain-address-input2" >
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="domain-address-apt">Apartment number</label>
-                                                <input type="text" class="form-control" name="domain-address-apt-input2" placeholder="Address" id="domain-address-apt-input2" >
-                                            </div>
-
-
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                         <div class="col-xs-12 text-center">
-                                             <div class="form-group">
-
-                                             <#--<a class="btn btn-danger" onclick="deleteSelected()">-->
-                                                <#--<span class="glyphicon glyphicon-remove "></span>Delete-->
-                                                <#--</a>
-                                            </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>-->
 
                             </div></div></div>
                     <div class="tab-pane" id="tab2">
@@ -162,11 +110,11 @@
                                 <div id="search-alert"></div>
                                 <form id="userSearch">
 
-                                    <div class="form-group html-editor-align-right">
+                                    <div class="form-group">
                                         <label for="email">Load user</label>
                                         <input type="email" class="form-control" id="tab2-email" name="email" placeholder="Email">
                                         <div class="form-group">
-                                            <a class="btn btn-success"  onclick="getUser()">
+                                            <a class="btn btn-success pull-right"  style="margin-top: 10px" onclick="getUser()">
                                                 Load
                                             </a>
                                         </div>
@@ -174,7 +122,7 @@
 
                                 </form>
 
-                                <label for="user-roles-checkboxesM">User roles</label>
+                                <label for="user-roles-checkboxesM" style="margin-top: 10px">User roles</label>
                                 <form id = user-roles-checkboxesM>
                                     <label class="checkbox-inline">
                                         <input type="checkbox" id="adminM">Admin
@@ -295,7 +243,7 @@
 
                                         <div id="domains-buttons" class="hidden" >
                                             <button type="button" class="btn btn-danger btn-sm hidden" onclick="deleteSelected()" id="del-dom-btn">Delete selected domains from user</button>
-                                            <button type="button" class="btn btn-default btn-sm" onclick="redirectToDomains()" id="add-domain-btn">Add user to existing domain</button>
+                                           <#-- <button type="button" class="btn btn-default btn-sm" onclick="redirectToDomains()" id="add-domain-btn">Add user to existing domain</button>-->
                                         </div>
 
                                     </div>

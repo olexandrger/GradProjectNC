@@ -72,7 +72,7 @@ function registerByAdmin() {
                         domains: domains
                     }),
                     success: function (data) {
-                        $("#add-domain-btn-reg").removeClass("hidden");
+                        //$("#add-domain-btn-reg").removeClass("hidden");
                         var alert;
                         if (data.status == 'success') {
                             console.log("Registration success! " + JSON.stringify(data));
@@ -326,7 +326,7 @@ function addUserDomain(node,id, name, city) {
     if (name == undefined) name = "";
     if (id == undefined) id = -1;
     var html =
-        '<a href="#" class="list-group-item"'+' name="'+id+'"'+  ' onclick="displayDomain(this)">'+name+ '<input type="checkbox" class="pull-right"></a>';
+        '<a href="#" class="list-group-item"'+' name="'+id+'"'+  ' onclick="displayDomain(this)">'+name+ '<input type="checkbox" class="pull-right hidden"></a>';
 
     node.append($(html));
 

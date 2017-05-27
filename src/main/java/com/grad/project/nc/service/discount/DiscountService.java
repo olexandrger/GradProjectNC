@@ -3,6 +3,7 @@ package com.grad.project.nc.service.discount;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.Region;
+import com.grad.project.nc.service.exceptions.DiscountException;
 
 import java.util.Collection;
 
@@ -18,9 +19,9 @@ public interface DiscountService {
 
     Collection<ProductRegionPrice> getProductsRegionPricesForRegion(Long regionId);
 
-    Boolean add(Discount discount);
+    void add(Discount discount) throws DiscountException;
 
-    Boolean update(Discount discount);
+    void update(Discount discount) throws DiscountException;
 
     String getStatus();
 

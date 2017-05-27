@@ -20,8 +20,4 @@ public class ProductRegionPrice {
     private List<Discount> discounts;
     private List<ProductInstance> productInstances;
 
-
-    public double getPrice() {
-        return price;
-    }
 }
