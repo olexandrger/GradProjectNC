@@ -346,7 +346,7 @@ function loadComplaints() {
                         "placeholder='Content'" +
                         "id='selected-complain-content'" +
                         "maxlength='240'" +
-                        "resize='none' readonly>" + complaint.content+
+                        "resize='none' readonly>" + ((complaint.content !=null)?(complaint.content):(""))+
                         "</textarea>" +
                         "</div>" +
                         "</div>" +
@@ -357,7 +357,7 @@ function loadComplaints() {
                         "placeholder='Responce'" +
                         "id='selected-complain-responce'" +
                         "maxlength='240'" +
-                        "resize='none' readonly>" +complaint.response+"</textarea>" +
+                        "resize='none' readonly>" +((complaint.response != null)?(complaint.response):(""))+"</textarea>" +
                         "</div>" +
                         "</div>" +
                         "</form>" +
