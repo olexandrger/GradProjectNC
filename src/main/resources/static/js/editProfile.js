@@ -113,26 +113,6 @@ function showInfo(data) {
     $("#mf4").val(data.phoneNumber);
 }
 
-function showInfo(data) {
-    console.log(data);
-    $("#mf1").val(data.firstName);
-    $("#mf2").val(data.lastName);
-    $("#mf3").val(data.email);
-    $("#mf4").val(data.phoneNumber);
-    var showDomainButton = false;
-    for (var i = 0; i < data.roles.length; i++) {
-        var role = data.roles[i].roleName
-        if (role === "ROLE_CLIENT") {
-            showDomainButton = true;
-            break;
-        }
-    }
-    if (showDomainButton) {
-        $('#changeDomain').show();
-    }
-}
-
-
 function selectOrder(index) {
     if (index == -1) {
         $("#order-main").addClass("hidden");
