@@ -129,7 +129,6 @@ function loadInstance() {
             $("#instance-suspend-button").addClass("hidden");
             $("#instance-continue-button").addClass("hidden");
             $("#instance-deactivate-button").addClass("hidden");
-            // if (data.status.categoryName == INSTANCE_STATUS_CREATED) {
             if (data.status.categoryName == INSTANCE_STATUS_ACTIVATED) {
                 $("#instance-suspend-button").removeClass("hidden");
                 $("#instance-continue-button").addClass("hidden");
@@ -138,12 +137,6 @@ function loadInstance() {
                 $("#instance-suspend-button").addClass("hidden");
                 $("#instance-continue-button").removeClass("hidden");
                 $("#instance-deactivate-button").addClass("hidden");
-                // }  else if (data.status.categoryName == INSTANCE_STATUS_DEACTIVATED) {
-                //     $("#instance-suspend-button").addClass("hidden");
-                //     $("#instance-continue-button").addClass("hidden");
-                //     $("#instance-deactivate-button").addClass("hidden");
-            } else {
-                // console.error("Unknown instasnce status: " + data.status.categoryName);
             }
 
 
@@ -187,7 +180,6 @@ function addOrdersPage(pageNumber) {
         url: "/api/client/orders/get/byInstance/" + instanceId + "/size/" + (ordersPageSize + 1) + "/offset/" + (ordersPageNumber * ordersPageSize) ,
         success: function (data) {
             var ordersTable = $("#instance-orders-table");
-            // ordersTable.find(".order-row").remove();
             if (data.length <= ordersPageSize) {
                 $("#more-orders").addClass("hidden");
             } else {
