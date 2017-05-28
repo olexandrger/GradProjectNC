@@ -25,43 +25,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    /*
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .antMatchers("/readme.txt", "/css/*", "/registration").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().loginPage("/login").permitAll()
-                .and()
-                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
-    }
-    */
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint());
 
         http
-                .authorizeRequests()
+            .authorizeRequests()
                 .antMatchers("/*", "/css/*", "/js/*", "/api/user/**").permitAll()
                 .antMatchers("/admin/**", "/api/admin/**", "/api/csr/users/**").hasRole("ADMIN")
                 .antMatchers("/csr/**", "/api/csr/**").hasRole("CSR")
                 .antMatchers("/client/**", "/api/client/**").hasRole("CLIENT")
                 .antMatchers("/pmg/**", "/api/pmg/**").hasRole("PMG")
                 .antMatchers("/profile/**", "/api/profile/**").hasAnyRole("ADMIN", "CSR", "CLIENT", "PMG")
-//                    .antMatchers("/api/**").authenticated()
-                .and()
+            .and()
                 .formLogin()
-                .loginPage("/login")
-                .usernameParameter("email")
-                .successForwardUrl("/login/success")
-                .failureForwardUrl("/login/failed")
-                .and()
+                    .loginPage("/login")
+                    .usernameParameter("email")
+                    .successForwardUrl("/login/success")
+                    .failureForwardUrl("/login/failed")
+            .and()
                 .logout()
-                .logoutSuccessUrl("/login/logout")
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
+                    .logoutSuccessUrl("/login/logout")
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
     }
 
 

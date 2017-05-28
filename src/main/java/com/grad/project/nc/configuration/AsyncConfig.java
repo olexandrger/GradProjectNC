@@ -1,5 +1,6 @@
 package com.grad.project.nc.configuration;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -11,6 +12,7 @@ import java.util.concurrent.Executor;
 
 @Configuration
 @EnableAsync
+@Slf4j
 public class AsyncConfig implements AsyncConfigurer {
     @Override
     public Executor getAsyncExecutor() {
@@ -21,13 +23,8 @@ public class AsyncConfig implements AsyncConfigurer {
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return new AsyncUncaughtExceptionHandler() {
-            @Override
-            public void handleUncaughtException(Throwable throwable, Method method, Object... objects) {
-                org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
-                logger.info("Exception in mail");
-                logger.info(throwable.getMessage());
-            }
+        return (throwable, method, objects) -> {
+            log.error("Exception in async execution", throwable);
         };
     }
 }
