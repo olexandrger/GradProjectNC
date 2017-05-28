@@ -218,7 +218,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="domain-region">Region id</label>
+                                                <label for="domain-region">Region </label>
                                                 <input type="text" class="form-control" name="domain-region" placeholder="Domain region" id="domain-region-input" disabled>
                                             </div>
 
