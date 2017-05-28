@@ -86,9 +86,11 @@ function loadInfo() {
     $.ajax({
             url: '/api/profile/get',
             success: function (data) {
+                console.log(data);
                 showInfo(data);
             },
             error: function (data) {
+                console.log(data);
                 showInfo(data);
             }
         }
@@ -96,6 +98,11 @@ function loadInfo() {
 }
 
 function showInfo(data) {
+    console.log(data);
+    $("#mf1").val(data.firstName);
+    $("#mf2").val(data.lastName);
+    $("#mf3").val(data.email);
+    $("#mf4").val(data.phoneNumber);
     var showDomainButton = false;
     for (var i = 0; i < data.roles.length; i++) {
         var role = data.roles[i].roleName
@@ -107,10 +114,6 @@ function showInfo(data) {
     if (showDomainButton) {
         $('#changeDomain').show();
     }
-    $("#mf1").val(data.firstName);
-    $("#mf2").val(data.lastName);
-    $("#mf3").val(data.email);
-    $("#mf4").val(data.phoneNumber);
 }
 
 
