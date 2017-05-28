@@ -147,7 +147,7 @@ function completeSelectedOrder() {
         success: function (data) {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
-                ordersData[selectedId].status = ORDER_STATUS_CREATED;
+                ordersData[selectedId].status = ORDER_STATUS_COMPLETED;
                 ordersData[selectedId].closeDate = Date.now() / 1000;
 
                 if (selectedOrder == selectedId) {
