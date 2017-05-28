@@ -1,24 +1,18 @@
 package com.grad.project.nc.controller.api.admin;
-
 import com.grad.project.nc.controller.api.data.RegistrationResponseHolder;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
 import com.grad.project.nc.controller.api.dto.FrontendUser;
 import com.grad.project.nc.model.*;
-import com.grad.project.nc.model.proxy.UserProxy;
 import com.grad.project.nc.persistence.RoleDao;
-import com.grad.project.nc.persistence.UserDao;
 import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
 import com.grad.project.nc.service.locations.LocationService;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.RegistrationService;
 import com.grad.project.nc.service.security.UserService;
-import com.grad.project.nc.service.security.UserServiceImpl;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
