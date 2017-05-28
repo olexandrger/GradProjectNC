@@ -20,11 +20,12 @@ public class EditProfileController {
     private AutoLoginService loginService;
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     public User dataTypes() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user;
+        return userService.getCurrentUser();
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")

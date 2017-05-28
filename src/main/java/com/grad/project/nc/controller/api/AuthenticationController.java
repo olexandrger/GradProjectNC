@@ -31,11 +31,10 @@ public class AuthenticationController {
         return Collections.singletonMap("status", "success");
     }
 
-    @RequestMapping(value = "/signout", method = RequestMethod.POST, consumes = "application/json", produces = "application/json" )
+    @RequestMapping(value = "/signout", method = RequestMethod.POST, produces = "application/json" )
     @ResponseBody
-    public Map logout(@RequestBody Map<String, String> params) {
-        String url = params.get("currentURL");
-        return logoutService.getRedirectUrl(url);
+    public Map logout(@RequestParam("currentURL") String url) {
+        return Collections.singletonMap("redirect", logoutService.getRedirectUrl(url));
     }
 
 }

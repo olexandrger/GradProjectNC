@@ -6,5 +6,5 @@ import java.util.Map;
 
 @Service
 public interface LogoutService {
-    public Map getRedirectUrl(String url);
+    public String getRedirectUrl(String url);
 }

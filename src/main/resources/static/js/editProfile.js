@@ -86,26 +86,19 @@ function loadInfo() {
     $.ajax({
             url: '/api/profile/get',
             success: function (data) {
-                console.log(data);
                 showInfo(data);
             },
             error: function (data) {
-                console.log(data);
-                showInfoInError(data);
+                showInfo(data);
             }
         }
     );
 }
 
-function showInfoInError(data) {
-    var newData = JSON.parse(data.responseText);
-    $("#mf1").val(newData.firstName);
-    $("#mf2").val(newData.lastName);
-    $("#mf3").val(newData.email);
-    $("#mf4").val(newData.phoneNumber);
+function showInfo(data) {
     var showDomainButton = false;
-    for (var i = 0; i < newData.roles.length; i++) {
-        var role = newData.roles[i].roleName
+    for (var i = 0; i < data.roles.length; i++) {
+        var role = data.roles[i].roleName
         if (role === "ROLE_CLIENT") {
             showDomainButton = true;
             break;
@@ -114,6 +107,10 @@ function showInfoInError(data) {
     if (showDomainButton) {
         $('#changeDomain').show();
     }
+    $("#mf1").val(data.firstName);
+    $("#mf2").val(data.lastName);
+    $("#mf3").val(data.email);
+    $("#mf4").val(data.phoneNumber);
 }
 
 function showInfo(data) {
