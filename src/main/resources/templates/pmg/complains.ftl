@@ -58,7 +58,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="new-complaint-reason">Compleint reason:</label>
+                        <label for="new-complaint-reason">Complaint reason:</label>
                         <select class="form-control" name="new-complaint-reason" id="new-complaint-reason">
                         </select>
                     </div>
@@ -89,7 +89,7 @@
         <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-heading" id="complain-list-panel-heading">
-                    <b>Complains:</b>
+                    <b>Complaints:</b>
                     <button type="button" class="btn" id="complaint-btn-prev-up" onclick="getPrevPage()"> &larr; Prev.
                     </button>
                     <button type="button" class="btn" id="complaint-btn-next-up" onclick="getNextPage()"> Next &rarr;
