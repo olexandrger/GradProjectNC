@@ -91,10 +91,29 @@ function loadInfo() {
             },
             error: function (data) {
                 console.log(data);
-                showInfo(data);
+                showInfoInError(data);
             }
         }
     );
+}
+
+function showInfoInError(data) {
+    var newData = JSON.parse(data.responseText);
+    $("#mf1").val(newData.firstName);
+    $("#mf2").val(newData.lastName);
+    $("#mf3").val(newData.email);
+    $("#mf4").val(newData.phoneNumber);
+    var showDomainButton = false;
+    for (var i = 0; i < newData.roles.length; i++) {
+        var role = newData.roles[i].roleName
+        if (role === "ROLE_CLIENT") {
+            showDomainButton = true;
+            break;
+        }
+    }
+    if (showDomainButton) {
+        $('#changeDomain').show();
+    }
 }
 
 function showInfo(data) {

@@ -23,7 +23,8 @@ public class EditProfileController {
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     public User dataTypes() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return user;
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
