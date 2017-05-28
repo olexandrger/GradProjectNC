@@ -334,7 +334,6 @@ function takeComplaintForConsideration() {
         },
         contentType: 'application/json',
         data: JSON.stringify({
-            userId: currentUserId,
             complaintId: complaintsData[selectedComplain].complainId
         }),
         success: function (data) {
@@ -364,7 +363,6 @@ function completComplaintConsideration() {
         },
         contentType: 'application/json',
         data: JSON.stringify({
-            userId: currentUserId,
             complaintId: complaintsData[selectedComplain].complainId,
             response: $("#selected-complain-responce").val()
         }),
