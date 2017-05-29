@@ -1,7 +1,9 @@
 package com.grad.project.nc.controller.api;
 
+import com.grad.project.nc.controller.api.dto.FrontendComplain;
 import com.grad.project.nc.model.Role;
 import com.grad.project.nc.model.User;
+import com.grad.project.nc.service.complain.ComplainService;
 import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
 import com.grad.project.nc.service.profile.ProfileService;
 import com.grad.project.nc.service.security.AutoLoginService;
@@ -13,9 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -26,6 +27,8 @@ public class EditProfileController {
     private ProfileService profileService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ComplainService complainService;
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     public FrontUser dataTypes() {
@@ -34,12 +37,12 @@ public class EditProfileController {
 
     @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public Map update(@RequestBody User user) {
+    public Map update(@RequestBody FrontUser frontUser) {
 
         Map<String, String> response = new HashMap<>();
 
         User oldUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
+        User user = mapFrontUserToUser(frontUser);
         user.setUserId(oldUser.getUserId());
 
         try {
@@ -65,6 +68,7 @@ public class EditProfileController {
 
         try {
             profileService.updatePassword(user, currentPassword, newPassword);
+            loginService.autologin(user.getEmail(), user.getPassword());
             response.put("message", "Your password has been changed");
         } catch (IncorrectUserDataException e) {
             response.put("message", e.getMessage());
@@ -72,6 +76,13 @@ public class EditProfileController {
         response.put("status", profileService.getStatus());
 
         return response;
+    }
+
+    @RequestMapping(value = "complaint/get/all/size/{size}/offset/{offset}", method = RequestMethod.GET)
+    public Collection<FrontendComplain> getComplains(@PathVariable Long size, @PathVariable Long offset){
+        return complainService.getAllComplainsByUserId(userService.getCurrentUser().getUserId(), size, offset).stream()
+                .map(FrontendComplain :: fromEntity)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private User mapFrontUserToUser(FrontUser frontUser){

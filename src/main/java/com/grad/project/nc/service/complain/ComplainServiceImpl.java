@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by DeniG on 16.05.2017.
@@ -50,6 +51,12 @@ public class ComplainServiceImpl implements ComplainService {
     @Override
     public Collection<Complain> getAllComplains(long size, long offset) {
         return complainDao.findAll(size, offset);
+    }
+
+    @Override
+    public Collection<Complain> getAllComplainsByUserId(Long userId, long size, long offset) {
+        List<Complain> byUserId = complainDao.findByUserId(userId, size, offset);
+        return byUserId;
     }
 
     @Override

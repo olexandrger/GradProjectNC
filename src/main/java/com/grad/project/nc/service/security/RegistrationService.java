@@ -50,30 +50,30 @@ public class RegistrationService {
 
     public void validation(User user) throws IncorrectUserDataException {
         status = ERROR;
-        if (user.getFirstName().isEmpty())
+        if (user.getFirstName().isEmpty()) {
             throw new IncorrectUserDataException(FIRST_NAME_IS_EMPTY);
-
-        if (user.getLastName().isEmpty())
+        }
+        if (user.getLastName().isEmpty()) {
             throw new IncorrectUserDataException(LAST_NAME_IS_EMPTY);
-
-        if (user.getEmail().isEmpty())
+        }
+        if (user.getEmail().isEmpty()) {
             throw new IncorrectUserDataException(EMAIL_IS_EMPTY);
-
-        if (user.getPassword().isEmpty())
+        }
+        if (user.getPassword().isEmpty()) {
             throw new IncorrectUserDataException(PASSWORD_IS_EMPTY);
-
-        if (!isPasswordValid(user.getPassword()))
+        }
+        if (!isPasswordValid(user.getPassword())) {
             throw new IncorrectUserDataException(INCORRECT_PASSWORD);
-
-        if (user.getPhoneNumber().isEmpty())
+        }
+        if (user.getPhoneNumber().isEmpty()) {
             throw new IncorrectUserDataException(PHONE_IS_EMPTY);
-
-        if (!isPhoneNumberValid(user.getPhoneNumber()))
+        }
+        if (!isPhoneNumberValid(user.getPhoneNumber())) {
             throw new IncorrectUserDataException(INCORRECT_PHONE);
-
-        if (!isEmailValid(user.getEmail()))
+        }
+        if (!isEmailValid(user.getEmail())) {
             throw new IncorrectUserDataException(INVALID_EMAIL);
-
+        }
     }
 
     boolean isEmailValid(String email) {
