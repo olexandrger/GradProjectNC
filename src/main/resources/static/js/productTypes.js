@@ -13,7 +13,9 @@ var defaultOpts = { //twbs pagination default options
     hideOnlyOnePage : true,
     onPageClick: function (event, page) {
         console.log('clicked page #' + page);
-        loadProductTypePage(page, amount);
+        loadProductTypePage(page, amount, function () {
+            selectItem(productTypesCache.length - 1);
+        });
     }
 };
 var $pagination;
@@ -211,7 +213,7 @@ function saveSelectedProductType() {
 
                 $.ajax({
                     type: 'GET',
-                    url: '/api/user/productTypes/get/' + data.id,
+                    url: '/api/user/productTypes/' + data.id,
                     success: function (data) {
                         console.log("result of GET request to server: " + JSON.stringify(data));
 
@@ -375,7 +377,9 @@ function loadDataTypes() {
             dataTypesHTML = createDataTypesHTML(data);
 
             $pagination = $('#pagination');
-            loadProductTypePage(startPage, amount);
+            loadProductTypePage(startPage, amount, function () {
+                selectItem(productTypesCache.length - 1);
+            });
         },
         error: function () {
             console.error("Cannot load dataTypes");
@@ -386,7 +390,7 @@ function loadDataTypes() {
 function getProductTypeById(id) {
     $.ajax({
         type: 'GET',
-        url: '/api/user/productTypes/get/' + id,
+        url: '/api/user/productTypes/' + id,
         success: function (data) {
             console.log("result of GET request to server: " + JSON.stringify(data));
             productTypesCache = [data];
@@ -406,7 +410,6 @@ function setupTypeahead() {
         datumTokenizer:  Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         identify: function(obj) { return obj.name; },
-        prefetch: '/api/user/productTypes/last?amount=' + prefetchAmount,
         remote: {
             wildcard: '%QUERY',
             url: '/api/user/productTypes/search?query=%QUERY'
@@ -434,8 +437,14 @@ function setupTypeahead() {
     $searchClear.click(function () {
         $typeahead.typeahead('val', '');
         $(this).addClass('hide');
+        currentSelected = -1;
+        $("#products-editor").addClass("hidden");
+
         var currentPage = +$pagination.find('li.active > a').text();
-        loadProductTypePage(currentPage, amount);
+        currentPage = currentPage != 0 ? currentPage : startPage;
+        loadProductTypePage(currentPage, amount, function () {
+            selectItem(productTypesCache.length - 1);
+        });
     });
 }
 

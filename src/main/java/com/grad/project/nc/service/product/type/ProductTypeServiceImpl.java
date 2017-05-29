@@ -56,7 +56,7 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
 
     @Override
     public Page<ProductType> findPaginated(int page, int amount) {
-        int totalPages = productTypeDao.countTotalProducts() / amount + 1;
+        int totalPages = (int) Math.ceil(productTypeDao.countTotalProducts() / (double) amount);
         List<ProductType> productTypes = productTypeDao.findPaginated(page, amount);
         productTypes.forEach(pt -> pt.getProductCharacteristics().forEach(ProductCharacteristic::getDataType));
 
