@@ -171,8 +171,8 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = newOrder(instanceId, ORDER_AIM_SUSPEND, userId);
 
         try {
-            startOrder(order.getProductOrderId());
-            completeOrder(order.getProductOrderId());
+            startOrder(order.getProductOrderId(), true);
+            completeOrder(order.getProductOrderId(), true);
         } catch (IllegalOrderOperationException e) {
             //theoretically impossible
             throw new RuntimeException(e);
@@ -187,8 +187,8 @@ public class OrdersServiceImpl implements OrdersService {
         ProductOrder order = newOrder(instanceId, ORDER_AIM_RESUME, userId);
 
         try {
-            startOrder(order.getProductOrderId());
-            completeOrder(order.getProductOrderId());
+            startOrder(order.getProductOrderId(), true);
+            completeOrder(order.getProductOrderId(), true);
         } catch (IllegalOrderOperationException e) {
             //theoretically impossible
             throw new RuntimeException(e);
@@ -226,8 +226,14 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public void startOrder(long orderId) throws InsufficientRightsException, IllegalOrderOperationException {
-        if (!hasCsrAuthority(userService.getCurrentUser())) {
-            throw new InsufficientRightsException("Orders can be started only by CSR");
+        startOrder(orderId, false);
+    }
+
+    private void startOrder(long orderId, boolean ignoreSecurity) throws InsufficientRightsException, IllegalOrderOperationException {
+        if (!ignoreSecurity) {
+            if (!hasCsrAuthority(userService.getCurrentUser())) {
+                throw new InsufficientRightsException("Orders can be started only by CSR");
+            }
         }
 
         ProductOrder order = orderDao.find(orderId);
@@ -264,6 +270,7 @@ public class OrdersServiceImpl implements OrdersService {
         order.setStatus(categoryDao.find(ORDER_STATUS_CANCELLED));
         order.setCloseDate(OffsetDateTime.now());
 
+
         if (order.getOrderAim().getCategoryId() == ORDER_AIM_CREATE) {
             order.getProductInstance().setStatus(categoryDao.find(INSTANCE_STATUS_DEACTIVATED));
             productInstanceDao.update(order.getProductInstance());
@@ -273,14 +280,16 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public void completeOrder(long orderId) throws IllegalOrderOperationException, InsufficientRightsException {
+        completeOrder(orderId, false);
+    }
+
+    private void completeOrder(long orderId, boolean ignoreSecurity) throws IllegalOrderOperationException, InsufficientRightsException {
         ProductOrder order = orderDao.find(orderId);
 
-//        if (order.getResponsible() == null) {
-//            throw new RuntimeException("Responsible can not be null in started order");
-//        }
-
-        if (order.getResponsible() != null && !order.getResponsible().getUserId().equals(userService.getCurrentUser().getUserId())) {
-            throw new InsufficientRightsException("Orders can be finished only by responsible");
+        if (!ignoreSecurity) {
+            if (order.getResponsible() != null && !order.getResponsible().getUserId().equals(userService.getCurrentUser().getUserId())) {
+                throw new InsufficientRightsException("Orders can be finished only by responsible");
+            }
         }
 
         if (!order.getStatus().getCategoryId().equals(ORDER_STATUS_IN_PROGRESS)) {

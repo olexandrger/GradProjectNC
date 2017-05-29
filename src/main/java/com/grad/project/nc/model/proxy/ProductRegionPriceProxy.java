@@ -104,37 +104,37 @@ public class ProductRegionPriceProxy extends ProductRegionPrice {
         super.setProductInstances(productInstances);
     }
 
-    @Override
-    public double getPrice(){
-
-
-
-        List<Discount> currentlyActiveDiscounts = this.getDiscounts().stream().filter(discount ->
-                (OffsetDateTime.now().isAfter(discount.getStartDate()) && OffsetDateTime.now().isBefore(discount.getEndDate())))
-                .collect(Collectors.toList());
-
-        if (currentlyActiveDiscounts == null || currentlyActiveDiscounts.size() == 0){
-            return super.getPrice();
-        }
-
-        //find biggest discount
-        final Comparator<Discount> discountComparator = Comparator.comparingDouble(Discount::getDiscount);
-        Discount d = currentlyActiveDiscounts.stream().max(discountComparator).get();
-
-        if (d.getDiscount() == 0){
-            return super.getPrice();
-        }
-        if (d.getDiscount() == 100){
-            return 0.0;
-        }
-
-        double discPrice = super.getPrice() - (super.getPrice() * (d.getDiscount()/100.0));
-
-
-        return discPrice;
-    }
-    public double getBasePrice(){
-
-        return super.getPrice();
-    }
+//    @Override
+//    public double getPrice(){
+//
+//
+//
+//        List<Discount> currentlyActiveDiscounts = this.getDiscounts().stream().filter(discount ->
+//                (OffsetDateTime.now().isAfter(discount.getStartDate()) && OffsetDateTime.now().isBefore(discount.getEndDate())))
+//                .collect(Collectors.toList());
+//
+//        if (currentlyActiveDiscounts == null || currentlyActiveDiscounts.size() == 0){
+//            return super.getPrice();
+//        }
+//
+//        //find biggest discount
+//        final Comparator<Discount> discountComparator = Comparator.comparingDouble(Discount::getDiscount);
+//        Discount d = currentlyActiveDiscounts.stream().max(discountComparator).get();
+//
+//        if (d.getDiscount() == 0){
+//            return super.getPrice();
+//        }
+//        if (d.getDiscount() == 100){
+//            return 0.0;
+//        }
+//
+//        double discPrice = super.getPrice() - (super.getPrice() * (d.getDiscount()/100.0));
+//
+//
+//        return discPrice;
+//    }
+//    public double getBasePrice(){
+//
+//        return super.getPrice();
+//    }
 }

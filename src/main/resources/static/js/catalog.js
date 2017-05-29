@@ -22,13 +22,9 @@ function getCharacteristicStringValue(characteristic, dataType) {
 }
 
 function getRegionalPrice(regionId) {
-    var price = "";
-    catalogProductsCache[currentSelected].prices.forEach(function(item) {
-        if (item.regionId == regionId)
-            price = item.price;
+    return catalogProductsCache[currentSelected].prices.find(function(price) {
+        return price.regionId == regionId;
     });
-
-    return price;
 }
 
 function selectCatalogProduct(index, positionInList) {
@@ -48,7 +44,8 @@ function selectCatalogProduct(index, positionInList) {
     var table = $("#catalog-table-details");
     catalogProductsCache[index].productCharacteristicValues.forEach(function (item) {
         var html =
-            '<tr class="table-row"><td>' + item.productCharacteristic.characteristicName + '</td>' +
+            '<tr class="table-row">' +
+                '<td>' + item.productCharacteristic.characteristicName + '</td>' +
                 '<td>' + getCharacteristicStringValue(item, item.productCharacteristic.dataType.categoryName) + '</td>' +
                 '<td>' + item.productCharacteristic.measure + '</td>' +
             '</tr>';
@@ -56,13 +53,45 @@ function selectCatalogProduct(index, positionInList) {
         table.append($(html));
     });
 
-    var html =
-        '<tr class="table-row">' +
+    var price =  getRegionalPrice(localStorage.getItem("regionId"));
+    console.log(JSON.stringify(price));
+
+    var priceHTML =
+        '<tr class="table-row final-price-table-row"">' +
             '<td>Price</td>' +
-            '<td colspan="2">' + getRegionalPrice(localStorage.getItem("regionId")) + '</td>' +
+            '<td colspan="2">' + price.price + '</td>' +
         '</tr>';
 
-    table.append($(html));
+    table.append($(priceHTML));
+
+    if (price.discount != null) {
+        table.find('tr').removeClass('final-price-table-row');
+
+        var discountHTML = '<tr class="table-row">' +
+            '<td>Discount : ' + price.discount.discountTitle + '</td>' +
+            '<td>' + price.discount.discount + '</td>' +
+            '<td><span class="info">%</span></td>' +
+            '</tr>';
+
+        table.append($(discountHTML));
+
+        var finalPrice = calculateFinalPrice(price);
+        var finalPriceHTML =
+            '<tr class="table-row final-price-table-row"">' +
+            '<td>Final price</td>' +
+            '<td colspan="2">' + finalPrice + '</td>' +
+            '</tr>';
+
+        table.append($(finalPriceHTML));
+    }
+}
+
+function calculateFinalPrice(priceObj) {
+    var discountObj = priceObj.discount;
+    if (discountObj != null) {
+        return priceObj.price - priceObj.price * discountObj.discount / 100;
+    }
+    return priceObj.price;
 }
 
 function updateCatalog() {
@@ -130,22 +159,20 @@ function loadDomainsData() {
 }
 
 function catalogChangeDomain(domainId) {
-
     //TODO display address
     //Maybe this is wright
      var price = getRegionalPrice(catalogDomains[domainId].address.location.region.regionId);
 
-
-
-
-    if (price == "") {
+    if (price == null) {
         price = "Product unavailable in this region";
+        $('#catalog-price-field').val(price);
         $('#new-product-order-modal-submit').addClass("disabled");
     } else {
         $('#new-product-order-modal-submit').removeClass("disabled");
+        $('#catalog-price-field').val(price);
     }
 
-    $('#catalog-price-field').val(price);
+    $('#catalog-price-field').val(calculateFinalPrice(price));
 }
 
 function catalogSubmitOrder() {

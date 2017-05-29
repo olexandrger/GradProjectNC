@@ -11,7 +11,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @org.springframework.context.annotation.Configuration
 @PropertySource("classpath:email.properties")
-@Slf4j
 public class EmailConfig {
     @Value("${email.config.server.host}") String serverHost;
     @Value("${email.config.server.port}") Integer serverPort;

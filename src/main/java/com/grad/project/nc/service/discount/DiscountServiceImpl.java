@@ -3,14 +3,15 @@ package com.grad.project.nc.service.discount;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.model.Region;
-import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.DiscountDao;
 import com.grad.project.nc.persistence.ProductRegionPriceDao;
 import com.grad.project.nc.persistence.RegionDao;
+import com.grad.project.nc.service.exceptions.DiscountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -20,21 +21,26 @@ import java.util.Collection;
 @Service
 public class DiscountServiceImpl implements DiscountService {
 
-    private CrudDao<Region> regionsDao;
-    private CrudDao<Discount> discountDao;
+    private RegionDao regionDao;
+    private DiscountDao discountDao;
     private ProductRegionPriceDao productRegionPriceDao;
 
     private String status;
     private String message;
     private Long addedDiscountId = Long.valueOf(-1);
-    private final String SUCCESS = "success";
-    private final String ERROR = "error";
-    private final String DISCOUNT_RANGE = "Error! Discount must be between 0 to 100 percent!";
-    private final String DISCOUNT_DATE = "Error! Start date must be before end date!";
+    private static final String SUCCESS = "success";
+    private static final String ERROR = "error";
+    private static final String DISCOUNT_RANGE = "Error! Discount must be between 0 to 100 percent!";
+    private static final String DISCOUNT_DATE = "Error! Start date must be before end date!";
+    private static final String DUPLICATE_PRODUCT = "Some of added products already have a discount";
+    private static final String GENERAL_ADD_ERROR = "Error during adding";
+    private static final String GENERAL_UPDATE_ERROR = "Error during updating";
+    private static final String ADDED_SUCCESSFULLY = "Discount added successfully!";
+    private static final String UPDATED_SUCCESSFULLY = "Discount updated successfully!";
 
     @Autowired
-    public DiscountServiceImpl(RegionDao regionsDao, DiscountDao discountDao, ProductRegionPriceDao productRegionPriceDao) {
-        this.regionsDao = regionsDao;
+    public DiscountServiceImpl(RegionDao regionDao, DiscountDao discountDao, ProductRegionPriceDao productRegionPriceDao) {
+        this.regionDao = regionDao;
         this.discountDao = discountDao;
         this.productRegionPriceDao = productRegionPriceDao;
     }
@@ -55,7 +61,7 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public Collection<Region> getRegions() {
 
-        return regionsDao.findAll();
+        return regionDao.findAll();
     }
 
 
@@ -66,106 +72,78 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public Boolean add(Discount discount) {
+    public void add(Discount discount) throws DiscountException {
         addedDiscountId = discount.getDiscountId();
 
         try {
-
-            if (validate(discount)){
-                addedDiscountId = discountDao.add(discount).getDiscountId();
-                message = "Discount added successfully!";
-            }
-            else {
-                return false;
-            }
+            validate(discount);
+            addedDiscountId = discountDao.add(discount).getDiscountId();
+            message = ADDED_SUCCESSFULLY;
+            status = SUCCESS;
         }
         catch (DuplicateKeyException dk){
-
             status = ERROR;
-            message = "Some of added products already have a discount";
-            dk.printStackTrace();
-            return false;
-
+            throw new DiscountException(DUPLICATE_PRODUCT);
         }
         catch (DataAccessException e){
             status = ERROR;
-            message = "Error during adding" ;
-
-            return false;
+            throw new DiscountException(GENERAL_ADD_ERROR);
         }
 
-        status = SUCCESS;
-        return true;
     }
 
     @Override
-    public Boolean update(Discount discount) {
+    public void update(Discount discount) throws DiscountException {
 
         try {
-            if (validate(discount)){
-                discountDao.update(discount);
-                message = "Discount updated successfully!";
-            }
-            else {
-                return false;
-            }
+            validate(discount);
+            discountDao.update(discount);
+            message = UPDATED_SUCCESSFULLY;
+            status = SUCCESS;
         }
         catch (DuplicateKeyException dk){
-
             status = ERROR;
-            message = "Some of added products already have a discount";
-            dk.printStackTrace();
-            return false;
-
+            throw new DiscountException(DUPLICATE_PRODUCT);
         }
         catch (DataAccessException e){
-            e.printStackTrace();
-
             status = ERROR;
-            message = "Error during updating";
-
-            return false;
+            throw new DiscountException(GENERAL_UPDATE_ERROR);
         }
-
-        status = SUCCESS;
-
-        return true;
 
     }
 
-    private boolean validate(Discount discount){
+    private void validate(Discount discount) throws DiscountException{
 
         if (!discount.getEndDate().isAfter(discount.getStartDate())){
             message = DISCOUNT_DATE;
             status = ERROR;
-            return false;
+
+            throw new DiscountException(DISCOUNT_DATE);
         }
         if (!(discount.getDiscount() >= 0.0 && discount.getDiscount() <= 100.0)){
             message = DISCOUNT_RANGE;
             status = ERROR;
-            return false;
+
+            throw new DiscountException(DISCOUNT_RANGE);
         }
 
-        return true;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public Long getAddedDiscountId() {
         return addedDiscountId;
+    }
+
+    @Override
+    @Transactional
+    public Discount findLargestDiscountByPriceId(Long priceId) {
+        return discountDao.findLargestDiscountByPriceId(priceId);
     }
 }

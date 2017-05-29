@@ -101,6 +101,14 @@ const INSTANCE_STATUS_SUSPENDED = "SUSPENDED";
 const INSTANCE_STATUS_DEACTIVATED = "DEACTIVATED";
 const INSTANCE_STATUS_CREATED = "CREATED";
 
+function calculateDiscountPrice(priceObj) {
+    var tmpPrice = priceObj.price;
+    var discountObj = priceObj.discount;
+    if (discountObj != null) {
+        return tmpPrice - tmpPrice * discountObj.discount / 100;
+    }
+    return tmpPrice;
+}
 function loadInstance() {
     $.ajax({
         url: "/api/client/instance/get/byId/" + instanceId,
@@ -115,12 +123,12 @@ function loadInstance() {
                 (address.apartment == undefined ? "" : " " + address.apartment)
                 + "<br/>" + address.city + ", " + data.price.region.regionName);
             $("#instance-product-price").html(data.price.price);
+            $("#instance-product-discount-price").html(calculateDiscountPrice(data.price));
 
             $("#instance-complain-button").removeClass("hidden");
             $("#instance-suspend-button").addClass("hidden");
             $("#instance-continue-button").addClass("hidden");
             $("#instance-deactivate-button").addClass("hidden");
-            // if (data.status.categoryName == INSTANCE_STATUS_CREATED) {
             if (data.status.categoryName == INSTANCE_STATUS_ACTIVATED) {
                 $("#instance-suspend-button").removeClass("hidden");
                 $("#instance-continue-button").addClass("hidden");
@@ -129,12 +137,6 @@ function loadInstance() {
                 $("#instance-suspend-button").addClass("hidden");
                 $("#instance-continue-button").removeClass("hidden");
                 $("#instance-deactivate-button").addClass("hidden");
-                // }  else if (data.status.categoryName == INSTANCE_STATUS_DEACTIVATED) {
-                //     $("#instance-suspend-button").addClass("hidden");
-                //     $("#instance-continue-button").addClass("hidden");
-                //     $("#instance-deactivate-button").addClass("hidden");
-            } else {
-                // console.error("Unknown instasnce status: " + data.status.categoryName);
             }
 
 
@@ -178,7 +180,6 @@ function addOrdersPage(pageNumber) {
         url: "/api/client/orders/get/byInstance/" + instanceId + "/size/" + (ordersPageSize + 1) + "/offset/" + (ordersPageNumber * ordersPageSize) ,
         success: function (data) {
             var ordersTable = $("#instance-orders-table");
-            // ordersTable.find(".order-row").remove();
             if (data.length <= ordersPageSize) {
                 $("#more-orders").addClass("hidden");
             } else {
@@ -337,7 +338,7 @@ function loadComplaints() {
                         "placeholder='Content'" +
                         "id='selected-complain-content'" +
                         "maxlength='240'" +
-                        "resize='none' readonly>" + complaint.content+
+                        "resize='none' readonly>" + ((complaint.content !=null)?(complaint.content):(""))+
                         "</textarea>" +
                         "</div>" +
                         "</div>" +
@@ -348,7 +349,7 @@ function loadComplaints() {
                         "placeholder='Responce'" +
                         "id='selected-complain-responce'" +
                         "maxlength='240'" +
-                        "resize='none' readonly>" +complaint.response+"</textarea>" +
+                        "resize='none' readonly>" +((complaint.response != null)?(complaint.response):(""))+"</textarea>" +
                         "</div>" +
                         "</div>" +
                         "</form>" +

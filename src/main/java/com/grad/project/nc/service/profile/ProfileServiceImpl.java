@@ -1,9 +1,10 @@
 package com.grad.project.nc.service.profile;
 
 import com.grad.project.nc.model.User;
-import com.grad.project.nc.service.security.AutoLoginService;
+import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
 import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,6 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Autowired
     private BCryptPasswordEncoder encoder;
-    @Autowired
-    private AutoLoginService loginService;
 
     private final String INVALID_EMAIL = "Incorrect email address";
     private final String INCORRECT_NEW_PASSWORD = "Incorrect new password. Minimum length - 8 symbols";
@@ -24,82 +23,63 @@ public class ProfileServiceImpl implements ProfileService {
     private final String LAST_NAME_IS_EMPTY = "Last name is empty";
     private final String EMAIL_IS_EMPTY = "Email is empty";
     private final String PHONE_IS_EMPTY = "Phone is empty";
-    private final String CHANGES_SAVED = "Changes saved";
-    private final String PASSWORD_SAVED = "Your password has been changed";
 
     private final String SUCCESS = "success";
     private final String ERROR = "error";
 
     private String status;
-    private String message;
 
     @Autowired
     private UserService userService;
 
     @Override
-    public boolean updateGeneralInformation(User user) {
-        if (user.getFirstName().isEmpty()) {
-            status = ERROR;
-            message = FIRST_NAME_IS_EMPTY;
-            return false;
-        }
-        if (user.getLastName().isEmpty()) {
-            status = ERROR;
-            message = LAST_NAME_IS_EMPTY;
-            return false;
-        }
-        if (user.getEmail().isEmpty()) {
-            status = ERROR;
-            message = EMAIL_IS_EMPTY;
-            return false;
-        }
-        if (user.getPhoneNumber().isEmpty()) {
-            status = ERROR;
-            message = PHONE_IS_EMPTY;
-            return false;
-        }
-        if (!isPhoneNumberValid(user.getPhoneNumber())) {
-            status = ERROR;
-            message = INCORRECT_PHONE;
-            return false;
-        }
-        if (!isEmailValid(user.getEmail())) {
-            status = ERROR;
-            message = INVALID_EMAIL;
-            return false;
-        }
-        if (!userService.updateGeneralInformation(user)) {
-            status = ERROR;
-            message = EMAIL_ALREADY_EXISTS;
-            return false;
+    public User updateGeneralInformation(User user) throws IncorrectUserDataException {
+        try {
+            userService.updateGeneralInformation(user);
+        } catch (DuplicateKeyException e) {
+            throw new IncorrectUserDataException(EMAIL_ALREADY_EXISTS);
         }
         status = SUCCESS;
-        message = CHANGES_SAVED;
-        return true;
+        return user;
     }
 
     @Override
-    public boolean updatePassword(User user, String currentPassword, String newPassword) {
-        if (!encoder.matches(currentPassword, user.getPassword())) {
-            status = ERROR;
-            message = INVALID_CURRENT_PASSWORD;
-            return false;
-        }
-        if (!isPasswordValid(newPassword)) {
-            status = ERROR;
-            message = INCORRECT_NEW_PASSWORD;
-            return false;
-        }
+    public User updatePassword(User user, String currentPassword, String newPassword) throws IncorrectUserDataException {
+        status = ERROR;
+        if (!encoder.matches(currentPassword, user.getPassword()))
+            throw new IncorrectUserDataException(INVALID_CURRENT_PASSWORD);
+
+        if (!isPasswordValid(newPassword))
+            throw new IncorrectUserDataException(INCORRECT_NEW_PASSWORD);
+
         user.setPassword(newPassword);
 
-        if (!userService.updatePassword(user)) {
-            status = ERROR;
-            message = ERROR;
-        }
-        loginService.autologin(user.getEmail(), user.getPassword());
+        userService.updatePassword(user);
+
         status = SUCCESS;
-        message = PASSWORD_SAVED;
-        return true;
+        return user;
+    }
+
+    public void validationGeneralInformation(User user) throws IncorrectUserDataException {
+        status = ERROR;
+        if (user.getFirstName().isEmpty()) {
+            throw new IncorrectUserDataException(FIRST_NAME_IS_EMPTY);
+        }
+        if (user.getLastName().isEmpty()) {
+            throw new IncorrectUserDataException(LAST_NAME_IS_EMPTY);
+        }
+        if (user.getEmail().isEmpty()) {
+            throw new IncorrectUserDataException(EMAIL_IS_EMPTY);
+        }
+        if (user.getPhoneNumber().isEmpty()) {
+            throw new IncorrectUserDataException(PHONE_IS_EMPTY);
+        }
+        if (!isPhoneNumberValid(user.getPhoneNumber())) {
+            throw new IncorrectUserDataException(INCORRECT_PHONE);
+        }
+        if (!isEmailValid(user.getEmail())) {
+            throw new IncorrectUserDataException(INVALID_EMAIL);
+        }
     }
 
     boolean isEmailValid(String email) {
@@ -132,8 +112,4 @@ public class ProfileServiceImpl implements ProfileService {
         return status;
     }
 
-    @Override
-    public String getMessage() {
-        return message;
-    }
 }

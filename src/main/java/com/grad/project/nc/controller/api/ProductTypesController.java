@@ -2,13 +2,13 @@ package com.grad.project.nc.controller.api;
 
 import com.grad.project.nc.controller.api.dto.FrontendCategory;
 import com.grad.project.nc.controller.api.dto.FrontendProductType;
+import com.grad.project.nc.controller.api.dto.TypeaheadItem;
+import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.service.product.type.ProductTypeService;
+import com.grad.project.nc.support.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +43,56 @@ public class ProductTypesController {
         return productTypeService.findAll()
                 .stream()
                 .map(FrontendProductType::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/productTypes/active", method = RequestMethod.GET)
+    public List<FrontendProductType> getActiveProductTypes() {
+        return productTypeService.findActive()
+                .stream()
+                .map(FrontendProductType::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @RequestMapping(
+            value = "/productTypes",
+            params = { "page", "amount" },
+            method = RequestMethod.GET
+    )
+    public Page<FrontendProductType> getPaginated(@RequestParam("page") int page,
+                                                  @RequestParam("amount") int amount) {
+        Page<ProductType> productTypePage = productTypeService.findPaginated(page, amount);
+
+        List<FrontendProductType> content = productTypePage.getContent()
+                .stream()
+                .map(FrontendProductType::fromEntity)
+                .collect(Collectors.toList());
+
+
+        return new Page<>(content, productTypePage.getTotalPages());
+    }
+
+    @RequestMapping(
+            value = "productTypes/last",
+            params = {"amount"},
+            method = RequestMethod.GET
+    )
+    public List<TypeaheadItem> fetchProductTypeTypeaheadItems(@RequestParam("amount") int amount) {
+        return productTypeService.findLastN(amount)
+                .stream()
+                .map(pt -> new TypeaheadItem(pt.getProductTypeId(), pt.getProductTypeName()))
+                .collect(Collectors.toList());
+    }
+
+    @RequestMapping(
+            value = "productTypes/search",
+            params = {"query"},
+            method = RequestMethod.GET
+    )
+    public List<TypeaheadItem> fetchProductTypeTypeaheadItemsByQuery(@RequestParam("query") String query) {
+        return productTypeService.findByNameContaining(query)
+                .stream()
+                .map(pt -> new TypeaheadItem(pt.getProductTypeId(), pt.getProductTypeName()))
                 .collect(Collectors.toList());
     }
 }

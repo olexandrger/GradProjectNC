@@ -164,7 +164,11 @@ function saveSelectedProduct() {
     var newProduct = {};
 
     newProduct.productId = productsCache[currentSelected].productId;
-    newProduct.productName = $("#product-name-input").val();
+    var productName = extractProductName();
+    if (productName == null) {
+        return
+    }
+    newProduct.productName = productName;
     newProduct.productDescription = $("#product-description-input").val();
     newProduct.isActive = ($('input[name=product-status]:checked').val() == 'true');
 
@@ -244,6 +248,26 @@ function saveSelectedProduct() {
                 .insertAfter($("#new-product-alert-place"));
         }
     });
+}
+
+function extractProductName() {
+    var productName = $("#product-name-input").val();
+    if (productName == '') {
+        $("#empty-product-name-alert").remove();
+        console.log("Error: Product name cannot be empty");
+
+        $('<div id="empty-product-name-alert" class="alert alert-danger" role="alert">' +
+            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+            "Please, specify product name, it cannot be empty</div>")
+            .delay(2000)
+            .fadeOut(function () {
+                $(this).remove();
+            })
+            .insertAfter($('#product-name-input'));
+
+        return null;
+    }
+    return productName;
 }
 
 function extractProductTypeId() {
@@ -539,6 +563,23 @@ function loadRegions() {
     });
 }
 
+function getProductById(id) {
+    $.ajax({
+        type: 'GET',
+        url: '/api/user/products/get/' + id,
+        success: function (data) {
+            console.log("result of GET request to server: " + JSON.stringify(data));
+            productsCache = [data];
+
+            displayLoadedProducts();
+            selectProduct(0);
+        },
+        error: function (data) {
+            console.log("Error occurred. Cannot GET specified resource");
+        }
+    });
+}
+
 function setupTypeahead() {
     // Instantiate the Bloodhound suggestion engine
     var products = new Bloodhound({
@@ -552,8 +593,11 @@ function setupTypeahead() {
         }
     });
 
+    var $typeahead = $('.typeahead');
+    var $searchClear = $('#search-clear');
+
 // Instantiate the Typeahead UI
-    $('.typeahead').typeahead({
+    $typeahead.typeahead({
         hint: true,
         highlight: true,
         minLength: 1
@@ -561,6 +605,17 @@ function setupTypeahead() {
         name: 'products',
         display: 'name',
         source: products
+    }).on('typeahead:selected', function (obj, datum) {
+        $searchClear.removeClass('hide');
+        getProductById(datum.id);
+    });
+
+    //setup search clear button
+    $searchClear.click(function () {
+        $typeahead.typeahead('val', '');
+        $(this).addClass('hide');
+        var currentPage = +$pagination.find('li.active > a').text();
+        loadProductPage(currentPage, amount);
     });
 }
 

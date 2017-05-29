@@ -78,14 +78,14 @@ function logout() {
         headers: {
             'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
         },
-        processData: false,
-        contentType: 'application/json',
-        data: JSON.stringify({currentURL : window.location.pathname.substr(1)}),
+        data: {
+            currentURL : window.location.pathname.substr(1)
+        },
         success: function (data) {
-            signOut(data)
+            signOut(data);
         },
         error: function (data) {
-            signOut(data)
+            signOut(data);
         }
     });
 }
@@ -98,18 +98,14 @@ function signOut(data) {
             'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
         },
         success: function () {
-            console.log("Logout success! " + JSON.stringify(data));
-            if (data.redirect) {
-                location = data.redirect;
-            } else {
-                location.reload();
-            }
+            location = data.redirect;
         },
         error: function () {
             console.error("Logout failure! " + JSON.stringify(data));
         }
     });
 }
+
 
 
 function login() {

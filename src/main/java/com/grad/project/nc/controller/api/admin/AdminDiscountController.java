@@ -7,6 +7,7 @@ import com.grad.project.nc.controller.api.dto.FrontendDiscount;
 import com.grad.project.nc.controller.api.dto.FrontendRegion;
 import com.grad.project.nc.model.Discount;
 import com.grad.project.nc.service.discount.DiscountService;
+import com.grad.project.nc.service.exceptions.DiscountException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,12 +38,10 @@ public class AdminDiscountController {
         Discount discount = FrontendDiscount.toEntity(frontendDiscount);
         NewDiscountResponseHolder responseHolder = new NewDiscountResponseHolder();
 
-        log.info("Adding discount " + frontendDiscount.getDiscountTitle() );
+        log.info("Adding discount: {} ",frontendDiscount.getDiscountTitle() );
 
-        if (!discountService.add(discount)) {
-            responseHolder.setMessage(discountService.getMessage());
-            responseHolder.setStatus(discountService.getStatus());
-        } else {
+        try{
+            discountService.add(discount);
             if (discountService.getAddedDiscountId() >= 0){
                 responseHolder.setMessage(discountService.getMessage());
                 responseHolder.setStatus(discountService.getStatus());
@@ -56,8 +55,13 @@ public class AdminDiscountController {
 
             }
 
+        }
+        catch (DiscountException de){
+            responseHolder.setMessage(de.getMessage());
+            responseHolder.setStatus(discountService.getStatus());
 
         }
+
 
 
         return responseHolder;
@@ -69,13 +73,16 @@ public class AdminDiscountController {
         Discount discount = FrontendDiscount.toEntity(frontendDiscount);
         DiscountResponseHolder responseHolder = new DiscountResponseHolder();
 
-        log.info("Updating discount " + frontendDiscount.getDiscountTitle() + frontendDiscount.getStartDate() );
+        log.info("Updating discount: {}",  frontendDiscount.getDiscountTitle() + frontendDiscount.getStartDate() );
 
-        if (!discountService.update(discount)) {
+        try{
+            discountService.update(discount);
             responseHolder.setMessage(discountService.getMessage());
             responseHolder.setStatus(discountService.getStatus());
-        } else {
-            responseHolder.setMessage(discountService.getMessage());
+
+        }
+        catch (DiscountException de){
+            responseHolder.setMessage(de.getMessage());
             responseHolder.setStatus(discountService.getStatus());
 
         }
@@ -104,7 +111,6 @@ public class AdminDiscountController {
     @RequestMapping(value = "/productPricesForRegion", method = RequestMethod.GET)
     @ResponseBody
     public Collection<FrontEndProductRegionPrice> getProductsRegionPricesForRegion(@RequestParam("regionId") Long regionId) {
-        log.info( "Found:" + regionId );
 
         return discountService.getProductsRegionPricesForRegion(regionId).stream()
                 .map(FrontEndProductRegionPrice::fromEntity)

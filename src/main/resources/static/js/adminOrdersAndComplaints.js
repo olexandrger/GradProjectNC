@@ -122,8 +122,12 @@ function loadComplaints() {
             data.forEach(function (item, i) {
                 if (i < complaintListSize) {
                     ref = document.createElement("a");
+                    span = document.createElement("span");
+                    span.className = getSpanClass(item.statusId);
+                    span.appendChild(document.createTextNode(item.status));
                     complaintName = item.userName + ": " + item.complainReason;
                     ref.appendChild(document.createTextNode("#" + item.complainId + ": " + item.userName + ": "));
+                    ref.append(span);
                     ref.appendChild(document.createElement("br"));
                     if (item.productInstanceName != null) {
                         ref.appendChild(document.createTextNode(item.productInstanceName + " - " + item.complainReason));
@@ -156,6 +160,23 @@ function loadComplaints() {
             alertError("Internal server error!")
         }
     });
+}
+
+function getSpanClass(statusId) {
+    switch(statusId){
+        case COMPLAINT_STATUS_CREATED:
+            return "label label-warning";
+            break;
+        case COMPLAINT_STATUS_UNDER_CONSIDERATION:
+            return "label label-info";
+            break;
+        case COMPLAINT_STATUS_CONSIDERATION_COMPLETED:
+            return"label label-success";
+            break;
+        default:
+            return "label label-danger";
+            break;
+    }
 }
 
 function selectOrder(index) {

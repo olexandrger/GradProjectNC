@@ -45,13 +45,6 @@ public class UserServiceImpl implements UserService{
     private final String PASSWORD_IS_EMPTY = "Password is empty";
     private final String PHONE_IS_EMPTY = "Phone is empty";
 
-   // @Autowired
-    //public UserServiceImpl(/*UserDao userDao, RoleDao roleDao,*/ BCryptPasswordEncoder bCryptPasswordEncoder) {
-        //this.userDao = userDao;
-        //this.roleDao = roleDao;
-      //  this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-   // }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userDao.findByEmail(username).orElseThrow(()-> new UsernameNotFoundException("user was not found!"));
@@ -171,24 +164,16 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Boolean updateGeneralInformation(User user) {
-        try {
-            userDao.updateGeneralInformation(user);
-        } catch (DataAccessException e) {
-            return false;
-        }
-        return true;
+    public User updateGeneralInformation(User user) {
+        userDao.updateGeneralInformation(user);
+        return user;
     }
 
     @Override
-    public Boolean updatePassword(User user) {
-        try {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            userDao.updatePassword(user);
-        } catch (DataAccessException e) {
-            return false;
-        }
-        return true;
+    public User updatePassword(User user) {
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userDao.updatePassword(user);
+        return user;
     }
 
     @Override
@@ -207,14 +192,24 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public List<User> findAllUsersByPhoneSorted(String sort, Long size, Long offset, String phone){
+        return userDao.findByPhoneSorted(sortSql(sort), size, offset, phone);
+    }
+
+    @Override
     public List<User> findUsersByRegionIdSorted(int id, String sort, Long size, Long offset){
         return userDao.findUsersByRegionIdSort(id, sortSql(sort), size, offset);
     }
 
+    @Override
+    public List<User> findUsersByRegionIdAndPhoneSorted(int id, String sort, Long size, Long offset, String phone){
+        return userDao.findUsersByRegionIdAndPhoneSort(id, sortSql(sort), size, offset, phone);
+    }
+
     public String sortSql(String sort){
         String sql = " order by ";
-        if(sort.equals("phone")){
-            sql += "phone_number";
+        if(sort.equals("email")){
+            sql += "email";
         }else
         if (sort.equals("lastname")){
             sql += "last_name";

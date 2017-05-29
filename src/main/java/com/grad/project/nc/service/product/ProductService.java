@@ -12,7 +12,9 @@ public interface ProductService extends CrudService<Product> {
 
     List<Product> findLastN(int n);
 
+    List<Product> findByNameContaining(String productName);
+
     List<Product> findByProductTypeId(Long productTypeId);
 
-    List<Product> findActiveProductsByRegionId(Long regionId);
+    List<Product> findCatalogProductsByRegionId(Long regionId);
 }

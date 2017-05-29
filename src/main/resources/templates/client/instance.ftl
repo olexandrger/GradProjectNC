@@ -74,6 +74,7 @@
                         <p>Product type: <span id="instance-product-type"></span></p>
                         <address>Address: <p class="tab" id="instance-address"></p></address>
                         <p>Price: <span id="instance-product-price"></span></p>
+                        <p>Discount price: <span id="instance-product-discount-price"></span></p>
                     </div>
                 </div>
                 <div class="col-sm-3 pull-down" style="margin-bottom: 5px">

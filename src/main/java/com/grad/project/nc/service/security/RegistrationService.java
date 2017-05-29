@@ -1,12 +1,12 @@
 package com.grad.project.nc.service.security;
 
 import com.grad.project.nc.model.User;
+import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +31,7 @@ public class RegistrationService {
     @Autowired
     private UserService userService;
 
-    public boolean register(User user) {
+    public User register(User user) throws IncorrectUserDataException {
         List<String> roles ;
         if(user.getRoles() == null || user.getRoles().isEmpty()){
             roles = new ArrayList<>();
@@ -39,67 +39,51 @@ public class RegistrationService {
         }else {
             roles = user.getRoles().stream().map(x -> x.getRoleName()).collect(Collectors.toList());
         }
-
-
-        if (user.getFirstName().isEmpty()) {
-            status = ERROR;
-            messageError = FIRST_NAME_IS_EMPTY;
-            return false;
-        }
-        if (user.getLastName().isEmpty()) {
-            status = ERROR;
-            messageError = LAST_NAME_IS_EMPTY;
-            return false;
-        }
-        if (user.getEmail().isEmpty()) {
-            status = ERROR;
-            messageError = EMAIL_IS_EMPTY;
-            return false;
-        }
-        if (user.getPassword().isEmpty()) {
-            status = ERROR;
-            messageError = PASSWORD_IS_EMPTY;
-            return false;
-        }
-        if (!isPasswordValid(user.getPassword())) {
-            status = ERROR;
-            messageError = INCORRECT_PASSWORD;
-            return false;
-        }
-        if (user.getPhoneNumber().isEmpty()) {
-            status = ERROR;
-            messageError = PHONE_IS_EMPTY;
-            return false;
-        }
-        if (!isPhoneNumberValid(user.getPhoneNumber())) {
-            status = ERROR;
-            messageError = INCORRECT_PHONE;
-            return false;
-        }
-        if (!isEmailValid(user.getEmail())) {
-            status = ERROR;
-            messageError = INVALID_EMAIL;
-            return false;
-        }
         try {
             userService.createUser(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber(), roles/*Collections.singletonList("ROLE_CLIENT")*/);
         } catch (DuplicateKeyException e) {
-            status = ERROR;
-            messageError = EMAIL_ALREADY_EXISTS;
-            return false;
+            throw new IncorrectUserDataException(EMAIL_ALREADY_EXISTS);
         }
         status = SUCCESS;
-        return true;
+        return user;
     }
 
-     boolean isEmailValid(String email) {
+    public void validation(User user) throws IncorrectUserDataException {
+        status = ERROR;
+        if (user.getFirstName().isEmpty()) {
+            throw new IncorrectUserDataException(FIRST_NAME_IS_EMPTY);
+        }
+        if (user.getLastName().isEmpty()) {
+            throw new IncorrectUserDataException(LAST_NAME_IS_EMPTY);
+        }
+        if (user.getEmail().isEmpty()) {
+            throw new IncorrectUserDataException(EMAIL_IS_EMPTY);
+        }
+        if (user.getPassword().isEmpty()) {
+            throw new IncorrectUserDataException(PASSWORD_IS_EMPTY);
+        }
+        if (!isPasswordValid(user.getPassword())) {
+            throw new IncorrectUserDataException(INCORRECT_PASSWORD);
+        }
+        if (user.getPhoneNumber().isEmpty()) {
+            throw new IncorrectUserDataException(PHONE_IS_EMPTY);
+        }
+        if (!isPhoneNumberValid(user.getPhoneNumber())) {
+            throw new IncorrectUserDataException(INCORRECT_PHONE);
+        }
+        if (!isEmailValid(user.getEmail())) {
+            throw new IncorrectUserDataException(INVALID_EMAIL);
+        }
+    }
+
+    boolean isEmailValid(String email) {
         final String regex = "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`\\{|\\}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
         java.util.regex.Pattern p = java.util.regex.Pattern.compile(regex);
         java.util.regex.Matcher m = p.matcher(email);
         return m.matches();
     }
 
-     boolean isPasswordValid(String password) {
+    boolean isPasswordValid(String password) {
         if (password.length() < 8 || password.length() > 20)
             return false;
         final String regex = "^[a-zA-Z0-9!@#$%^&*()_+|~\\-=\\/‘\\{\\}\\[\\]:\";’<>?,./]+$";
@@ -108,7 +92,7 @@ public class RegistrationService {
         return m.matches();
     }
 
-     boolean isPhoneNumberValid(String phone) {
+    boolean isPhoneNumberValid(String phone) {
         final String regex = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$";
         java.util.regex.Pattern p = java.util.regex.Pattern.compile(regex);
         java.util.regex.Matcher m = p.matcher(phone);

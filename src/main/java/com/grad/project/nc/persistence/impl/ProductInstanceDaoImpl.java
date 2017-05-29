@@ -68,6 +68,32 @@ public class ProductInstanceDaoImpl extends AbstractDao implements ProductInstan
     }
 
     @Override
+    public List<ProductInstance> findAll(long size, long offset) {
+        String findAllQuery = "SELECT \"instance_id\", \"price_id\", \"domain_id\", \"status_id\" " +
+                "FROM \"product_instance\" ORDER BY \"instance_id\" DESC ";
+
+        return findMultiplePage(findAllQuery, new ProductInstanceRowMapper(), size, offset);
+    }
+
+
+
+    @Override
+    public List<ProductInstance> findByUserId(Long id, Long size, Long offset) {
+        String findAllQuery = "SELECT \"instance_id\", \"price_id\", \"domain_id\", \"status_id\" " +
+                "FROM \"product_instance\" WHERE domain_id IN (SELECT domain_id FROM user_domain WHERE user_id = " + id + ")";
+
+        return findMultiplePage(findAllQuery, new ProductInstanceRowMapper(), size, offset);
+    }
+
+    @Override
+    public List<ProductInstance> findByStatus( Long size, Long offset, Long statusId) {
+        String findAllQuery = "SELECT \"instance_id\", \"price_id\", \"domain_id\", \"status_id\" " +
+                "FROM \"product_instance\" WHERE \"status_id\" = ? ORDER BY \"instance_id\" DESC";
+
+        return findMultiplePage(findAllQuery, new ProductInstanceRowMapper(), size, offset, statusId);
+    }
+
+    @Override
     public void delete(Long id) {
         String deleteQuery = "DELETE FROM \"product_instance\" WHERE \"instance_id\"=?";
 

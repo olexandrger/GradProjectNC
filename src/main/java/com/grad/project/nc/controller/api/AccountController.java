@@ -39,7 +39,7 @@ public class AccountController {
             result.put("userId", user.getUserId());
             List<Link> profileLinks = new LinkedList<>();
 
-            profileLinks.add(new Link("Edit profile", "/profile/edit"));
+            profileLinks.add(new Link("My profile", "/profile/edit"));
 
             if (user.getRoles().contains(roleDao.findByName("ROLE_CLIENT"))) {
                 profileLinks.add(new Link("Domains", "/client/domains"));

@@ -9,6 +9,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,12 @@ import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 
 @Service
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     private JavaMailSender mailSender;
 
     private Configuration freemarkerConfiguration;
-
-    private Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     @Autowired
     public EmailServiceImpl(JavaMailSender mailSender, @Qualifier("createFreemarkerConfiguration") Configuration configuration) {
@@ -52,14 +52,14 @@ public class EmailServiceImpl implements EmailService {
 
             mailSender.send(message);
         } catch (MessagingException | IOException | TemplateException e) {
-            logger.error("Can not send email", e);
+            log.error("Can not send email", e);
         }
     }
 
     @Override
     @Async
     public void sendRegistrationEmail(User user) {
-        logger.info("Sending registration email to " + user.getUsername());
+        log.info("Sending registration email to {}", user.getUsername());
         sendEmail(new Mail(user.getEmail(), new RegistrationMailContent(user)));
     }
 
@@ -67,14 +67,14 @@ public class EmailServiceImpl implements EmailService {
     @Async
     public void sendNewOrderEmail(ProductOrder order) {
         User user = order.getUser();
-        logger.info("Sending new order email to " + user.getUsername());
+        log.info("Sending new order email to {}", user.getUsername());
         sendEmail(new Mail(user.getEmail(), new NewOrderMailContent(order)));
     }
 
     @Override
     @Async
     public void sendInstanceStatusChangedEmail(ProductInstance instance) {
-        logger.info("Sending instance mails");
+        log.info("Sending instance mails");
         instance.getDomain().getUsers().forEach((user) -> {
             sendEmail(new Mail(user.getEmail(), new InstanceStatusChangedMailContent(user, instance)));
         });
@@ -83,21 +83,21 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendNewComplaintEmail(Complain complain) {
         User user = complain.getUser();
-        logger.info("Sending new complain email to " + user.getUsername());
+        log.info("Sending new complain email to {}", user.getUsername());
         sendEmail(new Mail(user.getEmail(), new NewComplaintMailContent(complain)));
     }
 
     @Override
     public void sendComplaintUnderConsiderationChangedEmail(Complain complain) {
         User user = complain.getUser();
-        logger.info("Sending complain under considerations email to " + user.getUsername());
+        log.info("Sending complain under considerations email to {}", user.getUsername());
         sendEmail(new Mail(user.getEmail(), new ComplaintUnderConsiderationMailContent(complain)));
     }
 
     @Override
     public void sendComplaintCompleteEmail(Complain complain) {
         User user = complain.getUser();
-        logger.info("Sending complain complete email to " + user.getUsername());
+        log.info("Sending complain complete email to {}", user.getUsername());
         sendEmail(new Mail(user.getEmail(), new ComplaintCompletedMailContent(complain)));
     }
 

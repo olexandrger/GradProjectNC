@@ -147,7 +147,7 @@ function completeSelectedOrder() {
         success: function (data) {
             if (data.status == "success") {
                 orderSuccessMessage(data.message);
-                ordersData[selectedId].status = ORDER_STATUS_CREATED;
+                ordersData[selectedId].status = ORDER_STATUS_COMPLETED;
                 ordersData[selectedId].closeDate = Date.now() / 1000;
 
                 if (selectedOrder == selectedId) {
@@ -283,11 +283,6 @@ function getLabelName(status) {
     }
 }
 
-// function findById(id) {
-//     ordersUrl = "/api/csr/orders/get/" + id;
-//     ordersListCurrentPage = 0;
-//     loadOrders();
-// }
 
 
 function searchOrders() {
@@ -371,7 +366,6 @@ function loadNewOrderModal() {
     $("#new-order-instanse").attr("disabled", "true");
     $("#new-order-aim").empty();
     $("#new-order-aim").attr("disabled", "true");
-    //$("#new-order-aim").removeAttr("disabled");
     $("#new-order-modal-error-msg").empty();
     $("#new-order-modal-error-msg").attr("hidden", "true");
 

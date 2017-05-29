@@ -1,5 +1,8 @@
 package com.grad.project.nc.service.locations;
 
+import org.springframework.context.annotation.Scope;
+
+@Scope("prototype")
 public interface LocationService {
     //after this method you can obtain regionName, locationId, lat, lng
     LocationService doRequestForJSONByAddress(String address);

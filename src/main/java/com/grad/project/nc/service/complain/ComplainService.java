@@ -16,4 +16,5 @@ public interface ComplainService {
     public void completeComplaint(long userId, long complainId, String responce) throws IncorrectComplaintStateException, IncompleteComplaintDataExceptions;
     public Collection<Complain> findByInstanceId(Long instanceId, long size, long offset);
     public void setResponsible(long responsibleId, long complaintId) throws IncorrectRoleException, IncorrectComplaintStateException;
+    public Collection<Complain> getAllComplainsByUserId(Long userId, long size, long offset);
 }

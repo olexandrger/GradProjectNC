@@ -1,5 +1,6 @@
 package com.grad.project.nc.service.locations;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,8 +13,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
+
 @Service
 @PropertySource("classpath:locations.properties")
+@Slf4j
 public class LocationServiceImpl implements LocationService {
     @Value("${baseurl}")
     private String baseUrl;
@@ -25,6 +28,11 @@ public class LocationServiceImpl implements LocationService {
     private JSONObject location;
     private JSONLocationReader jsonLocationReader = new JSONLocationReader();
 
+
+    //log.info("Time: {}", start);
+
+
+
     @Override
     public LocationService doRequestForJSONByAddress(String address) {
         if (doRequestForJSONByAddress(address, mainLanguage) != null) {
@@ -35,10 +43,12 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public LocationService doRequestForJSONByGooglePlaceId(String id) {
-        if (doRequestForJSONByGooglePlaceId(id, mainLanguage) != null) {
-            location = doRequestForJSONByGooglePlaceId(id, mainLanguage);
+        JSONObject tmp = doRequestForJSONByGooglePlaceId(id, mainLanguage);
 
+        if ( tmp != null) {
+            location = tmp;
         }
+
         return this;
     }
 

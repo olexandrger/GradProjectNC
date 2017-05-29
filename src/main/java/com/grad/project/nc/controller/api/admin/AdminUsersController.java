@@ -1,22 +1,18 @@
 package com.grad.project.nc.controller.api.admin;
-
 import com.grad.project.nc.controller.api.data.RegistrationResponseHolder;
 import com.grad.project.nc.controller.api.dto.FrontendDomain;
 import com.grad.project.nc.controller.api.dto.FrontendUser;
 import com.grad.project.nc.model.*;
-import com.grad.project.nc.model.proxy.UserProxy;
 import com.grad.project.nc.persistence.RoleDao;
-import com.grad.project.nc.persistence.UserDao;
+import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
+import com.grad.project.nc.service.locations.LocationService;
 import com.grad.project.nc.service.notifications.EmailService;
 import com.grad.project.nc.service.security.RegistrationService;
 import com.grad.project.nc.service.security.UserService;
-import com.grad.project.nc.service.security.UserServiceImpl;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -39,6 +35,8 @@ public class AdminUsersController {
     private UserService userService;
     @Autowired
     private RoleDao roleDao;
+    @Autowired
+    private LocationService locationService;
 
     private static final long USER_ROLE_PMG =4;
 
@@ -51,13 +49,14 @@ public class AdminUsersController {
         RegistrationResponseHolder registrationResponse = new RegistrationResponseHolder();
         log.info("Registering " + frontUser.getRoles().toString());
 
-        if (!registrationService.register(user)) {
-            registrationResponse.setMessage(registrationService.getMessageError());
-        } else {
-            registrationResponse.setMessage("You've been registered successfully");
+        try {
+            registrationService.validation(user);
+            registrationService.register(user);
             emailService.sendRegistrationEmail(user);
+            registrationResponse.setMessage("User registered successfully");
+        } catch (IncorrectUserDataException e) {
+            registrationResponse.setMessage(e.getMessage());
         }
-
         registrationResponse.setStatus(registrationService.getStatus());
         return registrationResponse;
     }
@@ -89,6 +88,14 @@ public class AdminUsersController {
         FrontUser frontUser = mapUserToFrontUser(userService.findByEMail(name));
 
         return frontUser;
+    }
+
+    @RequestMapping(value = "/getAddressForUserDomain/", method = RequestMethod.GET)
+    @ResponseBody
+    public String getAddress(@RequestParam("id") String id) {
+
+        locationService.doRequestForJSONByGooglePlaceId(id);
+        return locationService.getCity() +", " + locationService.getStreet() + " " + locationService.getBuildingNumber();
     }
 
     @RequestMapping(value = "/userRoles", method = RequestMethod.GET)
