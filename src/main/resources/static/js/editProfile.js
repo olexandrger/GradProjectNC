@@ -463,6 +463,8 @@ function selectComplaint(index) {
         $("#selected-complain-start-date").val(moment.unix(complaintsData[selectedComplain].openDate).format("LLL"));
         if (complaintsData[selectedComplain].closeDate != null) {
             $("#selected-complain-end-date").val(moment.unix(complaintsData[selectedComplain].closeDate).format("LLL"));
+        } else {
+            $("#selected-complain-end-date").val("");
         }
         $("#selected-complain-title").val(complaintsData[selectedComplain].complainTitle);
         $("#selected-complain-content").val(complaintsData[selectedComplain].content);
