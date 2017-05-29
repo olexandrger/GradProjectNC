@@ -180,6 +180,22 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
         return products;
     }
 
+    @Override
+    @Transactional
+    public Page<Product> findByProductTypeAndRegionPaginated(Long productTypeId, Long regionId,
+                                                             int page, int amount) {
+        int totalPages = productDao.countProductsOf(productTypeId, regionId) / amount + 1;
+        List<Product> products = productDao.findByProductTypeAndRegionPaginated(productTypeId, regionId, page, amount);
+        loadProductHelper(products);
+
+        products.forEach(p -> p.getPrices()
+                .forEach(price ->
+                        price.setDiscounts(Collections.singletonList(discountDao
+                                .findLargestDiscountByPriceId(price.getPriceId())))));
+
+        return new Page<>(products, totalPages);
+    }
+
     private void loadProductHelper(Product product) {
         product.getProductType();
         product.getProductCharacteristicValues();

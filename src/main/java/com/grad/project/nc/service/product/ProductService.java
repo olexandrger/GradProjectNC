@@ -17,4 +17,6 @@ public interface ProductService extends CrudService<Product> {
     List<Product> findByProductTypeId(Long productTypeId);
 
     List<Product> findCatalogProductsByRegionId(Long regionId);
+
+    Page<Product> findByProductTypeAndRegionPaginated(Long productTypeId, Long regionId, int page, int amount);
 }

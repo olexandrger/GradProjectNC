@@ -24,4 +24,8 @@ public interface ProductDao extends CrudDao<Product> {
     Product findByProductRegionPriceId(Long productRegionPriceId);
 
     int countTotalProducts();
+
+    List<Product> findByProductTypeAndRegionPaginated(Long productTypeId, Long regionId, int page, int amount);
+
+    int countProductsOf(Long productTypeId, Long regionId);
 }

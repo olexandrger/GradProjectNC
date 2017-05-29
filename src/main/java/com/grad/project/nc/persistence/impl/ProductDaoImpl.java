@@ -170,6 +170,29 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
         return findOne(countQuery, new SingleColumnRowMapper<>(int.class));
     }
 
+    @Override
+    public List<Product> findByProductTypeAndRegionPaginated(Long productTypeId, Long regionId, int page, int amount) {
+        int offset = (page - 1) * amount;
+        String findPaginatedQuery = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
+                "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
+                "JOIN \"product_region_price\" prp " +
+                "ON p.\"product_id\" = prp.\"product_id\" AND prp.\"region_id\" = ? " +
+                "WHERE p.\"product_type_id\" = ? " +
+                "ORDER BY product_id DESC LIMIT ? OFFSET ?";
+
+        return findMultiple(findPaginatedQuery, new ProductRowMapper(),regionId, productTypeId, amount, offset);
+    }
+
+    @Override
+    public int countProductsOf(Long productTypeId, Long regionId) {
+        String countQuery = "SELECT count(*) FROM \"product\" p " +
+                "JOIN \"product_region_price\" prp " +
+                "ON p.\"product_id\" = prp.\"product_id\" AND prp.\"region_id\" = ? " +
+                "WHERE p.\"product_type_id\" = ?";
+
+        return findOne(countQuery, new SingleColumnRowMapper<>(int.class), regionId, productTypeId);
+    }
+
     private class ProductRowMapper implements RowMapper<Product> {
 
         @Override

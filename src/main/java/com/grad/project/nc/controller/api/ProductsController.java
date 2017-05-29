@@ -29,12 +29,23 @@ public class ProductsController {
     }
 
     //restful endpoint for product catalog
-    @RequestMapping(value = "/byRegion/{id}", method = RequestMethod.GET)
-    public List<FrontendCatalogProduct> getByRegion(@PathVariable("id") Long id) {
-        return productService.findCatalogProductsByRegionId(id)
+    @RequestMapping(
+            params = {"productTypeId", "regionId", "page", "amount"},
+            method = RequestMethod.GET
+    )
+    public Page<FrontendCatalogProduct> getCatalogProducts(@RequestParam("productTypeId") Long productTypeId,
+                                                    @RequestParam("regionId") Long regionId,
+                                                    @RequestParam("page") int page,
+                                                    @RequestParam("amount") int amount) {
+        Page<Product> productPage = productService.findByProductTypeAndRegionPaginated(productTypeId,
+                regionId, page, amount);
+
+        List<FrontendCatalogProduct> content = productPage.getContent()
                 .stream()
                 .map(FrontendCatalogProduct::fromEntity)
                 .collect(Collectors.toList());
+
+        return new Page<>(content, productPage.getTotalPages());
     }
 
     //restful endpoint created to obtain products for editing (performed by admin)
