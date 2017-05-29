@@ -28,16 +28,17 @@ public class ProductsController {
         return FrontendProduct.fromEntity(productService.find(id));
     }
 
-    //restful endpoint for product catalog
-    @RequestMapping(
-            params = {"productTypeId", "regionId", "page", "amount"},
-            method = RequestMethod.GET
-    )
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public FrontendCatalogProduct getCatalogProduct(@PathVariable("id") Long id) {
+        return FrontendCatalogProduct.fromEntity(productService.findCatalogProduct(id));
+    }
+
+    @RequestMapping(params = {"productTypeId", "regionId", "page", "amount"}, method = RequestMethod.GET)
     public Page<FrontendCatalogProduct> getCatalogProducts(@RequestParam("productTypeId") Long productTypeId,
                                                     @RequestParam("regionId") Long regionId,
                                                     @RequestParam("page") int page,
                                                     @RequestParam("amount") int amount) {
-        Page<Product> productPage = productService.findByProductTypeAndRegionPaginated(productTypeId,
+        Page<Product> productPage = productService.findActiveByProductTypeIdAndRegionIdPaginated(productTypeId,
                 regionId, page, amount);
 
         List<FrontendCatalogProduct> content = productPage.getContent()
@@ -48,7 +49,18 @@ public class ProductsController {
         return new Page<>(content, productPage.getTotalPages());
     }
 
-    //restful endpoint created to obtain products for editing (performed by admin)
+    @RequestMapping(value = "/search",
+            params = {"query", "productTypeId", "regionId"},
+            method = RequestMethod.GET)
+    public List<TypeaheadItem> fetchProductTypeaheadItemsByQuery(@RequestParam("query") String query,
+                                                                 @RequestParam("productTypeId") Long productTypeId,
+                                                                 @RequestParam("regionId") Long regionId) {
+        return productService.findByNameContaining(query, productTypeId, regionId)
+                .stream()
+                .map(product -> new TypeaheadItem(product.getProductId(), product.getProductName()))
+                .collect(Collectors.toList());
+    }
+
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<FrontendProduct> getAll() {
         return productService.findAll()
@@ -57,10 +69,7 @@ public class ProductsController {
                 .collect(Collectors.toList());
     }
 
-    @RequestMapping(
-            params = { "page", "amount" },
-            method = RequestMethod.GET
-    )
+    @RequestMapping(params = { "page", "amount" }, method = RequestMethod.GET)
     public Page<FrontendProduct> getPaginated(@RequestParam("page") int page, @RequestParam("amount") int amount) {
         Page<Product> productPage = productService.findPaginated(page, amount);
 
@@ -73,23 +82,7 @@ public class ProductsController {
         return new Page<>(content, productPage.getTotalPages());
     }
 
-    @RequestMapping(
-            value = "/last",
-            params = {"amount"},
-            method = RequestMethod.GET
-    )
-    public List<TypeaheadItem> fetchProductTypeaheadItems(@RequestParam("amount") int amount) {
-        return productService.findLastN(amount)
-                .stream()
-                .map(product -> new TypeaheadItem(product.getProductId(), product.getProductName()))
-                .collect(Collectors.toList());
-    }
-
-    @RequestMapping(
-            value = "/search",
-            params = {"query"},
-            method = RequestMethod.GET
-    )
+    @RequestMapping(value = "/search", params = {"query"}, method = RequestMethod.GET)
     public List<TypeaheadItem> fetchProductTypeaheadItemsByQuery(@RequestParam("query") String query) {
         return productService.findByNameContaining(query)
                 .stream()

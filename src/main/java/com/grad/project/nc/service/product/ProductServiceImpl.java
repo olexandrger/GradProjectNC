@@ -6,7 +6,6 @@ import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.persistence.*;
 import com.grad.project.nc.service.AbstractService;
 import com.grad.project.nc.support.pagination.Page;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class ProductServiceImpl extends AbstractService<Product> implements ProductService {
 
     private final ProductDao productDao;
@@ -61,8 +59,21 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
 
     @Override
     @Transactional
+    public Product findCatalogProduct(Long id) {
+        Product product = productDao.find(id);
+        loadProductHelper(product);
+
+        product.getPrices().forEach(price ->
+                price.setDiscounts(Collections.singletonList(discountDao
+                        .findLargestDiscountByPriceId(price.getPriceId()))));
+
+        return product;
+    }
+
+    @Override
+    @Transactional
     public Page<Product> findPaginated(int page, int amount) {
-        int totalPages = productDao.countTotalProducts() / amount + 1;
+        int totalPages = (int) Math.ceil(productDao.countTotalProducts() / (double) amount);
         List<Product> products = productDao.findPaginated(page, amount);
         loadProductHelper(products);
 
@@ -182,10 +193,11 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
 
     @Override
     @Transactional
-    public Page<Product> findByProductTypeAndRegionPaginated(Long productTypeId, Long regionId,
-                                                             int page, int amount) {
-        int totalPages = productDao.countProductsOf(productTypeId, regionId) / amount + 1;
-        List<Product> products = productDao.findByProductTypeAndRegionPaginated(productTypeId, regionId, page, amount);
+    public Page<Product> findActiveByProductTypeIdAndRegionIdPaginated(Long productTypeId, Long regionId,
+                                                                       int page, int amount) {
+        int totalPages = (int) Math.ceil(productDao.countActiveProductsOf(productTypeId, regionId) / (double) amount);
+        List<Product> products = productDao.findActiveByProductTypeIdAndRegionIdPaginated(productTypeId, regionId,
+                page, amount);
         loadProductHelper(products);
 
         products.forEach(p -> p.getPrices()
@@ -194,6 +206,11 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
                                 .findLargestDiscountByPriceId(price.getPriceId())))));
 
         return new Page<>(products, totalPages);
+    }
+
+    @Override
+    public List<Product> findByNameContaining(String productName, Long productTypeId, Long regionId) {
+        return productDao.findByNameContaining(productName, productTypeId, regionId);
     }
 
     private void loadProductHelper(Product product) {

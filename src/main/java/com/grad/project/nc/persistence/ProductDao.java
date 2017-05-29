@@ -25,7 +25,10 @@ public interface ProductDao extends CrudDao<Product> {
 
     int countTotalProducts();
 
-    List<Product> findByProductTypeAndRegionPaginated(Long productTypeId, Long regionId, int page, int amount);
+    List<Product> findActiveByProductTypeIdAndRegionIdPaginated(Long productTypeId, Long regionId,
+                                                                int page, int amount);
 
-    int countProductsOf(Long productTypeId, Long regionId);
+    int countActiveProductsOf(Long productTypeId, Long regionId);
+
+    List<Product> findByNameContaining(String productName, Long productTypeId, Long regionId);
 }

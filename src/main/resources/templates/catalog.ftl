@@ -10,11 +10,14 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/catalog.css">
+    <link rel="stylesheet" href="/css/typeahead.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://momentjs.com/downloads/moment.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
     <script src="/js/catalogBar.js"></script>
     <script src="/js/catalog.js"></script>
 </head>
@@ -29,14 +32,19 @@
         </div>
     </div>
 
-    <div class="row" style="margin-top: 10px;">
+    <div id = "content-row" class="row hidden" style="margin-top: 10px;">
 
-        <div class="col-sm-4">
+        <div class="col-sm-3 col-sm-offset-1">
+            <div id="typeahead-box" class="input-group">
+                <span class="input-group-addon info"><span class="glyphicon glyphicon-search"></span></span>
+                <input class="typeahead" type="text" placeholder="Search">
+                <button type="button" id="search-clear" class="btn btn-link hide"><i class="glyphicon glyphicon-remove"></i></button>
+            </div>
             <div class="list-group" id="catalog-products-list">
             </div>
         </div>
 
-        <div class="col-sm-8 hidden" id="catalog-main-info">
+        <div class="col-sm-7 hidden" id="catalog-main-info">
             <div class="row">
                 <div class="col-sm-12">
                     <h2 id="catalog-product-name">Product name here</h2>

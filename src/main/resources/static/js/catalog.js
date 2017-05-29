@@ -12,10 +12,15 @@ var defaultOpts = { //twbs pagination default options
     hideOnlyOnePage : true,
     onPageClick: function (event, page) {
         console.log('clicked page #' + page);
-        loadCatalogPageOfType({page: page});
+        loadCatalogPageOfType({page: page}, function () {
+            selectCatalogProduct(0);
+        });
     }
 };
 var $pagination;
+
+//typeahead global variables
+var prefetchAmount = 50;
 
 var catalogDomains;
 
@@ -40,7 +45,9 @@ function selectCatalogProduct(index) {
     var activeLinkIndex = index + 1;
 
     var catalogProductList = $("#catalog-products-list");
-    $("#catalog-main-info").removeClass("hidden");
+    if (currentSelected == -1) {
+        $("#catalog-main-info").removeClass("hidden");
+    }
     catalogProductList.find("a").removeClass("active");
     catalogProductList.find("a:nth-child(" + (activeLinkIndex) + ")").addClass("active");
     currentSelected = index;
@@ -177,7 +184,6 @@ function displayCatalogProducts() {
     console.log("Refreshing catalog");
     var catalogProductList = $("#catalog-products-list");
     catalogProductList.empty();
-    $("#catalog-main-info").addClass("hidden");
 
     catalogProductsCache.forEach(function (product, index) {
         var ref = document.createElement("a");
@@ -192,7 +198,7 @@ function displayCatalogProducts() {
     });
 }
 
-function loadCatalogPageOfType(options) {
+function loadCatalogPageOfType(options, callback) {
     var page = options.page != undefined ? options.page : startPage;
     var amount = options.amount != undefined ? options.amount : defaultAmount;
     var productTypeId;
@@ -203,7 +209,7 @@ function loadCatalogPageOfType(options) {
     var regionId = options.regionId != undefined ? options.regionId : localStorage.getItem("regionId");
 
     console.log("loading products of page #" + page);
-    $.ajax({
+    var jqxhr = $.ajax({
         url: '/api/user/products?productTypeId=' + productTypeId + '&regionId=' + regionId +
         '&page=' + page + '&amount=' + amount,
         success: function (data) {
@@ -216,6 +222,10 @@ function loadCatalogPageOfType(options) {
             console.error("Cannot load products");
         }
     });
+
+    if (callback != undefined) {
+        jqxhr.done(callback);
+    }
 }
 
 function updatePaginationWidget(currentPage, totalPages) {
@@ -234,4 +244,74 @@ function catalogCreateOrder() {
     $('#catalog-price-field').val("")
 }
 
+function getProductById(id) {
+    $.ajax({
+        type: 'GET',
+        url: '/api/user/products/' + id,
+        success: function (data) {
+            console.log("result of GET request to server: " + JSON.stringify(data));
+            catalogProductsCache = [data];
+
+            displayCatalogProducts();
+            selectCatalogProduct(0);
+        },
+        error: function (data) {
+            console.log("Error occurred. Cannot GET specified resource");
+        }
+    });
+}
+
+function setupTypeahead() {
+    // Instantiate the Bloodhound suggestion engine
+    var catalogProducts = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        identify: function (obj) {return obj.name;},
+        remote: {
+            url: '/api/user/products/search',
+            prepare: function (query, settings) {
+                settings.url += '?query=' + query + '&productTypeId=' + currentProductTypeId +
+                '&regionId=' + localStorage.getItem("regionId");
+                return settings;
+            }
+        }
+    });
+
+    var $typeahead = $('.typeahead');
+    var $searchClear = $('#search-clear');
+
+// Instantiate the Typeahead UI
+    $typeahead.typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+    }, {
+        name: 'catalogProducts',
+        display: 'name',
+        source: catalogProducts
+    }).on('typeahead:selected', function (obj, datum) {
+        $searchClear.removeClass('hide');
+        getProductById(datum.id);
+    });
+
+    //setup search clear button
+    $searchClear.click(function () {
+        $typeahead.typeahead('val', '');
+        $(this).addClass('hide');
+
+        var currentPage = +$pagination.find('li.active > a').text();
+        currentPage = currentPage != 0 ? currentPage : startPage;
+        loadCatalogPageOfType({page: currentPage}, function () {
+            selectCatalogProduct(0);
+        });
+    });
+}
+
 $(document).on("account-loaded", loadDomainsData);
+$(document).on("region-changed", function () {
+    $('#catalog-product-types-list li.active > a').click();
+});
+
+$(document).ready(function () {
+    setupTypeahead();
+});

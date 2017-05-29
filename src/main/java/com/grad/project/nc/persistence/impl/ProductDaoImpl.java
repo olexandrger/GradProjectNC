@@ -171,26 +171,41 @@ public class ProductDaoImpl extends AbstractDao implements ProductDao {
     }
 
     @Override
-    public List<Product> findByProductTypeAndRegionPaginated(Long productTypeId, Long regionId, int page, int amount) {
+    public List<Product> findActiveByProductTypeIdAndRegionIdPaginated(Long productTypeId, Long regionId,
+                                                                       int page, int amount) {
         int offset = (page - 1) * amount;
         String findPaginatedQuery = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", " +
                 "p.\"is_active\", p.\"product_type_id\" FROM \"product\" p " +
                 "JOIN \"product_region_price\" prp " +
                 "ON p.\"product_id\" = prp.\"product_id\" AND prp.\"region_id\" = ? " +
-                "WHERE p.\"product_type_id\" = ? " +
+                "WHERE p.\"product_type_id\" = ? AND p.\"is_active\" = true " +
                 "ORDER BY product_id DESC LIMIT ? OFFSET ?";
 
         return findMultiple(findPaginatedQuery, new ProductRowMapper(),regionId, productTypeId, amount, offset);
     }
 
     @Override
-    public int countProductsOf(Long productTypeId, Long regionId) {
+    public int countActiveProductsOf(Long productTypeId, Long regionId) {
         String countQuery = "SELECT count(*) FROM \"product\" p " +
                 "JOIN \"product_region_price\" prp " +
                 "ON p.\"product_id\" = prp.\"product_id\" AND prp.\"region_id\" = ? " +
-                "WHERE p.\"product_type_id\" = ?";
+                "WHERE p.\"product_type_id\" = ? AND p.\"is_active\" = true";
 
         return findOne(countQuery, new SingleColumnRowMapper<>(int.class), regionId, productTypeId);
+    }
+
+    @Override
+    public List<Product> findByNameContaining(String productName, Long productTypeId, Long regionId) {
+        String query = "SELECT p.\"product_id\", p.\"product_name\", p.\"product_description\", p.\"is_active\", " +
+                "p.\"product_type_id\" FROM \"product\" p " +
+                "JOIN \"product_region_price\" prp " +
+                "ON p.\"product_id\" = prp.\"product_id\" AND prp.\"region_id\" = ? " +
+                "WHERE p.\"product_type_id\" = ? AND " +
+                "LOWER(p.\"product_name\") LIKE LOWER(?)";
+
+        String substr = "%" + productName + "%";
+
+        return findMultiple(query, new ProductRowMapper(),regionId, productTypeId, substr);
     }
 
     private class ProductRowMapper implements RowMapper<Product> {
