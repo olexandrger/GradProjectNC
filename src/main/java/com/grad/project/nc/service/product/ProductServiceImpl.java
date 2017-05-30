@@ -216,7 +216,6 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
     private void loadProductHelper(Product product) {
         product.getProductType();
         product.getProductCharacteristicValues();
-        product.getProductCharacteristics();
         product.getPrices();
     }
 
@@ -224,7 +223,6 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
         products.forEach(p -> {
             p.getProductType();
             p.getProductCharacteristicValues();
-            p.getProductCharacteristics();
             p.getPrices();
         });
     }
