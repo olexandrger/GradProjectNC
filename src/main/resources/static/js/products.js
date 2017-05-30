@@ -237,12 +237,11 @@ function saveSelectedProduct() {
                 });
             alert.insertAfter($("#new-product-alert-place"));
         },
-        error: function (data) {
+        error: function (jqXHR, textStatus, errorThrown) {
             $("#new-product-alert").remove();
-            console.error("Product update error! " + JSON.stringify(data));
             $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                "Product changes failed</div>")
+                jqXHR.responseText + '</div>')
                 .delay(2000)
                 .fadeOut(function () {
                     $(this).remove();
@@ -307,23 +306,14 @@ function extractProductCharacteristicValues() {
         switch ($(this).find('input[name=data-type]').val()) {
             case 'NUMBER':
                 data = $(this).find('input[name=characteristic-value]').val();
-                if (data === '') {
-                    return;
-                }
                 value.numberValue = +data;
                 break;
             case 'DATE':
                 data = $(this).find('.date').data("DateTimePicker").date();
-                if (data == null) {
-                    return;
-                }
                 value.dateValue = data;
                 break;
             case 'STRING':
                 data = $(this).find('input[name=characteristic-value]').val();
-                if (data === '') {
-                    return;
-                }
                 value.stringValue = data;
                 break;
         }

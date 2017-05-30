@@ -118,7 +118,7 @@ function addProductCharacteristic(id, name, measure, dataTypeId) {
 
 function extractProductTypeName() {
     var productTypeName = $("#product-type-name-input").val();
-    if (productTypeName == '') {
+    if (productTypeName == '' || productTypeName.length < 3) {
         $("#empty-product-type-name-alert").remove();
         console.log("Error: Product type name cannot be empty");
 
@@ -239,13 +239,12 @@ function saveSelectedProductType() {
                 });
             alert.insertAfter($("#new-product-type-alert-place"));
         },
-        error: function (data) {
+        error: function (jqXHR, textStatus, errorThrown) {
             $("#new-product-type-alert").remove();
-            console.error("Error while trying to add/update product type" + JSON.stringify(data));
 
             $('<div id="new-product-type-alert" class="alert alert-danger" role="alert">' +
                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                'Error while trying to add/update product type</div>')
+                jqXHR.responseText + '</div>')
                 .delay(2000)
                 .fadeOut(function () {
                     $(this).remove();
