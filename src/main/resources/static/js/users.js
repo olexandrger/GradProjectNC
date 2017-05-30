@@ -346,8 +346,32 @@ function displayDomain(element) {
             $("#domain-id-input").val(userData.domains[characteristic].domainId);
             $("#domain-name-input").val(userData.domains[characteristic].domainName);
             $("#domain-type-input").val(userData.domains[characteristic].domainType.categoryName);
-            $("#domain-region-input").val(userData.domains[characteristic].regionId);
-            $("#domain-address-input").val(address.city +", "+ address.street+", "+address.building );
+            $("#domain-region-input").val(userData.domains[characteristic].address.location.region.regionName);
+            var addressfull;
+
+            $.ajax({
+                    type: 'GET',
+                    url: '/api/admin/users/getAddressForUserDomain/' ,
+                    headers: {
+
+                        'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
+                    },
+
+                    data: ({id: address.location.googlePlaceId}),
+
+                    success: function (data) {
+                        addressfull = data;
+                        console.log(JSON.stringify(data));
+                        $("#domain-address-input").val(addressfull + ", apt." + address.apartment);
+                    },
+                    error: function (data) {
+
+                    }
+
+                }
+            );
+
+
             $("#domain-address-apt-input").val(address.apartment);
 
 

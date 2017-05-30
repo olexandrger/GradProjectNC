@@ -45,13 +45,6 @@ public class UserServiceImpl implements UserService{
     private final String PASSWORD_IS_EMPTY = "Password is empty";
     private final String PHONE_IS_EMPTY = "Phone is empty";
 
-   // @Autowired
-    //public UserServiceImpl(/*UserDao userDao, RoleDao roleDao,*/ BCryptPasswordEncoder bCryptPasswordEncoder) {
-        //this.userDao = userDao;
-        //this.roleDao = roleDao;
-      //  this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-   // }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userDao.findByEmail(username).orElseThrow(()-> new UsernameNotFoundException("user was not found!"));

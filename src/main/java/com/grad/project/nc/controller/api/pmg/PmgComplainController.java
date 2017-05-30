@@ -7,6 +7,7 @@ import com.grad.project.nc.service.exceptions.IncompleteComplaintDataExceptions;
 import com.grad.project.nc.service.exceptions.IncorrectComplaintStateException;
 import com.grad.project.nc.service.exceptions.InsufficientRightsException;
 import com.grad.project.nc.service.exceptions.ProhibitedComplaintActionExcrption;
+import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 public class PmgComplainController {
 
     private ComplainService complainService;
+    private UserService userService;
 
     @Autowired
-    public PmgComplainController(ComplainService complainService) {
+    public PmgComplainController(ComplainService complainService, UserService userService) {
         this.complainService = complainService;
+        this.userService = userService;
     }
 
     @RequestMapping(value = "/get/all/size/{size}/offset/{offset}", method = RequestMethod.GET)
@@ -57,7 +60,8 @@ public class PmgComplainController {
     @RequestMapping (value = "/take/byId/", method = RequestMethod.POST)
     public Map<String, Object> takeComplain(@RequestBody Map<String, String> params){
         Map<String, Object> result = new HashMap<>();
-        long userId = Long.parseLong(params.get("userId"));
+
+        long userId = userService.getCurrentUser().getUserId();
         long complainId = Long.parseLong(params.get("complaintId"));
         try {
             complainService.appointComplain(userId, complainId);
@@ -71,26 +75,10 @@ public class PmgComplainController {
         return result;
     }
 
-//    @RequestMapping (value = "/update/response/", method = RequestMethod.POST)
-//    public Map<String, Object> updareResponce(@RequestBody Map<String, String> params){
-//        Map<String, Object> result = new HashMap<>();
-//        long userId =Long.parseLong(params.get("userId"));
-//        long complainId =Long.parseLong(params.get("complaintId"));
-//        String response = params.get("response");
-//        try {
-//            complainService.updadeComplainResponse(complainId,userId,response);
-//            result.put("status", "success");
-//            result.put("message", "Response successfully updated");
-//        } catch (IncorrectComplaintStateException ex){
-//            result.put("status", "fail");
-//            result.put("message", ex.getMessage());
-//        }
-//        return result;
-//    }
     @RequestMapping (value = "/complete/byid/", method = RequestMethod.POST)
     public Map<String, Object> completeComplain(@RequestBody Map<String, String> params){
         Map<String, Object> result = new HashMap<>();
-        long userId =Long.parseLong(params.get("userId"));
+        long userId =userService.getCurrentUser().getUserId();
         long complainId =Long.parseLong(params.get("complaintId"));
         String response = params.get("response");
         try {

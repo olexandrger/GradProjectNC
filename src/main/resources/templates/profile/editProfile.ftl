@@ -26,9 +26,10 @@
     <div class="tabbable">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab1" data-toggle="tab">General</a></li>
-            <li><a href="#tab2" data-toggle="tab">Password</a></li>
-            <li><a href="#tab3" data-toggle="tab" onclick="loadAllInstances()">My services</a></li>
-            <li><a href="#tab4" data-toggle="tab" onclick="loadOrders();">My orders</a></li>
+            <li><a href="#tab2" data-toggle="tab">Password</a>
+            <li><a href="#tab3" data-toggle="tab" onclick="firstLoadComplaints()">My complaints</a></li>
+            <li><a href="#tab4" data-toggle="tab" onclick="loadAllInstances()">My services</a></li>
+            <li><a href="#tab5" data-toggle="tab" onclick="loadOrders();">My orders</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="tab1">
@@ -124,19 +125,185 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane active" id="tab3">
+            <div class="tab-pane" id="tab3">
+
                 <div class="row">
-                <div class=" col-sm-5 col-sm-offset-1">
-                    </br>
-                    <div class="list-group" id="instances-list"></div>
-                    <ul class="pager">
-                        <li class="previous hidden" id="instances-page-previous"><a href="#" onclick="previousInstancesPage()">Previous</a></li>
-                        <li class="next hidden" id="instances-page-next"><a href="#" onclick="nextInstancesPage()">Next</a></li>
-                    </ul>
+                    <div class="col-sm-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="complain-list-panel-heading">
+                                <b>Complaints:</b>
+                                <button type="button" class="btn" id="complaint-btn-prev-up" onclick="getPrevPage()"> &larr; Prev.
+                                </button>
+                                <button type="button" class="btn" id="complaint-btn-next-up" onclick="getNextPage()"> Next &rarr;
+                                </button>
+                            </div>
+                            <div class="panel-body" id="complain-list-panel-body">
+                                <ul class="list-group" id="complain-list"></ul>
+                            </div>
+                            <div class="panel-footer" id="complain-list-panel-footer">
+                                <button type="button" class="btn" id="complaint-btn-prev" onclick="getPrevPage()"> &larr; Prev.
+                                </button>
+                                <button type="button" class="btn" id="complaint-btn-next" onclick="getNextPage()"> Next &rarr;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="panel panel-default hidden" id="complain-info-panel">
+                            <div class="panel-heading" id="complain-content-panel-heading">Complain content:</div>
+                            <div class="panel-body" id="complain-content-panel-body">
+                                <div class="row">
+                                    <form>
+                                        <div class="form-group">
+                                            <div class="col-sm-4">
+                                                <label for="complain-user-email">User email:</label>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input type="email" class="form-control" id="complain-user-email" disabled>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="collapse" id="complain-user-details-collapse">
+                                        <div class="row" id="complain-user-details">
+                                            user details
+                                        </div>
+                                        <br>
+                                    </div>
+                                </div>
+
+
+                            <#--responsible-->
+                                <div id="responsible-info-row">
+                                    <div class="row">
+                                        <form>
+                                            <div class="form-group">
+                                                <div class="col-sm-4">
+                                                    <label for="complain-responsible-email">Responsible email:</label>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input type="email" class="form-control" id="complain-responsible-email" disabled>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div id="complain-responsible-details-collapse" class="collapse">
+                                            <div class="row" id="complain-responsible-details">
+                                                responsible details
+                                            </div>
+                                            <br>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            <#--instanse-->
+                                <div id="instance-info-row">
+                                    <div class="row">
+                                        <form>
+                                            <div class="form-group">
+                                                <div class="col-sm-4">
+                                                    <label for="complain-instance-name">Instance name:</label>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input type="text" class="form-control" id="complain-instance-name" disabled>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            <#--reason and status-->
+                                <div class="row">
+                                    <form>
+                                        <div class="form-group">
+                                            <div class="col-sm-3">
+                                                <label for="selected-complain-stats">Complain status: </label>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="text" class="form-control" id="selected-complain-stats" value="STATUS"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-3">
+                                                <label for="selected-complain-reason">Complain reason: </label>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="text" class="form-control" id="selected-complain-reason" value="REASON"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            <#--start and end-->
+                                <div class="row">
+                                    <form>
+                                        <div class="form-group">
+                                            <div class="col-sm-2">
+                                                <label for="selected-complain-start-date">Start date: </label>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input type="datetime" class="form-control" id="selected-complain-start-date" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-2">
+                                                <label for="selected-complain-end-date">End date: </label>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="selected-complain-end-date" value="" disabled>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-sm-12">
+                                    <form>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="selected-complain-title">Complaint subject:</label>
+                                                <input type="text" class="form-control" id="selected-complain-title" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="selected-complain-content ">Complaint content:</label>
+                                                <textarea class="form-control " name="complain-content" rows="4"
+                                                          placeholder="Content"
+                                                          id="selected-complain-content"
+                                                          maxlength="240" readonly></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="omplain-response">Complaint Responce:</label>
+                                                <textarea class="form-control" name="complain-response" rows="4"
+                                                          placeholder="Responce"
+                                                          id="selected-complain-responce"
+                                                          maxlength="240" readonly></textarea>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            </div>
             <div class="tab-pane active" id="tab4">
+                <div class="row">
+                    <div class=" col-sm-5 col-sm-offset-1">
+                        </br>
+                        <div class="list-group" id="instances-list"></div>
+                        <ul class="pager">
+                            <li class="previous hidden" id="instances-page-previous"><a href="#" onclick="previousInstancesPage()">Previous</a></li>
+                            <li class="next hidden" id="instances-page-next"><a href="#" onclick="nextInstancesPage()">Next</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane active" id="tab5">
                 </br>
                 <div class="row">
                     <div class="row">
@@ -220,9 +387,9 @@
 
             </div>
         </div>
-            </div>
-        </div>
     </div>
+</div>
+</div>
 </div>
 
 </div>

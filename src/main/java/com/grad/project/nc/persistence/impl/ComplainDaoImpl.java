@@ -126,6 +126,19 @@ public class ComplainDaoImpl extends AbstractDao implements ComplainDao {
     }
 
     @Override
+    public List<Complain> findByUserId(Long userId, long size, long offset) {
+        String query = "SELECT c.\"complain_id\", c.\"user_id\", c.\"product_instance_id\", " +
+                "c.\"complain_title\", c.\"content\", c.\"status_id\", c.\"responsible_id\", c.\"response\", " +
+                "c.\"open_date\", c.\"close_date\", c.\"complain_reason_id\" " +
+                "FROM \"complain\" c " +
+                "INNER JOIN \"user\" u " +
+                "ON c.\"user_id\" = u.\"user_id\" " +
+                "WHERE u.\"user_id\" = ?";
+
+        return findMultiplePage(query, new ComplainRowMapper(), size, offset, userId);
+    }
+
+    @Override
     public List<Complain> findByInstanceId(Long instanceId, long size, long offset) {
             String findAllQuery = "SELECT \"complain_id\", \"user_id\", \"product_instance_id\", " +
                     "\"complain_title\", \"content\", \"status_id\", \"responsible_id\", \"response\", " +

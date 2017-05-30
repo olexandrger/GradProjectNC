@@ -71,17 +71,17 @@ ORDER BY cuo.instance_id, cuo.close_date NULLS FIRST ;',
    '[
      {
        "id": 0,
-       "e-mail": "User e-mail",
+       "name": "User e-mail",
        "type": "STRING"
      },
      {
        "id": 1,
-       "From date": "Start date",
+       "name": "Start date",
        "type": "DATETIME"
      },
      {
        "id": 2,
-       "To date": "End date",
+       "name": "End date",
        "type": "DATETIME"
      }
    ]' :: JSON);

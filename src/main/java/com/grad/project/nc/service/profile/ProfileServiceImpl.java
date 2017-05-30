@@ -2,10 +2,8 @@ package com.grad.project.nc.service.profile;
 
 import com.grad.project.nc.model.User;
 import com.grad.project.nc.service.exceptions.IncorrectUserDataException;
-import com.grad.project.nc.service.security.AutoLoginService;
 import com.grad.project.nc.service.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,8 +13,6 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Autowired
     private BCryptPasswordEncoder encoder;
-    @Autowired
-    private AutoLoginService loginService;
 
     private final String INVALID_EMAIL = "Incorrect email address";
     private final String INCORRECT_NEW_PASSWORD = "Incorrect new password. Minimum length - 8 symbols";
@@ -60,30 +56,30 @@ public class ProfileServiceImpl implements ProfileService {
 
         userService.updatePassword(user);
 
-        loginService.autologin(user.getEmail(), user.getPassword());
         status = SUCCESS;
         return user;
     }
 
     public void validationGeneralInformation(User user) throws IncorrectUserDataException {
         status = ERROR;
-        if (user.getFirstName().isEmpty())
+        if (user.getFirstName().isEmpty()) {
             throw new IncorrectUserDataException(FIRST_NAME_IS_EMPTY);
-
-        if (user.getLastName().isEmpty())
+        }
+        if (user.getLastName().isEmpty()) {
             throw new IncorrectUserDataException(LAST_NAME_IS_EMPTY);
-
-        if (user.getEmail().isEmpty())
+        }
+        if (user.getEmail().isEmpty()) {
             throw new IncorrectUserDataException(EMAIL_IS_EMPTY);
-
-        if (user.getPhoneNumber().isEmpty())
+        }
+        if (user.getPhoneNumber().isEmpty()) {
             throw new IncorrectUserDataException(PHONE_IS_EMPTY);
-
-        if (!isPhoneNumberValid(user.getPhoneNumber()))
+        }
+        if (!isPhoneNumberValid(user.getPhoneNumber())) {
             throw new IncorrectUserDataException(INCORRECT_PHONE);
-
-        if (!isEmailValid(user.getEmail()))
+        }
+        if (!isEmailValid(user.getEmail())) {
             throw new IncorrectUserDataException(INVALID_EMAIL);
+        }
     }
 
     boolean isEmailValid(String email) {
