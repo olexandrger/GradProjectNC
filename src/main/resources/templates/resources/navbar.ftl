@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-inverse">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar">
@@ -7,26 +7,20 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand">NcGrad</a>
+            <a class="navbar-brand" href="/">NcGrad</a>
         </div>
 
         <div class="navbar-collapse" id="myNavbar">
-            <ul class="nav navbar-nav">
-                <li id="navbar-main-page"><a href="/">Our services</a></li>
+            <ul id="navigation" class="nav navbar-nav">
+                <li id="navbar-catalog"><a href="/catalog">Our services</a></li>
                 <li id="navbar-about"><a href="/about">About</a></li>
                 <li id="navbar-contacts"><a href="/contacts">Contacts</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" id="region-select">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="region-selected">
-                        <!--<span class="caret"></span>-->
-                    </a>
-                    <ul class="dropdown-menu"><!--
-                        <li><a href="#">Region 1</a></li>
-                        <li><a href="#">Region 2</a></li>
-                        <li><a href="#">Region 3</a></li>-->
-                    </ul>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="region-selected"></a>
+                    <ul class="dropdown-menu"></ul>
                 </li>
                 <li>
                     <a href="#" class="hidden" data-toggle="modal" id="navbar-login-button" data-target="#login-modal">Login</a>
@@ -39,12 +33,7 @@
                         Welcome, user!<span class="caret"></span>
                     </a>
 
-                    <ul class="dropdown-menu">
-                        <!--
-                        <li><a href="#">Region 1</a></li>
-                        <li><a href="#">Region 2</a></li>
-                        <li><a href="#">Region 3</a></li>-->
-                    </ul>
+                    <ul class="dropdown-menu"></ul>
                 </li>
             </ul>
         </div>
@@ -108,10 +97,6 @@
                         <label for="password">Password</label>
                         <input type="password" class="form-control" name="password" placeholder="Password">
                     </div>
-                    <#--<div class="form-group">-->
-                        <#--<label for="repeatPassword">Repeat password</label>-->
-                        <#--<input type="password" class="form-control" name="repeatPassword" placeholder="Repeat password">-->
-                    <#--</div>-->
                     <div class="form-group">
                         <label for="phone">Phone</label>
                         <input type="text" class="form-control" name="phone" placeholder="Phone">

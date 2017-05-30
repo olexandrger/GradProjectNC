@@ -1,23 +1,37 @@
-console.log("catalog js");
-
 var catalogProductsCache;
+
+var currentProductTypeId;
 var currentSelected = -1;
 
-var catalogSelectedCategory = decodeURIComponent(window.location.search.substr(1));
-// var catalogCharacteristics = {};
+//pagination global variables
+var startPage = 1;
+var defaultAmount = 10;
+var defaultOpts = { //twbs pagination default options
+    visiblePages : 7,
+    initiateStartPageClick: false,
+    hideOnlyOnePage : true,
+    onPageClick: function (event, page) {
+        console.log('clicked page #' + page);
+        loadCatalogPageOfType({page: page}, function () {
+            selectCatalogProduct(0);
+        });
+    }
+};
+var $pagination;
+
+//typeahead global variables
+var prefetchAmount = 50;
 
 var catalogDomains;
 
-function getCharacteristicStringValue(characteristic, dataType) {
-    if (dataType == "NUMBER") {
-        return characteristic.numberValue;
-    }
-
-    if (dataType == "STRING")
-        return characteristic.stringValue;
-
-    if (dataType == "DATE") {
-        return moment.unix(characteristic.dateValue).format("LLL")
+function getValue(valueObj, dataType) {
+    switch (dataType) {
+        case 'NUMBER':
+            return valueObj.numberValue;
+        case 'STRING':
+            return valueObj.stringValue;
+        case 'DATE':
+            return moment.unix(valueObj.dateValue).format("LLL");
     }
 }
 
@@ -27,14 +41,16 @@ function getRegionalPrice(regionId) {
     });
 }
 
-function selectCatalogProduct(index, positionInList) {
-    $("#catalog-main-info").removeClass("hidden");
+function selectCatalogProduct(index) {
+    var activeLinkIndex = index + 1;
 
+    var catalogProductList = $("#catalog-products-list");
+    if (currentSelected == -1) {
+        $("#catalog-main-info").removeClass("hidden");
+    }
+    catalogProductList.find("a").removeClass("active");
+    catalogProductList.find("a:nth-child(" + (activeLinkIndex) + ")").addClass("active");
     currentSelected = index;
-
-    var list = $("#catalog-products-list");
-    list.find("a").removeClass("active");
-    list.find("a:nth-child(" + positionInList + ")").addClass("active");
 
     $(".table-row").remove();
 
@@ -46,7 +62,7 @@ function selectCatalogProduct(index, positionInList) {
         var html =
             '<tr class="table-row">' +
                 '<td>' + item.productCharacteristic.characteristicName + '</td>' +
-                '<td>' + getCharacteristicStringValue(item, item.productCharacteristic.dataType.categoryName) + '</td>' +
+                '<td>' + getValue(item, item.productCharacteristic.dataType.categoryName) + '</td>' +
                 '<td>' + item.productCharacteristic.measure + '</td>' +
             '</tr>';
 
@@ -94,42 +110,6 @@ function calculateFinalPrice(priceObj) {
     return priceObj.price;
 }
 
-function updateCatalog() {
-    console.log("Updating catalog");
-    var list = $("#catalog-products-list");
-    list.empty();
-    $("#catalog-main-info").addClass("hidden");
-
-    var positionInList = 1;
-    catalogProductsCache.forEach(function(item, index) {
-        if (item.productTypeId == catalogSelectedCategory) {
-            var ref = document.createElement("a");
-            ref.appendChild(document.createTextNode(item.productName));
-            ref.className = "list-group-item";
-            ref.href = "#";
-            var position = positionInList++;
-            ref.onclick = function () {
-                selectCatalogProduct(index, position);
-            };
-            list.append(ref);
-        }
-    });
-}
-
-function loadCatalogData() {
-    console.log("Loading catalog data");
-    $.ajax({
-        url: "/api/user/products/byRegion/" + localStorage.getItem("regionId"),
-        success: function(data) {
-            catalogProductsCache = data;
-            updateCatalog();
-        },
-        error: function () {
-            console.error("Cannot load list of products");
-        }
-    });
-}
-
 function loadDomainsData() {
     console.log("Loading domains data for catalog");
     $.ajax({
@@ -159,8 +139,6 @@ function loadDomainsData() {
 }
 
 function catalogChangeDomain(domainId) {
-    //TODO display address
-    //Maybe this is wright
      var price = getRegionalPrice(catalogDomains[domainId].address.location.region.regionId);
 
     if (price == null) {
@@ -176,11 +154,7 @@ function catalogChangeDomain(domainId) {
 }
 
 function catalogSubmitOrder() {
-
-    //TODO Maybe this is wright
-    var selectedDomainIndex =document.getElementById("catalog-domain-selector").value;
-
-
+    var selectedDomainIndex = document.getElementById("catalog-domain-selector").value;
     $.ajax({
         url: "/api/client/orders/new/create",
         method: "POST",
@@ -194,10 +168,6 @@ function catalogSubmitOrder() {
         }),
         success: function(data) {
             if (data.status == "success") {
-                // console.log(data.message);
-                // var info = window.name == "" ? {} : JSON.parse(window.name);
-                // info.selectedInstanceId = data.instanceId;
-                // window.name = JSON.stringify(info);
                 window.location.href = "/client/instance/" + data.instanceId;
             } else {
                 console.error("Cannot create order: " + data.message);
@@ -210,6 +180,63 @@ function catalogSubmitOrder() {
     });
 }
 
+function displayCatalogProducts() {
+    console.log("Refreshing catalog");
+    var catalogProductList = $("#catalog-products-list");
+    catalogProductList.empty();
+
+    catalogProductsCache.forEach(function (product, index) {
+        var ref = document.createElement("a");
+        ref.appendChild(document.createTextNode(product.productName));
+        ref.className = "list-group-item";
+        ref.href = "#";
+        ref.onclick = function () {
+            selectCatalogProduct(index);
+        };
+
+        catalogProductList.append(ref);
+    });
+}
+
+function loadCatalogPageOfType(options, callback) {
+    var page = options.page != undefined ? options.page : startPage;
+    var amount = options.amount != undefined ? options.amount : defaultAmount;
+    var productTypeId;
+    if (options.productTypeId != undefined) {
+        currentProductTypeId = options.productTypeId;
+    }
+    productTypeId = currentProductTypeId;
+    var regionId = options.regionId != undefined ? options.regionId : localStorage.getItem("regionId");
+
+    console.log("loading products of page #" + page);
+    var jqxhr = $.ajax({
+        url: '/api/user/products?productTypeId=' + productTypeId + '&regionId=' + regionId +
+        '&page=' + page + '&amount=' + amount,
+        success: function (data) {
+            catalogProductsCache = data.content;
+            displayCatalogProducts();
+
+            updatePaginationWidget(page, data.totalPages);
+        },
+        error: function () {
+            console.error("Cannot load products");
+        }
+    });
+
+    if (callback != undefined) {
+        jqxhr.done(callback);
+    }
+}
+
+function updatePaginationWidget(currentPage, totalPages) {
+    console.log('updating pagination widget');
+    $pagination.twbsPagination('destroy');
+    $pagination.twbsPagination($.extend({}, defaultOpts, {
+        startPage: currentPage,
+        totalPages: totalPages
+    }));
+}
+
 function catalogCreateOrder() {
     $('#new-product-order-modal').modal('toggle');
     $('#new-product-order-modal-submit').addClass("disabled");
@@ -217,5 +244,74 @@ function catalogCreateOrder() {
     $('#catalog-price-field').val("")
 }
 
+function getProductById(id) {
+    $.ajax({
+        type: 'GET',
+        url: '/api/user/products/' + id,
+        success: function (data) {
+            console.log("result of GET request to server: " + JSON.stringify(data));
+            catalogProductsCache = [data];
+
+            displayCatalogProducts();
+            selectCatalogProduct(0);
+        },
+        error: function (data) {
+            console.log("Error occurred. Cannot GET specified resource");
+        }
+    });
+}
+
+function setupTypeahead() {
+    // Instantiate the Bloodhound suggestion engine
+    var catalogProducts = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        identify: function (obj) {return obj.name;},
+        remote: {
+            url: '/api/user/products/search',
+            prepare: function (query, settings) {
+                settings.url += '?query=' + query + '&productTypeId=' + currentProductTypeId +
+                '&regionId=' + localStorage.getItem("regionId");
+                return settings;
+            }
+        }
+    });
+
+    var $typeahead = $('.typeahead');
+    var $searchClear = $('#search-clear');
+
+// Instantiate the Typeahead UI
+    $typeahead.typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+    }, {
+        name: 'catalogProducts',
+        display: 'name',
+        source: catalogProducts
+    }).on('typeahead:selected', function (obj, datum) {
+        $searchClear.removeClass('hide');
+        getProductById(datum.id);
+    });
+
+    //setup search clear button
+    $searchClear.click(function () {
+        $typeahead.typeahead('val', '');
+        $(this).addClass('hide');
+
+        var currentPage = +$pagination.find('li.active > a').text();
+        currentPage = currentPage != 0 ? currentPage : startPage;
+        loadCatalogPageOfType({page: currentPage}, function () {
+            selectCatalogProduct(0);
+        });
+    });
+}
+
 $(document).on("account-loaded", loadDomainsData);
-$(document).on("region-changed", loadCatalogData);
+$(document).on("region-changed", function () {
+    $('#catalog-product-types-list li.active > a').click();
+});
+
+$(document).ready(function () {
+    setupTypeahead();
+});

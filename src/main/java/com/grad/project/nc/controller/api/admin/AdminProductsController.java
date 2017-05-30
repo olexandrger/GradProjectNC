@@ -3,6 +3,7 @@ package com.grad.project.nc.controller.api.admin;
 import com.grad.project.nc.controller.api.dto.FrontendProduct;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.service.product.ProductService;
+import com.grad.project.nc.support.validation.ProductValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,14 +18,18 @@ import java.util.Map;
 public class AdminProductsController {
 
     private final ProductService productService;
+    private final ProductValidator productValidator;
 
     @Autowired
-    public AdminProductsController(ProductService productService) {
+    public AdminProductsController(ProductService productService, ProductValidator productValidator) {
         this.productService = productService;
+        this.productValidator = productValidator;
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public Map<String, String> update(@RequestBody FrontendProduct frontendProduct) {
+        productValidator.validate(frontendProduct);
+
         Product product = frontendProduct.toModel();
         productService.update(product);
 
@@ -37,6 +42,8 @@ public class AdminProductsController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Map<String, String> add(@RequestBody FrontendProduct frontendProduct) {
+        productValidator.validate(frontendProduct);
+
         Product product = frontendProduct.toModel();
         productService.add(product);
 

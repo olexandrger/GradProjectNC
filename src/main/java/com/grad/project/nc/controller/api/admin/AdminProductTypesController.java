@@ -3,6 +3,7 @@ package com.grad.project.nc.controller.api.admin;
 import com.grad.project.nc.controller.api.dto.FrontendProductType;
 import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.service.product.type.ProductTypeService;
+import com.grad.project.nc.support.validation.ProductTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,14 +18,18 @@ import java.util.Map;
 public class AdminProductTypesController {
 
     private final ProductTypeService productTypeService;
+    private final ProductTypeValidator productTypeValidator;
 
     @Autowired
-    public AdminProductTypesController(ProductTypeService productTypeService) {
+    public AdminProductTypesController(ProductTypeService productTypeService, ProductTypeValidator productTypeValidator) {
         this.productTypeService = productTypeService;
+        this.productTypeValidator = productTypeValidator;
     }
 
     @RequestMapping(value = "/productTypes/add", method = RequestMethod.POST)
     public Map<String, String> addProductType(@RequestBody FrontendProductType frontendProductType) {
+        productTypeValidator.validate(frontendProductType);
+
         ProductType productType = frontendProductType.toModel();
         productTypeService.add(productType);
 
@@ -37,6 +42,8 @@ public class AdminProductTypesController {
 
     @RequestMapping(value = "/productTypes/update", method = RequestMethod.POST)
     public Map<String, String> updateProductType(@RequestBody FrontendProductType frontendProductType) {
+        productTypeValidator.validate(frontendProductType);
+
         ProductType productType = frontendProductType.toModel();
         productTypeService.update(productType);
 

@@ -1,25 +1,36 @@
+var productTypesCache;
+
 function loadCategories() {
     $.ajax({
         url: "/api/user/productTypes/active",
         success: function (data) {
             console.log("Product types loaded");
+            productTypesCache = data;
+            $pagination = $('#pagination');
+
             var productTypeList = $("#catalog-product-types-list");
 
-            data.forEach(function (productType, i) {
-
+            data.forEach(function (productType) {
                 var li = document.createElement("li");
-                li.setAttribute("id", "catalog-link-" + productType.productTypeId);
-
-                if (productType.productTypeId == decodeURIComponent(window.location.search.substr(1))) {
-                    li.className += "active";
-                }
 
                 var ref = document.createElement("a");
                 ref.appendChild(document.createTextNode(productType.productTypeName));
-                ref.href = "/catalog?" + productType.productTypeId;
+                ref.href = "#";
+                ref.onclick = function () {
+                    var $contentRow =  $('#content-row');
+                    $contentRow.addClass('hidden');
+                    $('#catalog-product-types-list li').removeClass('active');
+                    $(this).parent().addClass('active');
+
+                    loadCatalogPageOfType({productTypeId: productType.productTypeId}, function () {
+                        if (catalogProductsCache.length > 0) {
+                            selectCatalogProduct(0);
+                            $contentRow.removeClass('hidden');
+                        }
+                    });
+                };
 
                 li.appendChild(ref);
-
                 productTypeList.append(li);
             });
 
@@ -30,15 +41,6 @@ function loadCategories() {
     });
 }
 
-
 $(document).ready(function () {
-    $("#navbar-main-page").addClass("active");
-
     loadCategories();
 });
-
-//
-// $(document).on("create-order", function(event, product) {
-//     console.log("Selected product");
-//     console.log(product);
-// });

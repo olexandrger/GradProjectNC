@@ -20,11 +20,6 @@ function displayAuthenticatedNavigationBar(data) {
             var ref = document.createElement("a");
             ref.appendChild(document.createTextNode(item.name));
             ref.href = item.reference;
-            /*
-            ref.onclick = function () {
-                selectRegion(item);
-            };
-*/
             var li = document.createElement("li");
             li.appendChild(ref);
             list.append(li);
@@ -198,23 +193,15 @@ function selectRegion(region) {
     selectedRegion.append($("<span class='caret'></span>"));
     localStorage.setItem("regionId", region.regionId);
 
-    // console.log("region changed");
     $(document).trigger("region-changed");
 }
-
-
-// $(document).on("region-changed", function() {console.log("Same file works")});
 
 function loadNavbarRegions() {
     $.ajax({
         url: "/api/user/regions/all",
         success: function(data) {
-
             var list = $("#region-select").find("ul");
-
             data.forEach(function(item) {
-                // console.log(item + " loaded");
-
                 var ref = document.createElement("a");
                 ref.appendChild(document.createTextNode(item.regionName));
                 ref.onclick = function () {
@@ -227,12 +214,9 @@ function loadNavbarRegions() {
             });
 
             var lastChosenId = localStorage.getItem("regionId");
-
             var contains = false;
 
-            // console.log(lastChosenId);
             data.forEach(function(item) {
-                // console.log(item.regionId);
                if (item.regionId == lastChosenId) {
                    contains = true;
                    selectRegion(item);
@@ -250,8 +234,21 @@ function loadNavbarRegions() {
     });
 }
 
-
 $(document).ready(function () {
+    setNavigation();
     getAccountInformation();
     loadNavbarRegions();
 });
+
+function setNavigation() {
+    var path = window.location.pathname;
+    path = path.replace(/\/$/, "");
+    path = decodeURIComponent(path);
+
+    $("#navigation a").each(function () {
+        var href = $(this).attr('href');
+        if (path.substring(0, href.length) === href) {
+            $(this).closest('li').addClass('active');
+        }
+    });
+}

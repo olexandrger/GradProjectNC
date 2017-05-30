@@ -14,7 +14,9 @@ var defaultOpts = { //twbs pagination default options
     hideOnlyOnePage : true,
     onPageClick: function (event, page) {
         console.log('clicked page #' + page);
-        loadProductPage(page, amount);
+        loadProductPage(page, amount, function () {
+            selectProduct(productsCache.length - 1);
+        });
     }
 };
 var $pagination;
@@ -235,12 +237,11 @@ function saveSelectedProduct() {
                 });
             alert.insertAfter($("#new-product-alert-place"));
         },
-        error: function (data) {
+        error: function (jqXHR, textStatus, errorThrown) {
             $("#new-product-alert").remove();
-            console.error("Product update error! " + JSON.stringify(data));
             $('<div id="new-product-alert" class="alert alert-danger" role="alert">' +
                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                "Product changes failed</div>")
+                jqXHR.responseText + '</div>')
                 .delay(2000)
                 .fadeOut(function () {
                     $(this).remove();
@@ -305,23 +306,14 @@ function extractProductCharacteristicValues() {
         switch ($(this).find('input[name=data-type]').val()) {
             case 'NUMBER':
                 data = $(this).find('input[name=characteristic-value]').val();
-                if (data === '') {
-                    return;
-                }
                 value.numberValue = +data;
                 break;
             case 'DATE':
                 data = $(this).find('.date').data("DateTimePicker").date();
-                if (data == null) {
-                    return;
-                }
                 value.dateValue = data;
                 break;
             case 'STRING':
                 data = $(this).find('input[name=characteristic-value]').val();
-                if (data === '') {
-                    return;
-                }
                 value.stringValue = data;
                 break;
         }
@@ -534,7 +526,9 @@ function loadProductTypes() {
             productTypesCache = productTypes;
 
             $pagination = $('#pagination');
-            loadProductPage(startPage, amount);
+            loadProductPage(startPage, amount, function () {
+                selectProduct(productsCache.length - 1);
+            });
         },
         error: function () {
             console.error("Cannot load product types");
@@ -586,7 +580,6 @@ function setupTypeahead() {
         datumTokenizer:  Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         identify: function(obj) { return obj.name; },
-        prefetch: '/api/user/products/last?amount=' + prefetchAmount,
         remote: {
             wildcard: '%QUERY',
             url: '/api/user/products/search?query=%QUERY'
@@ -614,8 +607,14 @@ function setupTypeahead() {
     $searchClear.click(function () {
         $typeahead.typeahead('val', '');
         $(this).addClass('hide');
+        currentSelected = -1;
+        $("#products-editor").addClass("hidden");
+
         var currentPage = +$pagination.find('li.active > a').text();
-        loadProductPage(currentPage, amount);
+        currentPage = currentPage != 0 ? currentPage : startPage;
+        loadProductPage(currentPage, amount, function () {
+            selectProduct(productsCache.length - 1);
+        });
     });
 }
 
