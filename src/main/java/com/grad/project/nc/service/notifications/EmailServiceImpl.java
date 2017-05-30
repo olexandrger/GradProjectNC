@@ -81,6 +81,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendNewComplaintEmail(Complain complain) {
         User user = complain.getUser();
         log.info("Sending new complain email to {}", user.getUsername());
@@ -88,6 +89,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendComplaintUnderConsiderationChangedEmail(Complain complain) {
         User user = complain.getUser();
         log.info("Sending complain under considerations email to {}", user.getUsername());
@@ -95,6 +97,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendComplaintCompleteEmail(Complain complain) {
         User user = complain.getUser();
         log.info("Sending complain complete email to {}", user.getUsername());
