@@ -117,7 +117,9 @@ function addProductCharacteristic(id, name, measure, dataTypeId) {
     $("#characteristic-box").append(element);
 
     if (dataTypeId != undefined) {
-        element.find('select[name="characteristic-dataTypeId"]').val(dataTypeId);
+        $dataTypeSelector = element.find('select[name="characteristic-dataTypeId"]');
+        $dataTypeSelector.val(dataTypeId);
+        $dataTypeSelector.prop("disabled", true);
     }
 }
 
@@ -219,6 +221,9 @@ function saveSelectedProductType() {
 
                     $("#product-types-list").find("a:nth-child(" + (productTypesCache.length - currentSelected) + ")")
                         .html(data.productTypeName);
+                    $('.product-characteristic-input select[name="characteristic-dataTypeId"]')
+                        .prop("disabled", true);
+
                     productTypesCache[currentSelected] = data;
                 },
                 error: function (data) {
