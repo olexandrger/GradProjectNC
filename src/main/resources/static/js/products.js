@@ -314,7 +314,7 @@ function extractProductCharacteristicValues() {
                 break;
             case 'STRING':
                 data = $($valueInputs[i]).find('input[name=characteristic-value]').val();
-                if (data.length == 0) {
+                if (data.trim().length == 0) {
                     showValueDangerAlert("'" + characteristicName + "' cannot be empty");
                     return null;
                 }
