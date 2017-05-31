@@ -44,9 +44,9 @@ public class ProductTypesController {
                 .collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/productTypes/active", method = RequestMethod.GET)
-    public List<FrontendProductType> getActiveProductTypes() {
-        return productTypeService.findActive()
+    @RequestMapping(value = "/productTypes", params = {"active", "regionId"}, method = RequestMethod.GET)
+    public List<FrontendProductType> getCatalogProductTypes(@RequestParam("regionId") Long regionId) {
+        return productTypeService.findValuableAndActiveByRegionId(regionId)
                 .stream()
                 .map(FrontendProductType::fromEntity)
                 .collect(Collectors.toList());

@@ -309,7 +309,9 @@ function setupTypeahead() {
 
 $(document).on("account-loaded", loadDomainsData);
 $(document).on("region-changed", function () {
-    $('#catalog-product-types-list li.active > a').click();
+    $("#catalog-product-types-list").empty();
+    $('#content-row, #pagination-row').addClass('hidden');
+    loadCategories();
 });
 
 $(document).ready(function () {

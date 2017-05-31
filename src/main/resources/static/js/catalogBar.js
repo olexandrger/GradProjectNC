@@ -2,13 +2,14 @@ var productTypesCache;
 
 function loadCategories() {
     $.ajax({
-        url: "/api/user/productTypes/active",
+        url: "/api/user/productTypes?active&regionId=" + localStorage.getItem("regionId"),
         success: function (data) {
-            console.log("Product types loaded");
             productTypesCache = data;
-            $pagination = $('#pagination');
+            var $productTypeList = $("#catalog-product-types-list");
 
-            var productTypeList = $("#catalog-product-types-list");
+            if (productTypesCache.length == 0) {
+                $productTypeList.append($('<h3>There are no available services for specified region</h3>'));
+            }
 
             data.forEach(function (productType) {
                 var li = document.createElement("li");
@@ -17,23 +18,22 @@ function loadCategories() {
                 ref.appendChild(document.createTextNode(productType.productTypeName));
                 ref.href = "#";
                 ref.onclick = function () {
-                    var $contentRow =  $('#content-row');
-                    $contentRow.addClass('hidden');
-                    $('#catalog-product-types-list li').removeClass('active');
+                    var $contentAndPaginationRow =  $('#content-row, #pagination-row');
+                    $contentAndPaginationRow.addClass('hidden');
+                    $productTypeList.find('li').removeClass('active');
                     $(this).parent().addClass('active');
 
                     loadCatalogPageOfType({productTypeId: productType.productTypeId}, function () {
                         if (catalogProductsCache.length > 0) {
                             selectCatalogProduct(0);
-                            $contentRow.removeClass('hidden');
+                            $contentAndPaginationRow.removeClass('hidden');
                         }
                     });
                 };
 
                 li.appendChild(ref);
-                productTypeList.append(li);
+                $productTypeList.append(li);
             });
-
         },
         error: function () {
             console.error("Cannot load product types");
@@ -42,5 +42,6 @@ function loadCategories() {
 }
 
 $(document).ready(function () {
+    $pagination = $('#pagination');
     loadCategories();
 });

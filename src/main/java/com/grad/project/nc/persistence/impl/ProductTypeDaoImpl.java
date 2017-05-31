@@ -103,11 +103,16 @@ public class ProductTypeDaoImpl extends AbstractDao implements ProductTypeDao {
     }
 
     @Override
-    public List<ProductType> findByActiveStatus(boolean isActive) {
-        String findQuery = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
-                "\"is_active\" FROM \"product_type\" WHERE \"is_active\" = ?";
+    public List<ProductType> findValuableAndActiveByRegionId(Long regionId) {
+        String findQuery = "SELECT DISTINCT pt.\"product_type_id\", pt.\"product_type_name\", " +
+                "pt.\"product_type_description\", pt.\"is_active\" " +
+                "FROM \"product_type\" pt " +
+                "JOIN \"product\" p ON pt.\"product_type_id\" = p.\"product_type_id\" " +
+                "JOIN \"product_region_price\" prp ON prp.\"product_id\" = p.\"product_id\" AND prp.\"region_id\" = ? " +
+                "WHERE pt.\"is_active\" = true " +
+                "ORDER BY pt.\"product_type_id\" DESC";
 
-        return findMultiple(findQuery, new ProductTypeRowMapper(), isActive);
+        return findMultiple(findQuery, new ProductTypeRowMapper(), regionId);
     }
 
     @Override

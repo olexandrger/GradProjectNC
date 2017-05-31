@@ -1,7 +1,6 @@
 package com.grad.project.nc.service.product.type;
 
 import com.grad.project.nc.model.Category;
-import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.persistence.CategoryDao;
@@ -36,8 +35,8 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
 
     @Override
     @Transactional
-    public List<ProductType> findActive() {
-        List<ProductType> productTypes = productTypeDao.findByActiveStatus(true);
+    public List<ProductType> findValuableAndActiveByRegionId(Long regionId) {
+        List<ProductType> productTypes = productTypeDao.findValuableAndActiveByRegionId(regionId);
         productTypes.forEach(pt -> pt.getProductCharacteristics().forEach(ProductCharacteristic::getDataType));
         return productTypes;
     }
