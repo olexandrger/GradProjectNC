@@ -1,0 +1,28 @@
+body {
+    background-color: #2D72D9;
+    color: #fff;
+}
+
+.col-sm-6 {
+    float: none;
+    margin: 0 auto;
+}
+
+.error-container h1 {
+    font-size: 220px;
+
+}
+
+.error-container p {
+    font-size: 18px;
+    text-align: center;
+}
+
+a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #0200a7;
+}
