@@ -103,6 +103,14 @@ public class ProductTypeDaoImpl extends AbstractDao implements ProductTypeDao {
     }
 
     @Override
+    public ProductType findByName(String productTypeName) {
+        String query = "SELECT \"product_type_id\", \"product_type_name\", \"product_type_description\", " +
+                "\"is_active\" FROM \"product_type\" WHERE \"product_type_name\" = ?";
+
+        return findOne(query, new ProductTypeRowMapper(), productTypeName);
+    }
+
+    @Override
     public List<ProductType> findValuableAndActiveByRegionId(Long regionId) {
         String findQuery = "SELECT DISTINCT pt.\"product_type_id\", pt.\"product_type_name\", " +
                 "pt.\"product_type_description\", pt.\"is_active\" " +
