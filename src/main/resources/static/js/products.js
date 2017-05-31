@@ -204,6 +204,7 @@ function saveSelectedProduct() {
 
                     $("#products-list").find("a:nth-child(" + (productsCache.length - currentSelected) + ")")
                         .html(data.productName);
+                    $("#product-type-selector").prop('disabled', true);
                     productsCache[currentSelected] = data;
                 },
                 error: function (data) {
