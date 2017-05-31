@@ -29,7 +29,7 @@
 
     <div class="row">
         <div class="col-sm-10 col-sm-offset-1">
-            <div id="new-product-type-alert-place">
+            <div id="product-type-alert-place">
             </div>
         </div>
     </div>
@@ -53,7 +53,7 @@
         <div class="col-sm-7 hidden" id="product-type-editor">
 
             <div class="row">
-                <div class="col-sm-12" id="product-type-values">
+                <div class="col-sm-12">
                     <div class="form-group">
                         <label for="product-type-name">Name</label>
                         <input type="text" class="form-control" name="product-type-name" placeholder="Name"
