@@ -194,54 +194,58 @@ function saveSelectedProductType() {
 
     console.log("Object to be sent from client: " + JSON.stringify(newProductType));
 
+    var type = 'POST';
+    var url = '/api/admin/productTypes';
+    if (newProductType.productTypeId != null) {
+        type = 'PUT';
+        url += '/' + newProductType.productTypeId;
+    }
+
     $.ajax({
-        type: 'POST',
-        url: '/api/admin/productTypes/' + (newProductType.productTypeId == null ? 'add' : 'update'),
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-        },
+        type: type,
+        url: url,
+        headers: {'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")},
         processData: false,
         contentType: 'application/json',
-        data: JSON.stringify(newProductType),
-        success: function (data) {
-            $("#new-product-type-alert").remove();
-            $constructAlertDiv('new-product-type-alert', data.message)
-                .addClass('alert-success')
-                .delay(3000)
-                .fadeOut(function () {
-                    $(this).remove();
-                })
-                .appendTo($('#product-type-alert-place'));
+        data: JSON.stringify(newProductType)
+    }).done(function (data, textStatus, jqXHR) {
+        if (jqXHR.status === 200) {
+            displayMessage('Product type was successfully updated', 'alert-success');
+
+            $("#product-types-list").find("a:nth-child(" + (productTypesCache.length - currentSelected) + ")")
+                .html(data.productTypeName);
+            productTypesCache[currentSelected] = data;
+        }
+    }).done(function (data, textStatus, jqXHR) {
+        if (jqXHR.status === 201) {
+            displayMessage('Product type was successfully added', 'alert-success');
 
             $.ajax({
                 type: 'GET',
-                url: '/api/user/productTypes/' + data.id,
-                success: function (data) {
-                    console.log("result of GET request to server: " + JSON.stringify(data));
-
-                    $("#product-types-list").find("a:nth-child(" + (productTypesCache.length - currentSelected) + ")")
-                        .html(data.productTypeName);
-                    $('.product-characteristic-input select[name="characteristic-dataTypeId"]')
-                        .prop("disabled", true);
-
-                    productTypesCache[currentSelected] = data;
-                },
-                error: function (data) {
-                    console.log("Get request failed. Returned data: " + data)
-                }
+                url: jqXHR.getResponseHeader('Location')
+            }).done(function (data, textStatus, jqXHR) {
+                $("#product-types-list").find("a:nth-child(" + (productTypesCache.length - currentSelected) + ")")
+                    .html(data.productTypeName);
+                $('.product-characteristic-input select[name="characteristic-dataTypeId"]')
+                    .prop("disabled", true);
+                productTypesCache[currentSelected] = data;
             });
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            $("#new-product-type-alert").remove();
-            $constructAlertDiv('#new-product-type-alert', jqXHR.responseText)
-                .addClass('alert-danger')
-                .delay(3000)
-                .fadeOut(function () {
-                    $(this).remove();
-                })
-                .appendTo($("#product-type-alert-place"));
         }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
+        displayMessage(jqXHR.responseText, 'alert-danger');
     });
+
+    function displayMessage(message, alertClass) {
+        $('#new-product-type-alert').remove();
+        $constructAlertDiv('new-product-type-alert', message)
+            .addClass(alertClass)
+            .delay(3000)
+            .fadeOut(function () {
+                $(this).remove();
+            })
+            .appendTo($('#product-type-alert-place'));
+    }
 }
 
 function selectItem(index) {
@@ -294,7 +298,7 @@ function displayLoadedProductTypes() {
 function loadProductTypePage(page, amount, callback) {
     console.log("loading product types page #" + page);
     var jqxhr = $.ajax({
-        url: '/api/user/productTypes?page=' + page + '&amount=' + amount,
+        url: '/api/admin/productTypes?page=' + page + '&amount=' + amount,
         success: function (data) {
             productTypesCache = data.content;
             displayLoadedProductTypes();
@@ -331,7 +335,7 @@ function createDataTypesHTML(dataTypes) {
 
 function loadDataTypes() {
     $.ajax({
-        url: "/api/user/dataTypes",
+        url: "/api/admin/dataTypes",
         success: function (data) {
             console.log('data types are loaded');
             dataTypesHTML = createDataTypesHTML(data);
@@ -350,7 +354,7 @@ function loadDataTypes() {
 function getProductTypeById(id) {
     $.ajax({
         type: 'GET',
-        url: '/api/user/productTypes/' + id,
+        url: '/api/admin/productTypes/' + id,
         success: function (data) {
             console.log("result of GET request to server: " + JSON.stringify(data));
             productTypesCache = [data];
@@ -372,7 +376,7 @@ function setupTypeahead() {
         identify: function(obj) { return obj.name; },
         remote: {
             wildcard: '%QUERY',
-            url: '/api/user/productTypes/search?query=%QUERY'
+            url: '/api/admin/productTypes/search?query=%QUERY'
         }
     });
 

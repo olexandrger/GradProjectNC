@@ -177,52 +177,58 @@ function saveSelectedProduct() {
 
     console.log("Object to be sent from client: " + JSON.stringify(newProduct));
 
+    var type = 'POST';
+    var url = '/api/admin/products';
+    if (newProduct.productId != null) {
+        type = 'PUT';
+        url += '/' + newProduct.productId;
+    }
+
     $.ajax({
-        type: 'POST',
-        url: '/api/admin/products/' + (newProduct.productId == null ? "add" : "update"),
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")
-        },
+        type: type,
+        url: url,
+        headers: {'X-CSRF-TOKEN': $('meta[name=_csrf]').attr("content")},
         processData: false,
         contentType: 'application/json',
-        data: JSON.stringify(newProduct),
-        success: function (data) {
-            $('#new-product-alert').remove();
-            $constructAlertDiv('new-product-alert', data.message)
-                .addClass('alert-success')
-                .delay(3000)
-                .fadeOut(function () {
-                    $(this).remove();
-                })
-                .appendTo($('#product-alert-place'));
+        data: JSON.stringify(newProduct)
+    }).done(function (data, textStatus, jqXHR) {
+        if (jqXHR.status === 200) {
+            displayMessage('Product was successfully updated', 'alert-success');
+
+            $("#products-list").find("a:nth-child(" + (productsCache.length - currentSelected) + ")")
+                .html(data.productName);
+            productsCache[currentSelected] = data;
+        }
+    }).done(function (data, textStatus, jqXHR) {
+        if (jqXHR.status === 201) {
+            displayMessage('Product was successfully added', 'alert-success');
 
             $.ajax({
                 type: 'GET',
-                url: '/api/user/products/get/' + data.id,
-                success: function (data) {
-                    console.log("result of GET request to server: " + JSON.stringify(data));
-
-                    $("#products-list").find("a:nth-child(" + (productsCache.length - currentSelected) + ")")
-                        .html(data.productName);
-                    $("#product-type-selector").prop('disabled', true);
-                    productsCache[currentSelected] = data;
-                },
-                error: function (data) {
-                    console.log("Update after saving errored: " + data)
-                }
+                url: jqXHR.getResponseHeader('Location')
+            }).done(function (data, textStatus, jqXHR) {
+                $("#products-list").find("a:nth-child(" + (productsCache.length - currentSelected) + ")")
+                    .html(data.productName);
+                $("#product-type-selector").prop('disabled', true);
+                productsCache[currentSelected] = data;
             });
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            $("#new-product-alert").remove();
-            $constructAlertDiv('new-product-alert', jqXHR.responseText)
-                .addClass('alert-danger')
-                .delay(3000)
-                .fadeOut(function () {
-                    $(this).remove();
-                })
-                .appendTo($("#product-alert-place"));
         }
-    });
+    }).fail(
+        function (jqXHR, textStatus, errorThrown) {
+            displayMessage(jqXHR.responseText, 'alert-danger');
+        }
+    );
+
+    function displayMessage(message, alertClass) {
+        $('#new-product-alert').remove();
+        $constructAlertDiv('new-product-alert', message)
+            .addClass(alertClass)
+            .delay(3000)
+            .fadeOut(function () {
+                $(this).remove();
+            })
+            .appendTo($('#product-alert-place'));
+    }
 }
 
 function $constructAlertDiv(divId, message) {
@@ -489,7 +495,7 @@ function displayLoadedProducts() {
 function loadProductPage(page, amount, callback) {
     console.log("loading products of page #" + page);
     var jqxhr = $.ajax({
-        url: '/api/user/products?page=' + page + '&amount=' + amount,
+        url: '/api/admin/products?page=' + page + '&amount=' + amount,
         success: function (data) {
             productsCache = data.content;
             displayLoadedProducts();
@@ -517,7 +523,7 @@ function updatePaginationWidget(currentPage, totalPages) {
 
 function loadProductTypes() {
     $.ajax({
-        url: "/api/user/productTypes/all",
+        url: "/api/admin/productTypes",
         success: function (productTypes) {
             var productTypeSelector = $("#product-type-selector");
 
@@ -564,7 +570,7 @@ function loadRegions() {
 function getProductById(id) {
     $.ajax({
         type: 'GET',
-        url: '/api/user/products/get/' + id,
+        url: '/api/admin/products/' + id,
         success: function (data) {
             console.log("result of GET request to server: " + JSON.stringify(data));
             productsCache = [data];
@@ -586,7 +592,7 @@ function setupTypeahead() {
         identify: function(obj) { return obj.name; },
         remote: {
             wildcard: '%QUERY',
-            url: '/api/user/products/search?query=%QUERY'
+            url: '/api/admin/products/search?query=%QUERY'
         }
     });
 
