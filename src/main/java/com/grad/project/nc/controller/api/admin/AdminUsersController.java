@@ -47,7 +47,6 @@ public class AdminUsersController {
     public RegistrationResponseHolder add(@RequestBody FrontUser frontUser) {
         User user = mapFrontUserToUser(frontUser);
         RegistrationResponseHolder registrationResponse = new RegistrationResponseHolder();
-        log.info("Registering " + frontUser.getRoles().toString());
 
         try {
             registrationService.validation(user);
@@ -66,7 +65,6 @@ public class AdminUsersController {
     public RegistrationResponseHolder update(@RequestBody FrontUser frontUser) {
         User user = mapFrontUserToUser(frontUser);
         RegistrationResponseHolder updateResponse = new RegistrationResponseHolder();
-        log.info("Updating by admin " + frontUser.getFirstName());
 
         if (!userService.update(user)){
             updateResponse.setMessage(userService.getMessageError());
@@ -84,7 +82,6 @@ public class AdminUsersController {
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     @ResponseBody
     public FrontUser get(@RequestParam("name") String name) {
-        log.info( "Found:" + name  );
         FrontUser frontUser = mapUserToFrontUser(userService.findByEMail(name));
 
         return frontUser;
