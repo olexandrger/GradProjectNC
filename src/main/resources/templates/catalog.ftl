@@ -68,7 +68,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div id="pagination-row" class="row hidden">
         <div class="col-sm-12">
             <div class="text-center">
                 <ul id="pagination" class="pagination-xs"></ul>

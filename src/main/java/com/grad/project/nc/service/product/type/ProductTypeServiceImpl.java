@@ -1,7 +1,6 @@
 package com.grad.project.nc.service.product.type;
 
 import com.grad.project.nc.model.Category;
-import com.grad.project.nc.model.Product;
 import com.grad.project.nc.model.ProductCharacteristic;
 import com.grad.project.nc.model.ProductType;
 import com.grad.project.nc.persistence.CategoryDao;
@@ -9,6 +8,7 @@ import com.grad.project.nc.persistence.CrudDao;
 import com.grad.project.nc.persistence.ProductCharacteristicDao;
 import com.grad.project.nc.persistence.ProductTypeDao;
 import com.grad.project.nc.service.AbstractService;
+import com.grad.project.nc.service.exceptions.BusinessConstraintException;
 import com.grad.project.nc.support.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ProductTypeServiceImpl extends AbstractService<ProductType> implements ProductTypeService {
 
     private static final String DATA_TYPE_CATEGORY_TYPE_NAME = "DATA_TYPE";
+    private static final String DUPLICATE_NAME_MES = "Product type with such name already exists";
 
     private final CategoryDao categoryDao;
     private final ProductTypeDao productTypeDao;
@@ -36,8 +37,8 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
 
     @Override
     @Transactional
-    public List<ProductType> findActive() {
-        List<ProductType> productTypes = productTypeDao.findByActiveStatus(true);
+    public List<ProductType> findValuableAndActiveByRegionId(Long regionId) {
+        List<ProductType> productTypes = productTypeDao.findValuableAndActiveByRegionId(regionId);
         productTypes.forEach(pt -> pt.getProductCharacteristics().forEach(ProductCharacteristic::getDataType));
         return productTypes;
     }
@@ -71,6 +72,8 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
     @Override
     @Transactional
     public ProductType add(ProductType productType) {
+        checkConstraintsBeforeAdding(productType);
+
         productTypeDao.add(productType);
 
         productType.getProductCharacteristics()
@@ -84,6 +87,8 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
     @Override
     @Transactional
     public ProductType update(ProductType productType) {
+        checkConstraintsBeforeUpdating(productType);
+
         productTypeDao.update(productType);
 
         List<ProductCharacteristic> characteristicsToBeDeleted = productCharacteristicDao
@@ -129,5 +134,19 @@ public class ProductTypeServiceImpl extends AbstractService<ProductType> impleme
     @Override
     public CrudDao<ProductType> getBackingDao() {
         return productTypeDao;
+    }
+
+    private void checkConstraintsBeforeAdding(ProductType productType) {
+        if (productTypeDao.findByName(productType.getProductTypeName()) != null) {
+            throw new BusinessConstraintException(DUPLICATE_NAME_MES);
+        }
+    }
+
+    private void checkConstraintsBeforeUpdating(ProductType productType) {
+        ProductType selectedProductType = productTypeDao.findByName(productType.getProductTypeName());
+        if (selectedProductType != null
+                && !selectedProductType.getProductTypeId().equals(productType.getProductTypeId())) {
+            throw new BusinessConstraintException(DUPLICATE_NAME_MES);
+        }
     }
 }

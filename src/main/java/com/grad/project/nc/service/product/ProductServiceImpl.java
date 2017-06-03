@@ -5,6 +5,7 @@ import com.grad.project.nc.model.ProductCharacteristicValue;
 import com.grad.project.nc.model.ProductRegionPrice;
 import com.grad.project.nc.persistence.*;
 import com.grad.project.nc.service.AbstractService;
+import com.grad.project.nc.service.exceptions.BusinessConstraintException;
 import com.grad.project.nc.support.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl extends AbstractService<Product> implements ProductService {
+
+    private static final String DUPLICATE_NAME_MES = "Product with such name already exists";
 
     private final ProductDao productDao;
     private final ProductRegionPriceDao productRegionPriceDao;
@@ -95,6 +98,8 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
     @Override
     @Transactional
     public Product add(Product product) {
+        checkConstraintsBeforeAdding(product);
+
         productDao.add(product);
 
         product.getPrices()
@@ -113,6 +118,8 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
     @Override
     @Transactional
     public Product update(Product product) {
+        checkConstraintsBeforeUpdating(product);
+
         productDao.update(product);
 
         updateProductCharacteristicValues(product);
@@ -216,7 +223,6 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
     private void loadProductHelper(Product product) {
         product.getProductType();
         product.getProductCharacteristicValues();
-        product.getProductCharacteristics();
         product.getPrices();
     }
 
@@ -224,8 +230,20 @@ public class ProductServiceImpl extends AbstractService<Product> implements Prod
         products.forEach(p -> {
             p.getProductType();
             p.getProductCharacteristicValues();
-            p.getProductCharacteristics();
             p.getPrices();
         });
+    }
+
+    private void checkConstraintsBeforeAdding(Product product) {
+        if (productDao.findByName(product.getProductName()) != null) {
+            throw new BusinessConstraintException(DUPLICATE_NAME_MES);
+        }
+    }
+
+    private void checkConstraintsBeforeUpdating(Product product) {
+        Product selectedProduct = productDao.findByName(product.getProductName());
+        if (selectedProduct != null && !selectedProduct.getProductId().equals(product.getProductId())) {
+            throw new BusinessConstraintException(DUPLICATE_NAME_MES);
+        }
     }
 }

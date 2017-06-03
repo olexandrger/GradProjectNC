@@ -1,17 +1,19 @@
 package com.grad.project.nc.controller.api.admin;
 
 import com.grad.project.nc.controller.api.dto.FrontendProduct;
+import com.grad.project.nc.controller.api.dto.TypeaheadItem;
 import com.grad.project.nc.model.Product;
 import com.grad.project.nc.service.product.ProductService;
+import com.grad.project.nc.support.pagination.Page;
 import com.grad.project.nc.support.validation.ProductValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -26,31 +28,53 @@ public class AdminProductsController {
         this.productValidator = productValidator;
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public Map<String, String> update(@RequestBody FrontendProduct frontendProduct) {
+    @RequestMapping(value = "/{productId}", method = RequestMethod.PUT)
+    public ResponseEntity<FrontendProduct> update(@RequestBody FrontendProduct frontendProduct) {
         productValidator.validate(frontendProduct);
 
         Product product = frontendProduct.toModel();
         productService.update(product);
 
-        return new HashMap<String, String>() {{
-            put("status", "success");
-            put("message", "Product was successfully updated");
-            put("id", product.getProductId().toString());
-        }};
+        FrontendProduct updatedProduct = FrontendProduct.fromEntity(productService.find(product.getProductId()));
+        return ResponseEntity.ok(updatedProduct);
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Map<String, String> add(@RequestBody FrontendProduct frontendProduct) {
+    @PostMapping
+    public ResponseEntity<?> add(@RequestBody FrontendProduct frontendProduct) {
         productValidator.validate(frontendProduct);
 
-        Product product = frontendProduct.toModel();
-        productService.add(product);
+        Product result = productService.add(frontendProduct.toModel());
 
-        return new HashMap<String, String>() {{
-            put("status", "success");
-            put("message", "Product was successfully added");
-            put("id", product.getProductId().toString());
-        }};
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().path("/{id}")
+                .buildAndExpand(result.getProductId()).toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
+    @RequestMapping(value = "/{productId}", method = RequestMethod.GET)
+    public FrontendProduct getById(@PathVariable("productId") Long productId) {
+        return FrontendProduct.fromEntity(productService.find(productId));
+    }
+
+    @RequestMapping(params = { "page", "amount" }, method = RequestMethod.GET)
+    public Page<FrontendProduct> getPaginated(@RequestParam("page") int page, @RequestParam("amount") int amount) {
+        Page<Product> productPage = productService.findPaginated(page, amount);
+
+        List<FrontendProduct> content = productPage.getContent()
+                .stream()
+                .map(FrontendProduct::fromEntity)
+                .collect(Collectors.toList());
+
+
+        return new Page<>(content, productPage.getTotalPages());
+    }
+
+    @RequestMapping(value = "/search", params = {"query"}, method = RequestMethod.GET)
+    public List<TypeaheadItem> fetchProductTypeaheadItemsByQuery(@RequestParam("query") String query) {
+        return productService.findByNameContaining(query)
+                .stream()
+                .map(product -> new TypeaheadItem(product.getProductId(), product.getProductName()))
+                .collect(Collectors.toList());
     }
 }

@@ -139,21 +139,20 @@ function loadDomainsData() {
 }
 
 function catalogChangeDomain(domainId) {
-     var price = getRegionalPrice(catalogDomains[domainId].address.location.region.regionId);
+    var price = getRegionalPrice(catalogDomains[domainId].address.location.region.regionId);
 
-    if (price == null) {
-        price = "Product unavailable in this region";
-        $('#catalog-price-field').val(price);
-        $('#new-product-order-modal-submit').addClass("disabled");
-    } else {
-        $('#new-product-order-modal-submit').removeClass("disabled");
-        $('#catalog-price-field').val(price);
+    if (price === undefined) {
+        $('#catalog-price-field').val("Product unavailable in domain`s region");
+        $('#new-product-order-modal-submit').addClass("disabled").attr("disabled", true);
+        return;
     }
 
+    $('#new-product-order-modal-submit').removeClass("disabled").attr("disabled", false);
     $('#catalog-price-field').val(calculateFinalPrice(price));
 }
 
 function catalogSubmitOrder() {
+    console.log('triggerred');
     var selectedDomainIndex = document.getElementById("catalog-domain-selector").value;
     $.ajax({
         url: "/api/client/orders/new/create",
@@ -309,7 +308,9 @@ function setupTypeahead() {
 
 $(document).on("account-loaded", loadDomainsData);
 $(document).on("region-changed", function () {
-    $('#catalog-product-types-list li.active > a').click();
+    $("#catalog-product-types-list").empty();
+    $('#content-row, #pagination-row').addClass('hidden');
+    loadCategories();
 });
 
 $(document).ready(function () {
